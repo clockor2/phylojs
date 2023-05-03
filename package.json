@@ -19,13 +19,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ryansonshine/typescript-npm-package-template.git"
+    "url": "git+https://github.com/clockor2/phylo.ts.git"
   },
   "license": "MIT",
   "author": {
-    "name": "Wytamma Wirth",
-    "email": "ryansonshine@users.noreply.github.com",
-    "url": "https://github.com/ryansonshine"
+    "name": "Leo Featherstone & Wytamma Wirth",
+    "email": "clockor2@users.noreply.github.com",
+    "url": "https://github.com/clockor2"
   },
   "engines": {
     "node": ">=12.0"
@@ -42,9 +42,9 @@
     "codecov"
   ],
   "bugs": {
-    "url": "https://github.com/ryansonshine/typescript-npm-package-template/issues"
+    "url": "https://github.com/clockor2/phylo.ts/issues"
   },
-  "homepage": "https://github.com/ryansonshine/typescript-npm-package-template#readme",
+  "homepage": "https://github.com/clockor2/phylo.ts#readme",
   "devDependencies": {
     "@ryansonshine/commitizen": "^4.2.8",
     "@ryansonshine/cz-conventional-changelog": "^3.3.4",
