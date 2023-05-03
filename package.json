@@ -1,7 +1,7 @@
 {
-  "name": "typescript-npm-package-template",
+  "name": "phylo.ts",
   "version": "0.0.0-development",
-  "description": "A template for creating npm packages using TypeScript and VSCode",
+  "description": "A simple typescript library for phylogenetic trees",
   "main": "./lib/index.js",
   "files": [
     "lib/**/*"
@@ -31,15 +31,11 @@
     "node": ">=12.0"
   },
   "keywords": [
-    "boilerplate",
-    "template",
+    "phylogenetics",
+    "tree",
     "typescript",
-    "vscode",
-    "jest",
-    "husky",
-    "commitizen",
-    "semantic-release",
-    "codecov"
+    "javascript",
+    "library"
   ],
   "bugs": {
     "url": "https://github.com/clockor2/phylo.ts/issues"
