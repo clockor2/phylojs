@@ -1,5 +1,4 @@
 // Node constructor
-
 export class Node {
   id: number;
   parent: Node | undefined;
@@ -7,7 +6,7 @@ export class Node {
   height: number | undefined;
   branchLength: number | undefined;
   label: string | undefined;
-  annotation: { [key: string]: any };
+  annotation: { [key: string]: string };
   hybridID: number | undefined;
   collapsed: boolean | undefined;
   cartoon: boolean | undefined;
@@ -28,7 +27,7 @@ export class Node {
 
   // Ensure nodes with unique IDs have unique hashes.
   toString(): string {
-    return `node# + ${this.id}`;
+    return `node#${this.id}`;
   }
 
   addChild(child: Node): void {
@@ -39,6 +38,7 @@ export class Node {
   removeChild(child: Node): void {
     const idx = this.children.indexOf(child);
     this.children.splice(idx, 1);
+    child.parent = undefined; // Set parent of the removed child to undefined
   }
 
   isRoot(): boolean {
