@@ -41,9 +41,12 @@ export const Write: Write = (function () {
 
           if (idx > 0) res += ',';
           res += `"${key}"=`;
-          if (node.annotation[key] instanceof Array)
-            res += `{${String(node.annotation[key])}}`;
-          else res += `"${node.annotation[key]}"`;
+          const value = node.annotation[key];
+          if (Array.isArray(value)) {
+            res += `{${String(value.join(','))}}`; // Convert the array to a comma-separated string
+          } else {
+            res += `"${String(value)}"`; // Explicitly convert the value to a string
+          }
         }
         res += ']';
       }

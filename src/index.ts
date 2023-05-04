@@ -1,3 +1,3 @@
 export { Node } from './Node';
 export { Tree } from './Tree';
-export { Write } from './Write';
+export { Write } from './write';

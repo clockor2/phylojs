@@ -6,7 +6,7 @@ export class Node {
   height: number | undefined;
   branchLength: number | undefined;
   label: string | undefined;
-  annotation: { [key: string]: string };
+  annotation: { [key: string]: string | string[] };
   hybridID: number | undefined;
   collapsed: boolean | undefined;
   cartoon: boolean | undefined;
