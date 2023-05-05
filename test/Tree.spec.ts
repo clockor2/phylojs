@@ -1,7 +1,7 @@
 // phyloWriter.test.ts
 import { Node } from '../src/Node';
 import { Tree } from '../src/Tree';
-import { Write } from '../src/write';
+import { Write } from '../src/Write';
 
 describe('PhyloWriter', () => {
   const rootNode = new Node(0);
@@ -24,15 +24,22 @@ describe('PhyloWriter', () => {
   rootNode.addChild(childNode2);
   const tree = new Tree(rootNode);
 
-  test('newickWriter', () => {
+  test('reroot', () => {
+    expect(
+      tree
+        .getNodeList()
+        .map(n => n.label)
+        .filter(n => n !== undefined)
+    ).toStrictEqual(['A', 'B', 'C']);
+    tree.reroot(childNode4);
     const newick = Write.newick(tree);
-    expect(newick).toBe('("A":1,("B":1,"C":1):1):0.0;');
-  });
-
-  test('nexusWriter', () => {
-    const nexus = Write.nexus(tree);
-    expect(nexus).toBe(
-      '#NEXUS\n\nbegin trees;\n\ttree tree_1 = [&R] ("A":1,("B":1,"C":1):1):0.0;\nend;'
-    );
+    expect(newick).toBe('("C":0.5,("B":1,"A":2):0.5):0.0;');
+    expect(tree.root.children.length).toBe(2);
+    expect(
+      tree
+        .getNodeList()
+        .map(n => n.label)
+        .filter(n => n !== undefined)
+    ).toStrictEqual(['C', 'B', 'A']);
   });
 });
