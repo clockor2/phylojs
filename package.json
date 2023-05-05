@@ -1,5 +1,5 @@
 {
-  "name": "phylo.ts",
+  "name": "phylojs",
   "version": "0.0.0-development",
   "description": "A simple typescript library for phylogenetic trees",
   "main": "./lib/index.js",
@@ -19,7 +19,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/clockor2/phylo.ts.git"
+    "url": "git+https://github.com/clockor2/phylojs.git"
   },
   "license": "MIT",
   "author": {
@@ -38,9 +38,9 @@
     "library"
   ],
   "bugs": {
-    "url": "https://github.com/clockor2/phylo.ts/issues"
+    "url": "https://github.com/clockor2/phylojs/issues"
   },
-  "homepage": "https://github.com/clockor2/phylo.ts#readme",
+  "homepage": "https://github.com/clockor2/phylojs#readme",
   "devDependencies": {
     "@ryansonshine/commitizen": "^4.2.8",
     "@ryansonshine/cz-conventional-changelog": "^3.3.4",
