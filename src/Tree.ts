@@ -3,7 +3,7 @@ import { Node } from './Node';
 
 export class Tree {
   root: Node;
-  nodeList: Node[] = [];
+  nodeList: Node[] | undefined;
   nodeIDMap: { [key: string]: Node } | undefined;
   leafList: Node[] | undefined;
   recombEdgeMap: { [key: string]: Node[] } | undefined;
@@ -53,7 +53,7 @@ export class Tree {
 
   // Clear various node caches:
   clearCaches(): void {
-    this.nodeList = [];
+    this.nodeList = undefined;
     this.nodeIDMap = undefined;
     this.leafList = undefined;
     this.recombEdgeMap = undefined;

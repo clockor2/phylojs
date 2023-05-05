@@ -6,7 +6,7 @@ export class Node {
   height: number | undefined;
   branchLength: number | undefined;
   label: string | undefined;
-  annotation: { [key: string]: string | string[] };
+  annotation: { [key: string]: string | string[] | null };
   hybridID: number | undefined;
   collapsed: boolean | undefined;
   cartoon: boolean | undefined;
@@ -120,8 +120,9 @@ export class Node {
     const thisRes = f(this);
     if (thisRes !== null) res = res.concat(thisRes);
 
-    for (let i = 0; i < this.children.length; i++)
+    for (let i = 0; i < this.children.length; i++) {
       res = res.concat(this.children[i].applyPreOrder(f));
+    }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return res; // will have to create a function signature type
