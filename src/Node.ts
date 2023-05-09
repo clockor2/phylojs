@@ -4,6 +4,7 @@ export class Node {
   parent: Node | undefined;
   children: Node[];
   height: number | undefined;
+  rootToTipDist: number | undefined;
   branchLength: number | undefined;
   label: string | undefined;
   annotation: { [key: string]: string | string[] | null };
