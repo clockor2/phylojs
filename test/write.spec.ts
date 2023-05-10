@@ -1,7 +1,7 @@
 // phyloWriter.test.ts
 import { Node } from '../src/Node';
 import { Tree } from '../src/Tree';
-import { Write } from '../src/Write';
+import { writeNewick, writeNexus } from '../src/Write';
 
 describe('PhyloWriter', () => {
   const rootNode = new Node(0);
@@ -25,12 +25,12 @@ describe('PhyloWriter', () => {
   const tree = new Tree(rootNode);
 
   test('newickWriter', () => {
-    const newick = Write.newick(tree);
+    const newick = writeNewick(tree);
     expect(newick).toBe('("A":1,("B":1,"C":1):1):0.0;');
   });
 
   test('nexusWriter', () => {
-    const nexus = Write.nexus(tree);
+    const nexus = writeNexus(tree);
     expect(nexus).toBe(
       '#NEXUS\n\nbegin trees;\n\ttree tree_1 = [&R] ("A":1,("B":1,"C":1):1):0.0;\nend;'
     );
