@@ -1,4 +1,4 @@
 export { Node } from './Node';
 export { Tree } from './Tree';
-export { Write } from './Write';
-export { TreeFromNewick } from './Reader';
+export { writeNewick, writeNexus } from './Write';
+export { readNewick } from './Reader';

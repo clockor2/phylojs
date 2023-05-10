@@ -172,80 +172,23 @@ export class Tree {
     return this.recombEdgeMap;
   }
 
-  // Sort nodes according to clade sizes.
-  sortNodes(decending: boolean): void {
-    if (this.root === undefined) return;
-
-    function sortNodesRecurse(node: Node): number {
-      let size = 1;
-      const childSizes: { [key: number]: number } = {};
-      for (let i = 0; i < node.children.length; i++) {
-        const thisChildSize: number = sortNodesRecurse(node.children[i]);
-        size += thisChildSize;
-        childSizes[node.children[i].id] = thisChildSize;
-      }
-
-      node.children.sort((a: Node, b: Node) => {
-        if (decending) return childSizes[b.id] - childSizes[a.id];
-        else return childSizes[a.id] - childSizes[b.id];
-      });
-
-      return size;
-    }
-
-    sortNodesRecurse(this.root);
-
-    // Clear out-of-date leaf list
-    this.leafList = undefined;
+  // return subtree of tree
+  getSubtree(node: Node): Tree {
+    return new Tree(node);
   }
 
-  // Shuffle nodes
-  shuffleNodes(): void {
-    if (this.root === undefined) return;
-
-    function shuffleArray(array: any[]): void {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
+  // get all tip names from tree or from node
+  getTipLabels(node?: Node): (string | undefined)[] {
+    let tips: (string | undefined)[];
+    if (node !== undefined) {
+      tips = this.getSubtree(node)
+        .getLeafList()
+        .map(e => e.id.toString());
+    } else {
+      tips = this.getLeafList().map(e => e.label);
     }
 
-    function shuffleNodesRecurse(node: Node): void {
-      for (let i = 0; i < node.children.length; i++)
-        shuffleNodesRecurse(node.children[i]);
-
-      shuffleArray(node.children);
-    }
-
-    shuffleNodesRecurse(this.root);
-  }
-  // Tree methods
-
-  // Collapse zero-length edges:
-  collapseZeroLengthEdges(): void {
-    this.root.applyPreOrder(function (node: Node) {
-      const childrenToConsider = node.children.slice();
-      while (childrenToConsider.length > 0) {
-        const child = childrenToConsider.pop();
-        if (child === undefined) continue;
-        if (child.height == node.height) {
-          node.removeChild(child);
-
-          // Does this do the right thing for polytomy dummy nodes?
-          node.annotation = child.annotation;
-          node.label = child.label;
-
-          for (let j = 0; j < child.children.length; j++) {
-            const grandChild = child.children[j];
-            node.addChild(grandChild);
-            childrenToConsider.push(grandChild);
-          }
-        }
-      }
-    });
-
-    // Invalidate cached leaf and node lists
-    this.clearCaches();
+    return tips;
   }
 
   // Sum of all defined branch lengths
@@ -404,6 +347,80 @@ export class Tree {
     }
   }
 
+  // // Collapse zero-length edges:
+  // collapseZeroLengthEdges(): void {
+  //   this.root.applyPreOrder(function (node: Node) {
+  //     const childrenToConsider = node.children.slice();
+  //     while (childrenToConsider.length > 0) {
+  //       const child = childrenToConsider.pop();
+  //       if (child === undefined) continue;
+  //       if (child.height == node.height) {
+  //         node.removeChild(child);
+
+  //         // Does this do the right thing for polytomy dummy nodes?
+  //         node.annotation = child.annotation;
+  //         node.label = child.label;
+
+  //         for (let j = 0; j < child.children.length; j++) {
+  //           const grandChild = child.children[j];
+  //           node.addChild(grandChild);
+  //           childrenToConsider.push(grandChild);
+  //         }
+  //       }
+  //     }
+  //   });
+
+  //   // Invalidate cached leaf and node lists
+  //   this.clearCaches();
+  // }
+
+  // // Sort nodes according to clade sizes.
+  // sortNodes(decending: boolean): void {
+  //   if (this.root === undefined) return;
+
+  //   function sortNodesRecurse(node: Node): number {
+  //     let size = 1;
+  //     const childSizes: { [key: number]: number } = {};
+  //     for (let i = 0; i < node.children.length; i++) {
+  //       const thisChildSize: number = sortNodesRecurse(node.children[i]);
+  //       size += thisChildSize;
+  //       childSizes[node.children[i].id] = thisChildSize;
+  //     }
+
+  //     node.children.sort((a: Node, b: Node) => {
+  //       if (decending) return childSizes[b.id] - childSizes[a.id];
+  //       else return childSizes[a.id] - childSizes[b.id];
+  //     });
+
+  //     return size;
+  //   }
+
+  //   sortNodesRecurse(this.root);
+
+  //   // Clear out-of-date leaf list
+  //   this.leafList = undefined;
+  // }
+
+  // // Shuffle nodes
+  // shuffleNodes(): void {
+  //   if (this.root === undefined) return;
+
+  //   function shuffleArray(array: any[]): void {
+  //     for (let i = array.length - 1; i > 0; i--) {
+  //       const j = Math.floor(Math.random() * (i + 1));
+  //       [array[i], array[j]] = [array[j], array[i]];
+  //     }
+  //   }
+
+  //   function shuffleNodesRecurse(node: Node): void {
+  //     for (let i = 0; i < node.children.length; i++)
+  //       shuffleNodesRecurse(node.children[i]);
+
+  //     shuffleArray(node.children);
+  //   }
+
+  //   shuffleNodesRecurse(this.root);
+  // }
   // isRecombSrcNode(node: Node): boolean {
   //   if (node.hybridID !== undefined)
   //     return (

@@ -1,21 +1,9 @@
 // phyloWriter.test.ts
-import { TreeFromNewick } from '../src';
+import { readNewick } from '../src/Reader';
 import { Node } from '../src/Node';
 import { Tree } from '../src/Tree';
-import { Write } from '../src/Write';
+import { writeNewick } from '../src/Write';
 import { readFileSync } from 'fs';
-
-// describe('TESTER()', () => {
-//   test('ages (heights) stored as negative', () => {
-//     let tr = new TreeFromNewick('((A:1,B:1):1,C:1);')
-//     console.log(`
-//     Here ages: ${tr.getNodeList().map(e => e.height)}
-//     Here ID: ${tr.getNodeList().map(e => e.id)}`)
-//     //expect(tr.getLength()).toBe(4)
-//     expect(1).toBe(4)
-//   })
-
-// })
 
 describe('PhyloWriter', () => {
   const rootNode = new Node(0);
@@ -46,7 +34,7 @@ describe('PhyloWriter', () => {
         .filter(n => n !== undefined)
     ).toStrictEqual(['A', 'B', 'C']);
     tree.reroot(childNode4);
-    const newick = Write.newick(tree);
+    const newick = writeNewick(tree);
     expect(newick).toBe('("C":0.5,("B":1,"A":2):0.5):0.0;');
     expect(tree.root.children.length).toBe(2);
     expect(
@@ -60,15 +48,15 @@ describe('PhyloWriter', () => {
 
 describe('reroot() - basic', () => {
   test('updates nwk', () => {
-    let tr = new TreeFromNewick('((A:1,B:1):1,C:1);')
+    let tr = readNewick('((A:1,B:1):1,C:1);')
     tr.reroot(tr.getNodeList()[3])
-    let nwkPrime = Write.newick(tr)
+    let nwkPrime = writeNewick(tr)
 
     expect(nwkPrime).not.toBe('((A:1,B:1):1,C:1);')
   })
 
   let nwk = readFileSync('test/testTrees.nwk', 'utf-8').split(/\r?\n/)
-  const tr = nwk.map(e => new TreeFromNewick(e))
+  const tr = nwk.map(e => readNewick(e))
 
   test('invariant length with varying prop on test trees', () => {
     let nodes: any;
@@ -103,44 +91,82 @@ describe('reroot() - basic', () => {
 
 describe('getLength()', () => {
   test('all branch lengths defined', () => {
-    let tr = new TreeFromNewick('((A:1,B:1):1,C:1);')
+    let tr = readNewick('((A:1,B:1):1,C:1);')
     expect(tr.getLength()).toBe(4)
   })
 
   test('count undefined branch lengths as zero', () => {
-    let tr = new TreeFromNewick('((A:1,B:1),C:1);')
+    let tr = readNewick('((A:1,B:1),C:1);')
     expect(tr.getLength()).toBe(3)
   })
 })
 
 describe('getRTTDist()', () => {
   test('all branch lengths defined', () => {
-    let tr = new TreeFromNewick('((A:1,B:1):1,C:1);')
+    let tr = readNewick('((A:1,B:1):1,C:1);')
     let rttDist = tr.getRTTDist()
     expect(rttDist).toStrictEqual([2,2,1])
   })
 
   test('when some branch lengths defined', () => {
-    let tr = new TreeFromNewick('((A:1,B:1),C:1);')
+    let tr = readNewick('((A:1,B:1),C:1);')
     let rttDist = tr.getRTTDist()
     expect(rttDist).toStrictEqual([1,1,1])
   })
 
   test('returns values for test trees (<==> sum defined)', () => {
     let nwk = readFileSync('test/testTrees.nwk', 'utf-8').split(/\r?\n/)
-    const tr = nwk.map(e => new TreeFromNewick(e))
+    const tr = nwk.map(e => readNewick(e))
 
     let rttDistances = tr.map(e => e.getRTTDist())
 
     let type = rttDistances
-      .map(e => e.map( e => typeof e))
+      .map(e => e.map(e => typeof e))
 
     expect(
       JSON.stringify(type)
     )
     .toBe(
-      JSON.stringify(rttDistances.map(e => e.map(e => 'number')))
+      JSON.stringify(rttDistances.map(e => e.map(() => 'number')))
     )
   })
 
+})
+
+describe('getSubtree()', () => {
+  test('simple tree', () => {
+    let tr = readNewick('((((A,B),C),D),E);')
+    let subTree = tr.getSubtree(tr.getNodeList()[1])
+
+    expect(
+      writeNewick(subTree)
+    ).toBe(
+      '((("A":0.0,"B":0.0):0.0,"C":0.0):0.0,"D":0.0):0.0;'
+    )
+  })
+})
+
+describe('getTipLabels()', () => {
+  let tr = readNewick('((((A,B),C),D),E);')
+  test('whole tree', () => {
+    let labs = tr.getTipLabels()
+
+    expect(
+      JSON.stringify(labs)
+    ).toMatch(
+      JSON.stringify(["A", "B", "C", "D", "E"])
+    )
+  })
+
+  test('subtree', () => {
+    let labs = tr.getSubtree(
+      tr.getNodeList()[1]
+    ).getTipLabels()
+
+    expect(
+      JSON.stringify(labs)
+    ).toMatch(
+      JSON.stringify(["A", "B", "C", "D"])
+    )
+  })
 })
