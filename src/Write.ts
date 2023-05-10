@@ -3,7 +3,7 @@ import { Tree } from './Tree';
 
 interface PhylogenyWriter {
   (tree: Tree): string;
-}
+} 
 
 interface Write {
   newick: PhylogenyWriter;

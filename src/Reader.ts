@@ -31,7 +31,7 @@ class TreeBuilder extends Tree {
     super(root);
   }
 }
-
+ 
 export class TreeFromNewick extends TreeBuilder {
   static tokens: [string, RegExp, boolean, number?][] = [
     ['OPENP', /^\(/, false],
