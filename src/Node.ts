@@ -3,7 +3,8 @@ export class Node {
   id: number;
   parent: Node | undefined;
   children: Node[];
-  height: number | undefined;
+  height: number | undefined; // above root
+  rttDist: number | undefined;
   branchLength: number | undefined;
   label: string | undefined;
   annotation: { [key: string]: string | string[] | null };

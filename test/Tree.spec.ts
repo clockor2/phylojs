@@ -1,7 +1,21 @@
 // phyloWriter.test.ts
+import { TreeFromNewick } from '../src';
 import { Node } from '../src/Node';
 import { Tree } from '../src/Tree';
 import { Write } from '../src/Write';
+import { readFileSync } from 'fs';
+
+// describe('TESTER()', () => {
+//   test('ages (heights) stored as negative', () => {
+//     let tr = new TreeFromNewick('((A:1,B:1):1,C:1);')
+//     console.log(`
+//     Here ages: ${tr.getNodeList().map(e => e.height)}
+//     Here ID: ${tr.getNodeList().map(e => e.id)}`)
+//     //expect(tr.getLength()).toBe(4)
+//     expect(1).toBe(4)
+//   })
+
+// })
 
 describe('PhyloWriter', () => {
   const rootNode = new Node(0);
@@ -43,3 +57,90 @@ describe('PhyloWriter', () => {
     ).toStrictEqual(['C', 'B', 'A']);
   });
 });
+
+describe('reroot() - basic', () => {
+  test('updates nwk', () => {
+    let tr = new TreeFromNewick('((A:1,B:1):1,C:1);')
+    tr.reroot(tr.getNodeList()[3])
+    let nwkPrime = Write.newick(tr)
+
+    expect(nwkPrime).not.toBe('((A:1,B:1):1,C:1);')
+  })
+
+  let nwk = readFileSync('test/testTrees.nwk', 'utf-8').split(/\r?\n/)
+  const tr = nwk.map(e => new TreeFromNewick(e))
+
+  test('invariant length with varying prop on test trees', () => {
+    let nodes: any;
+    let prop: number;
+    let originalLength: number[] = []
+    let newLength: number[] = []
+    let diff: boolean[] = []
+    const tol = 1e-10 // smaller than smallest branch length here
+
+    for (let i = 0; i < tr.length; i++){
+
+      nodes = tr[i].getNodeList().slice(1) // exclude root (0th id)
+      for (let j = 0; j<nodes.length; j++) {
+
+        originalLength.push(tr[i].getLength())
+
+        prop = j / nodes.length
+        tr[i].reroot(nodes[j], prop)
+        newLength.push(tr[i].getLength())
+
+        diff.push(Math.abs(originalLength[j] - newLength[j]) < tol)
+
+      }
+    }
+    expect(
+      JSON.stringify(diff)
+    ).toBe(
+      JSON.stringify(originalLength.map(e => true))
+    )
+  })
+})
+
+describe('getLength()', () => {
+  test('all branch lengths defined', () => {
+    let tr = new TreeFromNewick('((A:1,B:1):1,C:1);')
+    expect(tr.getLength()).toBe(4)
+  })
+
+  test('count undefined branch lengths as zero', () => {
+    let tr = new TreeFromNewick('((A:1,B:1),C:1);')
+    expect(tr.getLength()).toBe(3)
+  })
+})
+
+describe('getRTTDist()', () => {
+  test('all branch lengths defined', () => {
+    let tr = new TreeFromNewick('((A:1,B:1):1,C:1);')
+    let rttDist = tr.getRTTDist()
+    expect(rttDist).toStrictEqual([2,2,1])
+  })
+
+  test('when some branch lengths defined', () => {
+    let tr = new TreeFromNewick('((A:1,B:1),C:1);')
+    let rttDist = tr.getRTTDist()
+    expect(rttDist).toStrictEqual([1,1,1])
+  })
+
+  test('returns values for test trees (<==> sum defined)', () => {
+    let nwk = readFileSync('test/testTrees.nwk', 'utf-8').split(/\r?\n/)
+    const tr = nwk.map(e => new TreeFromNewick(e))
+
+    let rttDistances = tr.map(e => e.getRTTDist())
+
+    let type = rttDistances
+      .map(e => e.map( e => typeof e))
+
+    expect(
+      JSON.stringify(type)
+    )
+    .toBe(
+      JSON.stringify(rttDistances.map(e => e.map(e => 'number')))
+    )
+  })
+
+})
