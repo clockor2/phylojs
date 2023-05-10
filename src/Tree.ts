@@ -19,12 +19,13 @@ export class Tree {
   // Compute node ages
   computeNodeAges(): void {
     const heights: number[] = this.root.applyPreOrder((node: Node) => {
-      if (node.parent === undefined) node.height = 0.0; // root case
+      if (node.parent === undefined) node.height = 0.0;
+      // root case
       else {
         if (node.branchLength !== undefined && node.parent.height !== undefined)
           node.height = node.parent.height - node.branchLength;
         else {
-          node.height = NaN; 
+          node.height = NaN;
         }
       }
 
@@ -46,31 +47,25 @@ export class Tree {
 
   // Return branch lengths in order matching .getNodeList()
   getBranchLengths(): (number | undefined)[] {
-    return(
-      this.getNodeList().map(
-        e => e.branchLength
-      )
-    )
+    return this.getNodeList().map(e => e.branchLength);
   }
 
   // root to tip distances. Count undefined branch lengths as zero
   getRTTDist(): (number | undefined)[] {
-    this
-    .root
-    .applyPreOrder((node: Node) => {
+    this.root.applyPreOrder((node: Node) => {
       if (node.parent == undefined) {
-        node.rttDist = 0.0 // root case
+        node.rttDist = 0.0; // root case
       } else if (node.parent.rttDist !== undefined) {
         if (node.branchLength !== undefined) {
-          node.rttDist = node.branchLength + node.parent.rttDist
+          node.rttDist = node.branchLength + node.parent.rttDist;
         } else {
           node.rttDist = node.parent.rttDist;
         }
       }
       return node.rttDist;
-    })
+    });
 
-    return this.getLeafList().map(e => e.rttDist)
+    return this.getLeafList().map(e => e.rttDist);
   }
 
   // Assign new node IDs (use with care!)
@@ -258,20 +253,17 @@ export class Tree {
     let totalLength = 0.0;
     const nodeList = this.getNodeList();
 
-    for (let node of nodeList) {
+    for (const node of nodeList) {
       if (node.branchLength !== undefined) {
-        totalLength += node.branchLength
+        totalLength += node.branchLength;
       }
     }
 
-    return totalLength
+    return totalLength;
   }
 
   // Re-root tree:
-  reroot(
-    edgeBaseNode: Node,
-    prop?: number
-    ): void {
+  reroot(edgeBaseNode: Node, prop?: number): void {
     this.recombEdgeMap = undefined;
     const currentRecombEdgeMap = this.getRecombEdgeMap();
 
@@ -283,11 +275,11 @@ export class Tree {
     edgeBaseNodeP.removeChild(edgeBaseNode);
     this.root.addChild(edgeBaseNode);
 
-    // handling proprtion to cut branch for root 
+    // handling proprtion to cut branch for root
     let BL = edgeBaseNode.branchLength; // TMP
     if (edgeBaseNode.branchLength !== undefined) {
       if (prop !== undefined && prop >= 0 && prop <= 1) {
-        let totalBL = edgeBaseNode.branchLength;
+        const totalBL = edgeBaseNode.branchLength;
         edgeBaseNode.branchLength *= prop;
         BL = totalBL - edgeBaseNode.branchLength;
       } else {
@@ -298,7 +290,6 @@ export class Tree {
 
     const node = edgeBaseNodeP;
     const prevNode = this.root;
-    
 
     const usedHybridIDs: { [key: string]: boolean } = {};
     for (const recombID in currentRecombEdgeMap) {

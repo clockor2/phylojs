@@ -3,7 +3,7 @@ import { Tree } from './Tree';
 
 interface PhylogenyWriter {
   (tree: Tree): string;
-} 
+}
 
 interface Write {
   newick: PhylogenyWriter;
@@ -13,9 +13,9 @@ interface Write {
 }
 
 export const Write: Write = (function () {
-  const phyloXMLNS = 'http://www.phyloxml.org';
-  const neXMLNS = 'http://www.nexml.org/2009';
-  const xsiNS = 'http://www.w3.org/2001/XMLSchema-instance';
+  //const phyloXMLNS = 'http://www.phyloxml.org';
+  //const neXMLNS = 'http://www.nexml.org/2009';
+  //const xsiNS = 'http://www.w3.org/2001/XMLSchema-instance';
 
   function newickRecurse(node: Node, annotate: boolean): string {
     let res = '';
