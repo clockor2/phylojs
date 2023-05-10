@@ -24,7 +24,7 @@ export class Tree {
         if (node.branchLength !== undefined && node.parent.height !== undefined)
           node.height = node.parent.height - node.branchLength;
         else {
-          node.height = NaN;
+          node.height = NaN; 
         }
       }
 
@@ -51,6 +51,26 @@ export class Tree {
         e => e.branchLength
       )
     )
+  }
+
+  // root to tip distances. Count undefined branch lengths as zero
+  getRTTDist(): (number | undefined)[] {
+    this
+    .root
+    .applyPreOrder((node: Node) => {
+      if (node.parent == undefined) {
+        node.rttDist = 0.0 // root case
+      } else if (node.parent.rttDist !== undefined) {
+        if (node.branchLength !== undefined) {
+          node.rttDist = node.branchLength + node.parent.rttDist
+        } else {
+          node.rttDist = node.parent.rttDist;
+        }
+      }
+      return node.rttDist;
+    })
+
+    return this.getLeafList().map(e => e.rttDist)
   }
 
   // Assign new node IDs (use with care!)
@@ -157,26 +177,6 @@ export class Tree {
     return this.recombEdgeMap;
   }
 
-  isRecombSrcNode(node: Node): boolean {
-    if (node.hybridID !== undefined)
-      return (
-        node.isHybrid() && this.getRecombEdgeMap()[node.hybridID][0] == node
-      );
-    return false;
-  }
-
-  isRecombDestNode(node: Node): boolean {
-    if (node.hybridID !== undefined)
-      return (
-        node.isHybrid() && this.getRecombEdgeMap()[node.hybridID][0] != node
-      );
-    return false;
-  }
-
-  isNetwork(): boolean {
-    return Object.keys(this.getRecombEdgeMap()).length > 0;
-  }
-
   // Sort nodes according to clade sizes.
   sortNodes(decending: boolean): void {
     if (this.root === undefined) return;
@@ -226,27 +226,6 @@ export class Tree {
   }
   // Tree methods
 
-  // Minimize distance between hybrid pairs
-  minimizeHybridSeparation(): void {
-    const recombEdgeMap = this.getRecombEdgeMap();
-
-    for (const recombID in recombEdgeMap) {
-      const srcNode = recombEdgeMap[recombID][0];
-
-      for (let i = 1; i < recombEdgeMap[recombID].length; i++) {
-        const destNode = recombEdgeMap[recombID][i];
-        const destNodeP = destNode.parent;
-        if (destNodeP === undefined) continue;
-        destNodeP.removeChild(destNode);
-        if (srcNode.isLeftOf(destNodeP)) {
-          destNodeP.children.splice(0, 0, destNode);
-        } else {
-          destNodeP.children.push(destNode);
-        }
-      }
-    }
-  }
-
   // Collapse zero-length edges:
   collapseZeroLengthEdges(): void {
     this.root.applyPreOrder(function (node: Node) {
@@ -272,6 +251,20 @@ export class Tree {
 
     // Invalidate cached leaf and node lists
     this.clearCaches();
+  }
+
+  // Sum of all defined branch lengths
+  getLength(): number {
+    let totalLength = 0.0;
+    const nodeList = this.getNodeList();
+
+    for (let node of nodeList) {
+      if (node.branchLength !== undefined) {
+        totalLength += node.branchLength
+      }
+    }
+
+    return totalLength
   }
 
   // Re-root tree:
@@ -420,142 +413,157 @@ export class Tree {
     }
   }
 
-  getTraitList(filter?: (node: any, trait: any) => boolean): any[] {
-    if (this.root === undefined) return [];
+  // isRecombSrcNode(node: Node): boolean {
+  //   if (node.hybridID !== undefined)
+  //     return (
+  //       node.isHybrid() && this.getRecombEdgeMap()[node.hybridID][0] == node
+  //     );
+  //   return false;
+  // }
 
-    const traitSet: { [key: string]: boolean } = {};
-    const nodeList = this.getNodeList();
+  // isRecombDestNode(node: Node): boolean {
+  //   if (node.hybridID !== undefined)
+  //     return (
+  //       node.isHybrid() && this.getRecombEdgeMap()[node.hybridID][0] != node
+  //     );
+  //   return false;
+  // }
 
-    for (const thisNode of nodeList) {
-      for (const trait in thisNode.annotation) {
-        if (filter !== undefined && !filter(thisNode, trait)) continue;
-        traitSet[trait] = true;
-      }
-    }
+  // isNetwork(): boolean {
+  //   return Object.keys(this.getRecombEdgeMap()).length > 0;
+  // }
 
-    // Create list from set
-    const traitList = Object.keys(traitSet);
+  // // Minimize distance between hybrid pairs
+  // minimizeHybridSeparation(): void {
+  //   const recombEdgeMap = this.getRecombEdgeMap();
 
-    return traitList;
-  }
+  //   for (const recombID in recombEdgeMap) {
+  //     const srcNode = recombEdgeMap[recombID][0];
 
-  // Return deep copy of tree:
-  copy(): Tree {
-    return new Tree(this.root.copy());
-  }
+  //     for (let i = 1; i < recombEdgeMap[recombID].length; i++) {
+  //       const destNode = recombEdgeMap[recombID][i];
+  //       const destNodeP = destNode.parent;
+  //       if (destNodeP === undefined) continue;
+  //       destNodeP.removeChild(destNode);
+  //       if (srcNode.isLeftOf(destNodeP)) {
+  //         destNodeP.children.splice(0, 0, destNode);
+  //       } else {
+  //         destNodeP.children.push(destNode);
+  //       }
+  //     }
+  //   }
+  // }
 
-  translate(tmap: { [key: string]: string }): void {
-    const nodeList = this.getNodeList();
-    for (const node of nodeList) {
-      const { label } = node;
-      if (label && Object.prototype.hasOwnProperty.call(tmap, label)) {
-        node.label = tmap[label];
-      }
-    }
-  }
+  // getTraitList(filter?: (node: any, trait: any) => boolean): any[] {
+  //   if (this.root === undefined) return [];
 
-  // Sum of all defined branch lengths
-  getLength(): number {
-    let totalLength = 0.0;
-    const nodeList = this.getNodeList();
+  //   const traitSet: { [key: string]: boolean } = {};
+  //   const nodeList = this.getNodeList();
 
-    for (let node of nodeList) {
-      if (node.branchLength !== undefined) {
-        totalLength += node.branchLength
-      }
-    }
+  //   for (const thisNode of nodeList) {
+  //     for (const trait in thisNode.annotation) {
+  //       if (filter !== undefined && !filter(thisNode, trait)) continue;
+  //       traitSet[trait] = true;
+  //     }
+  //   }
 
-    return totalLength
-    // // old code
-    // for (const node of nodeList) {
-    //   if (node.isRoot()) continue;
-    //   if (
-    //     node.parent === undefined ||
-    //     node.parent.height === undefined ||
-    //     node.height === undefined
-    //   )
-    //     throw 'height === undefined';
-    //   totalLength += node.parent.height - node.height;
-    // }
-    // return totalLength;
-  }
+  //   // Create list from set
+  //   const traitList = Object.keys(traitSet);
 
-  // Return list of nodes belonging to monophyletic groups involving
-  // the provided node list
-  getCladeNodes(nodes: Node[]): Node[] {
-    function getCladeMembers(node: Node, nodes: Node[]): Node[] {
-      let cladeMembers: Node[] = [];
+  //   return traitList;
+  // }
 
-      let allChildrenAreMembers = true;
-      for (let cidx = 0; cidx < node.children.length; cidx++) {
-        const child = node.children[cidx];
+  // // Return deep copy of tree:
+  // copy(): Tree {
+  //   return new Tree(this.root.copy());
+  // }
 
-        const childCladeMembers = getCladeMembers(child, nodes);
-        if (childCladeMembers.indexOf(child) < 0) allChildrenAreMembers = false;
+  // translate(tmap: { [key: string]: string }): void {
+  //   const nodeList = this.getNodeList();
+  //   for (const node of nodeList) {
+  //     const { label } = node;
+  //     if (label && Object.prototype.hasOwnProperty.call(tmap, label)) {
+  //       node.label = tmap[label];
+  //     }
+  //   }
+  // }
 
-        cladeMembers = cladeMembers.concat(childCladeMembers);
-      }
+  // // Return list of nodes belonging to monophyletic groups involving
+  // // the provided node list
+  // getCladeNodes(nodes: Node[]): Node[] {
+  //   function getCladeMembers(node: Node, nodes: Node[]): Node[] {
+  //     let cladeMembers: Node[] = [];
 
-      if (
-        nodes.indexOf(node) >= 0 ||
-        (node.children.length > 0 && allChildrenAreMembers)
-      )
-        cladeMembers = cladeMembers.concat(node);
+  //     let allChildrenAreMembers = true;
+  //     for (let cidx = 0; cidx < node.children.length; cidx++) {
+  //       const child = node.children[cidx];
 
-      return cladeMembers;
-    }
+  //       const childCladeMembers = getCladeMembers(child, nodes);
+  //       if (childCladeMembers.indexOf(child) < 0) allChildrenAreMembers = false;
 
-    return getCladeMembers(this.root, nodes);
-  }
+  //       cladeMembers = cladeMembers.concat(childCladeMembers);
+  //     }
 
-  // Return list of all nodes ancestral to those in the provided node list
-  getAncestralNodes(nodes: Node[]): Node[] {
-    function getAncestors(node: Node, nodes: Node[]): Node[] {
-      let ancestors: Node[] = [];
+  //     if (
+  //       nodes.indexOf(node) >= 0 ||
+  //       (node.children.length > 0 && allChildrenAreMembers)
+  //     )
+  //       cladeMembers = cladeMembers.concat(node);
 
-      for (let cidx = 0; cidx < node.children.length; cidx++) {
-        const child = node.children[cidx];
+  //     return cladeMembers;
+  //   }
 
-        ancestors = ancestors.concat(getAncestors(child, nodes));
-      }
+  //   return getCladeMembers(this.root, nodes);
+  // }
 
-      if (nodes.indexOf(node) >= 0 || ancestors.length > 0)
-        ancestors = ancestors.concat(node);
+  // // Return list of all nodes ancestral to those in the provided node list
+  // getAncestralNodes(nodes: Node[]): Node[] {
+  //   function getAncestors(node: Node, nodes: Node[]): Node[] {
+  //     let ancestors: Node[] = [];
 
-      return ancestors;
-    }
+  //     for (let cidx = 0; cidx < node.children.length; cidx++) {
+  //       const child = node.children[cidx];
 
-    return getAncestors(this.root, nodes);
-  }
+  //       ancestors = ancestors.concat(getAncestors(child, nodes));
+  //     }
 
-  getLineagesThroughTime(): any {
-    const nodeList = this.getNodeList().slice(0);
+  //     if (nodes.indexOf(node) >= 0 || ancestors.length > 0)
+  //       ancestors = ancestors.concat(node);
 
-    nodeList.sort(function (nodeA, nodeB) {
-      if (nodeA.height === undefined || nodeB.height === undefined)
-        throw 'height === undefined';
-      return nodeA.height - nodeB.height;
-    });
+  //     return ancestors;
+  //   }
 
-    interface Res {
-      lineages: number[];
-      ages: number[];
-    }
+  //   return getAncestors(this.root, nodes);
+  // }
 
-    const res: Res = { lineages: [], ages: [] };
+  // getLineagesThroughTime(): any {
+  //   const nodeList = this.getNodeList().slice(0);
 
-    let k = 0;
-    for (let i = 0; i < nodeList.length; i++) {
-      const node = nodeList[i];
+  //   nodeList.sort(function (nodeA, nodeB) {
+  //     if (nodeA.height === undefined || nodeB.height === undefined)
+  //       throw 'height === undefined';
+  //     return nodeA.height - nodeB.height;
+  //   });
 
-      k += 1 - node.children.length;
+  //   interface Res {
+  //     lineages: number[];
+  //     ages: number[];
+  //   }
 
-      res.lineages.push(k);
-      if (node.height !== undefined) {
-        res.ages.push(node.height);
-      }
-    }
+  //   const res: Res = { lineages: [], ages: [] };
 
-    return res;
-  }
+  //   let k = 0;
+  //   for (let i = 0; i < nodeList.length; i++) {
+  //     const node = nodeList[i];
+
+  //     k += 1 - node.children.length;
+
+  //     res.lineages.push(k);
+  //     if (node.height !== undefined) {
+  //       res.ages.push(node.height);
+  //     }
+  //   }
+
+  //   return res;
+  // }
 }

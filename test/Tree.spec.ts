@@ -5,6 +5,18 @@ import { Tree } from '../src/Tree';
 import { Write } from '../src/Write';
 import { readFileSync } from 'fs';
 
+// describe('TESTER()', () => {
+//   test('ages (heights) stored as negative', () => {
+//     let tr = new TreeFromNewick('((A:1,B:1):1,C:1);')
+//     console.log(`
+//     Here ages: ${tr.getNodeList().map(e => e.height)}
+//     Here ID: ${tr.getNodeList().map(e => e.id)}`)
+//     //expect(tr.getLength()).toBe(4)
+//     expect(1).toBe(4)
+//   })
+
+// })
+
 describe('PhyloWriter', () => {
   const rootNode = new Node(0);
   const childNode1 = new Node(1);
@@ -54,13 +66,11 @@ describe('reroot() - basic', () => {
 
     expect(nwkPrime).not.toBe('((A:1,B:1):1,C:1);')
   })
-})
 
-describe('reroot() - with test trees', () => {
   let nwk = readFileSync('test/testTrees.nwk', 'utf-8').split(/\r?\n/)
   const tr = nwk.map(e => new TreeFromNewick(e))
 
-  test('invariant length with varying prop', () => {
+  test('invariant length with varying prop on test trees', () => {
     let nodes: any;
     let prop: number;
     let originalLength: number[] = []
@@ -89,7 +99,6 @@ describe('reroot() - with test trees', () => {
       JSON.stringify(originalLength.map(e => true))
     )
   })
-
 })
 
 describe('getLength()', () => {
@@ -104,29 +113,34 @@ describe('getLength()', () => {
   })
 })
 
-describe('rootToTip()', () => {
+describe('getRTTDist()', () => {
   test('all branch lengths defined', () => {
     let tr = new TreeFromNewick('((A:1,B:1):1,C:1);')
-
-    tr
-    .root
-    .applyPreOrder((node: Node) => {
-      if (node.parent == undefined) {
-        node.rootToTipDist = 0.0 // root case
-      } else {
-        if (node.branchLength !== undefined && node.parent.rootToTipDist !== undefined)
-          node.rootToTipDist = node.branchLength + node.parent.rootToTipDist
-        else {
-          node.rootToTipDist = NaN; // TODO: handle descendant from undefined bl
-        }
-      }
-      return node.rootToTipDist;
-    })
-
-    let rootToTipDist = tr.getLeafList().map(e => e.rootToTipDist)
-    console.log(`r2tDist ${rootToTipDist}`)
-    expect(rootToTipDist).toBe([2,2,1])
+    let rttDist = tr.getRTTDist()
+    expect(rttDist).toStrictEqual([2,2,1])
   })
 
+  test('when some branch lengths defined', () => {
+    let tr = new TreeFromNewick('((A:1,B:1),C:1);')
+    let rttDist = tr.getRTTDist()
+    expect(rttDist).toStrictEqual([1,1,1])
+  })
+
+  test('returns values for test trees (<==> sum defined)', () => {
+    let nwk = readFileSync('test/testTrees.nwk', 'utf-8').split(/\r?\n/)
+    const tr = nwk.map(e => new TreeFromNewick(e))
+
+    let rttDistances = tr.map(e => e.getRTTDist())
+
+    let type = rttDistances
+      .map(e => e.map( e => typeof e))
+
+    expect(
+      JSON.stringify(type)
+    )
+    .toBe(
+      JSON.stringify(rttDistances.map(e => e.map(e => 'number')))
+    )
+  })
 
 })
