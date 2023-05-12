@@ -48,125 +48,105 @@ describe('PhyloWriter', () => {
 
 describe('reroot() - basic', () => {
   test('updates nwk', () => {
-    let tr = readNewick('((A:1,B:1):1,C:1);')
-    tr.reroot(tr.getNodeList()[3])
-    let nwkPrime = writeNewick(tr)
+    const tr = readNewick('((A:1,B:1):1,C:1);');
+    tr.reroot(tr.getNodeList()[3]);
+    const nwkPrime = writeNewick(tr);
 
-    expect(nwkPrime).not.toBe('((A:1,B:1):1,C:1);')
-  })
+    expect(nwkPrime).not.toBe('((A:1,B:1):1,C:1);');
+  });
 
-  let nwk = readFileSync('test/testTrees.nwk', 'utf-8').split(/\r?\n/)
-  const tr = nwk.map(e => readNewick(e))
+  const nwk = readFileSync('test/testTrees.nwk', 'utf-8').split(/\r?\n/);
+  const tr = nwk.map(e => readNewick(e));
 
   test('invariant length with varying prop on test trees', () => {
-    let nodes: any;
+    let nodes: Node[];
     let prop: number;
-    let originalLength: number[] = []
-    let newLength: number[] = []
-    let diff: boolean[] = []
-    const tol = 1e-10 // smaller than smallest branch length here
+    const originalLength: number[] = [];
+    const newLength: number[] = [];
+    const diff: boolean[] = [];
+    const tol = 1e-10; // smaller than smallest branch length here
 
-    for (let i = 0; i < tr.length; i++){
+    for (let i = 0; i < tr.length; i++) {
+      nodes = tr[i].getNodeList().slice(1); // exclude root (0th id)
+      for (let j = 0; j < nodes.length; j++) {
+        originalLength.push(tr[i].getLength());
 
-      nodes = tr[i].getNodeList().slice(1) // exclude root (0th id)
-      for (let j = 0; j<nodes.length; j++) {
+        prop = j / nodes.length;
+        tr[i].reroot(nodes[j], prop);
+        newLength.push(tr[i].getLength());
 
-        originalLength.push(tr[i].getLength())
-
-        prop = j / nodes.length
-        tr[i].reroot(nodes[j], prop)
-        newLength.push(tr[i].getLength())
-
-        diff.push(Math.abs(originalLength[j] - newLength[j]) < tol)
-
+        diff.push(Math.abs(originalLength[j] - newLength[j]) < tol);
       }
     }
-    expect(
-      JSON.stringify(diff)
-    ).toBe(
+    expect(JSON.stringify(diff)).toBe(
       JSON.stringify(originalLength.map(e => true))
-    )
-  })
-})
+    );
+  });
+});
 
 describe('getLength()', () => {
   test('all branch lengths defined', () => {
-    let tr = readNewick('((A:1,B:1):1,C:1);')
-    expect(tr.getLength()).toBe(4)
-  })
+    const tr = readNewick('((A:1,B:1):1,C:1);');
+    expect(tr.getLength()).toBe(4);
+  });
 
   test('count undefined branch lengths as zero', () => {
-    let tr = readNewick('((A:1,B:1),C:1);')
-    expect(tr.getLength()).toBe(3)
-  })
-})
+    const tr = readNewick('((A:1,B:1),C:1);');
+    expect(tr.getLength()).toBe(3);
+  });
+});
 
 describe('getRTTDist()', () => {
   test('all branch lengths defined', () => {
-    let tr = readNewick('((A:1,B:1):1,C:1);')
-    let rttDist = tr.getRTTDist()
-    expect(rttDist).toStrictEqual([2,2,1])
-  })
+    const tr = readNewick('((A:1,B:1):1,C:1);');
+    const rttDist = tr.getRTTDist();
+    expect(rttDist).toStrictEqual([2, 2, 1]);
+  });
 
   test('when some branch lengths defined', () => {
-    let tr = readNewick('((A:1,B:1),C:1);')
-    let rttDist = tr.getRTTDist()
-    expect(rttDist).toStrictEqual([1,1,1])
-  })
+    const tr = readNewick('((A:1,B:1),C:1);');
+    const rttDist = tr.getRTTDist();
+    expect(rttDist).toStrictEqual([1, 1, 1]);
+  });
 
   test('returns values for test trees (<==> sum defined)', () => {
-    let nwk = readFileSync('test/testTrees.nwk', 'utf-8').split(/\r?\n/)
-    const tr = nwk.map(e => readNewick(e))
+    const nwk = readFileSync('test/testTrees.nwk', 'utf-8').split(/\r?\n/);
+    const tr = nwk.map(e => readNewick(e));
 
-    let rttDistances = tr.map(e => e.getRTTDist())
+    const rttDistances = tr.map(e => e.getRTTDist());
 
-    let type = rttDistances
-      .map(e => e.map(e => typeof e))
+    const type = rttDistances.map(e => e.map(e => typeof e));
 
-    expect(
-      JSON.stringify(type)
-    )
-    .toBe(
+    expect(JSON.stringify(type)).toBe(
       JSON.stringify(rttDistances.map(e => e.map(() => 'number')))
-    )
-  })
-
-})
+    );
+  });
+});
 
 describe('getSubtree()', () => {
   test('simple tree', () => {
-    let tr = readNewick('((((A,B),C),D),E);')
-    let subTree = tr.getSubtree(tr.getNodeList()[1])
+    const tr = readNewick('((((A,B),C),D),E);');
+    const subTree = tr.getSubtree(tr.getNodeList()[1]);
 
-    expect(
-      writeNewick(subTree)
-    ).toBe(
+    expect(writeNewick(subTree)).toBe(
       '((("A":0.0,"B":0.0):0.0,"C":0.0):0.0,"D":0.0):0.0;'
-    )
-  })
-})
+    );
+  });
+});
 
 describe('getTipLabels()', () => {
-  let tr = readNewick('((((A,B),C),D),E);')
+  const tr = readNewick('((((A,B),C),D),E);');
   test('whole tree', () => {
-    let labs = tr.getTipLabels()
+    const labs = tr.getTipLabels();
 
-    expect(
-      JSON.stringify(labs)
-    ).toMatch(
-      JSON.stringify(["A", "B", "C", "D", "E"])
-    )
-  })
+    expect(JSON.stringify(labs)).toMatch(
+      JSON.stringify(['A', 'B', 'C', 'D', 'E'])
+    );
+  });
 
   test('subtree', () => {
-    let labs = tr.getSubtree(
-      tr.getNodeList()[1]
-    ).getTipLabels()
+    const labs = tr.getSubtree(tr.getNodeList()[1]).getTipLabels();
 
-    expect(
-      JSON.stringify(labs)
-    ).toMatch(
-      JSON.stringify(["A", "B", "C", "D"])
-    )
-  })
-})
+    expect(JSON.stringify(labs)).toMatch(JSON.stringify(['A', 'B', 'C', 'D']));
+  });
+});
