@@ -347,231 +347,231 @@ export class Tree {
     }
   }
 
-  // // Collapse zero-length edges:
-  // collapseZeroLengthEdges(): void {
-  //   this.root.applyPreOrder(function (node: Node) {
-  //     const childrenToConsider = node.children.slice();
-  //     while (childrenToConsider.length > 0) {
-  //       const child = childrenToConsider.pop();
-  //       if (child === undefined) continue;
-  //       if (child.height == node.height) {
-  //         node.removeChild(child);
+  // Collapse zero-length edges:
+  collapseZeroLengthEdges(): void {
+    this.root.applyPreOrder(function (node: Node) {
+      const childrenToConsider = node.children.slice();
+      while (childrenToConsider.length > 0) {
+        const child = childrenToConsider.pop();
+        if (child === undefined) continue;
+        if (child.height == node.height) {
+          node.removeChild(child);
 
-  //         // Does this do the right thing for polytomy dummy nodes?
-  //         node.annotation = child.annotation;
-  //         node.label = child.label;
+          // Does this do the right thing for polytomy dummy nodes?
+          node.annotation = child.annotation;
+          node.label = child.label;
 
-  //         for (let j = 0; j < child.children.length; j++) {
-  //           const grandChild = child.children[j];
-  //           node.addChild(grandChild);
-  //           childrenToConsider.push(grandChild);
-  //         }
-  //       }
-  //     }
-  //   });
+          for (let j = 0; j < child.children.length; j++) {
+            const grandChild = child.children[j];
+            node.addChild(grandChild);
+            childrenToConsider.push(grandChild);
+          }
+        }
+      }
+    });
 
-  //   // Invalidate cached leaf and node lists
-  //   this.clearCaches();
-  // }
+    // Invalidate cached leaf and node lists
+    this.clearCaches();
+  }
 
-  // // Sort nodes according to clade sizes.
-  // sortNodes(decending: boolean): void {
-  //   if (this.root === undefined) return;
+  // Sort nodes according to clade sizes.
+  sortNodes(decending: boolean): void {
+    if (this.root === undefined) return;
 
-  //   function sortNodesRecurse(node: Node): number {
-  //     let size = 1;
-  //     const childSizes: { [key: number]: number } = {};
-  //     for (let i = 0; i < node.children.length; i++) {
-  //       const thisChildSize: number = sortNodesRecurse(node.children[i]);
-  //       size += thisChildSize;
-  //       childSizes[node.children[i].id] = thisChildSize;
-  //     }
+    function sortNodesRecurse(node: Node): number {
+      let size = 1;
+      const childSizes: { [key: number]: number } = {};
+      for (let i = 0; i < node.children.length; i++) {
+        const thisChildSize: number = sortNodesRecurse(node.children[i]);
+        size += thisChildSize;
+        childSizes[node.children[i].id] = thisChildSize;
+      }
 
-  //     node.children.sort((a: Node, b: Node) => {
-  //       if (decending) return childSizes[b.id] - childSizes[a.id];
-  //       else return childSizes[a.id] - childSizes[b.id];
-  //     });
+      node.children.sort((a: Node, b: Node) => {
+        if (decending) return childSizes[b.id] - childSizes[a.id];
+        else return childSizes[a.id] - childSizes[b.id];
+      });
 
-  //     return size;
-  //   }
+      return size;
+    }
 
-  //   sortNodesRecurse(this.root);
+    sortNodesRecurse(this.root);
 
-  //   // Clear out-of-date leaf list
-  //   this.leafList = undefined;
-  // }
+    // Clear out-of-date leaf list
+    this.leafList = undefined;
+  }
 
-  // // Shuffle nodes
-  // shuffleNodes(): void {
-  //   if (this.root === undefined) return;
+  // Shuffle nodes
+  shuffleNodes(): void {
+    if (this.root === undefined) return;
 
-  //   function shuffleArray(array: any[]): void {
-  //     for (let i = array.length - 1; i > 0; i--) {
-  //       const j = Math.floor(Math.random() * (i + 1));
-  //       [array[i], array[j]] = [array[j], array[i]];
-  //     }
-  //   }
+    function shuffleArray(array: any[]): void {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
 
-  //   function shuffleNodesRecurse(node: Node): void {
-  //     for (let i = 0; i < node.children.length; i++)
-  //       shuffleNodesRecurse(node.children[i]);
+    function shuffleNodesRecurse(node: Node): void {
+      for (let i = 0; i < node.children.length; i++)
+        shuffleNodesRecurse(node.children[i]);
 
-  //     shuffleArray(node.children);
-  //   }
+      shuffleArray(node.children);
+    }
 
-  //   shuffleNodesRecurse(this.root);
-  // }
-  // isRecombSrcNode(node: Node): boolean {
-  //   if (node.hybridID !== undefined)
-  //     return (
-  //       node.isHybrid() && this.getRecombEdgeMap()[node.hybridID][0] == node
-  //     );
-  //   return false;
-  // }
+    shuffleNodesRecurse(this.root);
+  }
+  isRecombSrcNode(node: Node): boolean {
+    if (node.hybridID !== undefined)
+      return (
+        node.isHybrid() && this.getRecombEdgeMap()[node.hybridID][0] == node
+      );
+    return false;
+  }
 
-  // isRecombDestNode(node: Node): boolean {
-  //   if (node.hybridID !== undefined)
-  //     return (
-  //       node.isHybrid() && this.getRecombEdgeMap()[node.hybridID][0] != node
-  //     );
-  //   return false;
-  // }
+  isRecombDestNode(node: Node): boolean {
+    if (node.hybridID !== undefined)
+      return (
+        node.isHybrid() && this.getRecombEdgeMap()[node.hybridID][0] != node
+      );
+    return false;
+  }
 
-  // isNetwork(): boolean {
-  //   return Object.keys(this.getRecombEdgeMap()).length > 0;
-  // }
+  isNetwork(): boolean {
+    return Object.keys(this.getRecombEdgeMap()).length > 0;
+  }
 
-  // // Minimize distance between hybrid pairs
-  // minimizeHybridSeparation(): void {
-  //   const recombEdgeMap = this.getRecombEdgeMap();
+  // Minimize distance between hybrid pairs
+  minimizeHybridSeparation(): void {
+    const recombEdgeMap = this.getRecombEdgeMap();
 
-  //   for (const recombID in recombEdgeMap) {
-  //     const srcNode = recombEdgeMap[recombID][0];
+    for (const recombID in recombEdgeMap) {
+      const srcNode = recombEdgeMap[recombID][0];
 
-  //     for (let i = 1; i < recombEdgeMap[recombID].length; i++) {
-  //       const destNode = recombEdgeMap[recombID][i];
-  //       const destNodeP = destNode.parent;
-  //       if (destNodeP === undefined) continue;
-  //       destNodeP.removeChild(destNode);
-  //       if (srcNode.isLeftOf(destNodeP)) {
-  //         destNodeP.children.splice(0, 0, destNode);
-  //       } else {
-  //         destNodeP.children.push(destNode);
-  //       }
-  //     }
-  //   }
-  // }
+      for (let i = 1; i < recombEdgeMap[recombID].length; i++) {
+        const destNode = recombEdgeMap[recombID][i];
+        const destNodeP = destNode.parent;
+        if (destNodeP === undefined) continue;
+        destNodeP.removeChild(destNode);
+        if (srcNode.isLeftOf(destNodeP)) {
+          destNodeP.children.splice(0, 0, destNode);
+        } else {
+          destNodeP.children.push(destNode);
+        }
+      }
+    }
+  }
 
-  // getTraitList(filter?: (node: any, trait: any) => boolean): any[] {
-  //   if (this.root === undefined) return [];
+  getTraitList(filter?: (node: any, trait: any) => boolean): any[] {
+    if (this.root === undefined) return [];
 
-  //   const traitSet: { [key: string]: boolean } = {};
-  //   const nodeList = this.getNodeList();
+    const traitSet: { [key: string]: boolean } = {};
+    const nodeList = this.getNodeList();
 
-  //   for (const thisNode of nodeList) {
-  //     for (const trait in thisNode.annotation) {
-  //       if (filter !== undefined && !filter(thisNode, trait)) continue;
-  //       traitSet[trait] = true;
-  //     }
-  //   }
+    for (const thisNode of nodeList) {
+      for (const trait in thisNode.annotation) {
+        if (filter !== undefined && !filter(thisNode, trait)) continue;
+        traitSet[trait] = true;
+      }
+    }
 
-  //   // Create list from set
-  //   const traitList = Object.keys(traitSet);
+    // Create list from set
+    const traitList = Object.keys(traitSet);
 
-  //   return traitList;
-  // }
+    return traitList;
+  }
 
-  // // Return deep copy of tree:
-  // copy(): Tree {
-  //   return new Tree(this.root.copy());
-  // }
+  // Return deep copy of tree:
+  copy(): Tree {
+    return new Tree(this.root.copy());
+  }
 
-  // translate(tmap: { [key: string]: string }): void {
-  //   const nodeList = this.getNodeList();
-  //   for (const node of nodeList) {
-  //     const { label } = node;
-  //     if (label && Object.prototype.hasOwnProperty.call(tmap, label)) {
-  //       node.label = tmap[label];
-  //     }
-  //   }
-  // }
+  translate(tmap: { [key: string]: string }): void {
+    const nodeList = this.getNodeList();
+    for (const node of nodeList) {
+      const { label } = node;
+      if (label && Object.prototype.hasOwnProperty.call(tmap, label)) {
+        node.label = tmap[label];
+      }
+    }
+  }
 
-  // // Return list of nodes belonging to monophyletic groups involving
-  // // the provided node list
-  // getCladeNodes(nodes: Node[]): Node[] {
-  //   function getCladeMembers(node: Node, nodes: Node[]): Node[] {
-  //     let cladeMembers: Node[] = [];
+  // Return list of nodes belonging to monophyletic groups involving
+  // the provided node list
+  getCladeNodes(nodes: Node[]): Node[] {
+    function getCladeMembers(node: Node, nodes: Node[]): Node[] {
+      let cladeMembers: Node[] = [];
 
-  //     let allChildrenAreMembers = true;
-  //     for (let cidx = 0; cidx < node.children.length; cidx++) {
-  //       const child = node.children[cidx];
+      let allChildrenAreMembers = true;
+      for (let cidx = 0; cidx < node.children.length; cidx++) {
+        const child = node.children[cidx];
 
-  //       const childCladeMembers = getCladeMembers(child, nodes);
-  //       if (childCladeMembers.indexOf(child) < 0) allChildrenAreMembers = false;
+        const childCladeMembers = getCladeMembers(child, nodes);
+        if (childCladeMembers.indexOf(child) < 0) allChildrenAreMembers = false;
 
-  //       cladeMembers = cladeMembers.concat(childCladeMembers);
-  //     }
+        cladeMembers = cladeMembers.concat(childCladeMembers);
+      }
 
-  //     if (
-  //       nodes.indexOf(node) >= 0 ||
-  //       (node.children.length > 0 && allChildrenAreMembers)
-  //     )
-  //       cladeMembers = cladeMembers.concat(node);
+      if (
+        nodes.indexOf(node) >= 0 ||
+        (node.children.length > 0 && allChildrenAreMembers)
+      )
+        cladeMembers = cladeMembers.concat(node);
 
-  //     return cladeMembers;
-  //   }
+      return cladeMembers;
+    }
 
-  //   return getCladeMembers(this.root, nodes);
-  // }
+    return getCladeMembers(this.root, nodes);
+  }
 
-  // // Return list of all nodes ancestral to those in the provided node list
-  // getAncestralNodes(nodes: Node[]): Node[] {
-  //   function getAncestors(node: Node, nodes: Node[]): Node[] {
-  //     let ancestors: Node[] = [];
+  // Return list of all nodes ancestral to those in the provided node list
+  getAncestralNodes(nodes: Node[]): Node[] {
+    function getAncestors(node: Node, nodes: Node[]): Node[] {
+      let ancestors: Node[] = [];
 
-  //     for (let cidx = 0; cidx < node.children.length; cidx++) {
-  //       const child = node.children[cidx];
+      for (let cidx = 0; cidx < node.children.length; cidx++) {
+        const child = node.children[cidx];
 
-  //       ancestors = ancestors.concat(getAncestors(child, nodes));
-  //     }
+        ancestors = ancestors.concat(getAncestors(child, nodes));
+      }
 
-  //     if (nodes.indexOf(node) >= 0 || ancestors.length > 0)
-  //       ancestors = ancestors.concat(node);
+      if (nodes.indexOf(node) >= 0 || ancestors.length > 0)
+        ancestors = ancestors.concat(node);
 
-  //     return ancestors;
-  //   }
+      return ancestors;
+    }
 
-  //   return getAncestors(this.root, nodes);
-  // }
+    return getAncestors(this.root, nodes);
+  }
 
-  // getLineagesThroughTime(): any {
-  //   const nodeList = this.getNodeList().slice(0);
+  getLineagesThroughTime(): any {
+    const nodeList = this.getNodeList().slice(0);
 
-  //   nodeList.sort(function (nodeA, nodeB) {
-  //     if (nodeA.height === undefined || nodeB.height === undefined)
-  //       throw 'height === undefined';
-  //     return nodeA.height - nodeB.height;
-  //   });
+    nodeList.sort(function (nodeA, nodeB) {
+      if (nodeA.height === undefined || nodeB.height === undefined)
+        throw 'height === undefined';
+      return nodeA.height - nodeB.height;
+    });
 
-  //   interface Res {
-  //     lineages: number[];
-  //     ages: number[];
-  //   }
+    interface Res {
+      lineages: number[];
+      ages: number[];
+    }
 
-  //   const res: Res = { lineages: [], ages: [] };
+    const res: Res = { lineages: [], ages: [] };
 
-  //   let k = 0;
-  //   for (let i = 0; i < nodeList.length; i++) {
-  //     const node = nodeList[i];
+    let k = 0;
+    for (let i = 0; i < nodeList.length; i++) {
+      const node = nodeList[i];
 
-  //     k += 1 - node.children.length;
+      k += 1 - node.children.length;
 
-  //     res.lineages.push(k);
-  //     if (node.height !== undefined) {
-  //       res.ages.push(node.height);
-  //     }
-  //   }
+      res.lineages.push(k);
+      if (node.height !== undefined) {
+        res.ages.push(node.height);
+      }
+    }
 
-  //   return res;
-  // }
+    return res;
+  }
 }
