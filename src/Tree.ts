@@ -192,7 +192,7 @@ export class Tree {
   }
 
   // Sum of all defined branch lengths
-  getLength(): number {
+  getTotalBranchLength(): number {
     let totalLength = 0.0;
     const nodeList = this.getNodeList();
 

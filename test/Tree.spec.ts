@@ -69,11 +69,11 @@ describe('reroot() - basic', () => {
     for (let i = 0; i < tr.length; i++) {
       nodes = tr[i].getNodeList().slice(1); // exclude root (0th id)
       for (let j = 0; j < nodes.length; j++) {
-        originalLength.push(tr[i].getLength());
+        originalLength.push(tr[i].getTotalBranchLength());
 
         prop = j / nodes.length;
         tr[i].reroot(nodes[j], prop);
-        newLength.push(tr[i].getLength());
+        newLength.push(tr[i].getTotalBranchLength());
 
         diff.push(Math.abs(originalLength[j] - newLength[j]) < tol);
       }
@@ -84,15 +84,15 @@ describe('reroot() - basic', () => {
   });
 });
 
-describe('getLength()', () => {
+describe('getTotalBranchLength()', () => {
   test('all branch lengths defined', () => {
     const tr = readNewick('((A:1,B:1):1,C:1);');
-    expect(tr.getLength()).toBe(4);
+    expect(tr.getTotalBranchLength()).toBe(4);
   });
 
   test('count undefined branch lengths as zero', () => {
     const tr = readNewick('((A:1,B:1),C:1);');
-    expect(tr.getLength()).toBe(3);
+    expect(tr.getTotalBranchLength()).toBe(3);
   });
 });
 
