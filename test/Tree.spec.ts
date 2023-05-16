@@ -55,7 +55,7 @@ describe('reroot() - basic', () => {
     expect(nwkPrime).not.toBe('((A:1,B:1):1,C:1);');
   });
 
-  const nwk = readFileSync('test/testTrees.nwk', 'utf-8').split(/\r?\n/);
+  const nwk = readFileSync('test/data/testTrees.nwk', 'utf-8').split(/\r?\n/);
   const tr = nwk.map(e => readNewick(e));
 
   test('invariant length with varying prop on test trees', () => {
@@ -110,7 +110,7 @@ describe('getRTTDist()', () => {
   });
 
   test('returns values for test trees (<==> sum defined)', () => {
-    const nwk = readFileSync('test/testTrees.nwk', 'utf-8').split(/\r?\n/);
+    const nwk = readFileSync('test/data/testTrees.nwk', 'utf-8').split(/\r?\n/);
     const tr = nwk.map(e => readNewick(e));
 
     const rttDistances = tr.map(e => e.getRTTDist());
