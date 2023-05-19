@@ -51,8 +51,8 @@ export class Tree {
   }
 
   // root to tip distances. Count undefined branch lengths as zero
-  getRTTDist(): (number | undefined)[] {
-    this.root.applyPreOrder((node: Node) => {
+  getRTTDist(): number[] {
+    const rttDist: number[] = this.root.applyPreOrder((node: Node) => {
       if (node.parent == undefined) {
         node.rttDist = 0.0; // root case
       } else if (node.parent.rttDist !== undefined) {
@@ -62,10 +62,11 @@ export class Tree {
           node.rttDist = node.parent.rttDist;
         }
       }
-      return node.rttDist;
+      if (node.isLeaf()) return node.rttDist;
+      else return null;
     });
 
-    return this.getLeafList().map(e => e.rttDist);
+    return rttDist;
   }
 
   // Assign new node IDs (use with care!)
