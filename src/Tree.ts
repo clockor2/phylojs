@@ -179,16 +179,15 @@ export class Tree {
   }
 
   // get all tip names from tree or from node
-  getTipLabels(node?: Node): (string | undefined)[] {
-    let tips: (string | undefined)[];
+  getTipLabels(node?: Node): string[] {
+    let tips: string[];
     if (node !== undefined) {
       tips = this.getSubtree(node)
         .getLeafList()
-        .map(e => e.id.toString());
+        .map(e => e.label ?? e.id.toString());
     } else {
-      tips = this.getLeafList().map(e => e.label);
+      tips = this.getLeafList().map(e => e.label ?? e.id.toString());
     }
-
     return tips;
   }
 
