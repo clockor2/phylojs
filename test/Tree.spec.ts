@@ -1,11 +1,10 @@
-// phyloWriter.test.ts
 import { readNewick } from '../src/Reader';
 import { Node } from '../src/Node';
 import { Tree } from '../src/Tree';
 import { writeNewick } from '../src/Write';
 import { readFileSync } from 'fs';
 
-describe('PhyloWriter', () => {
+describe('Tree', () => {
   const rootNode = new Node(0);
   const childNode1 = new Node(1);
   childNode1.label = 'A';
@@ -162,6 +161,35 @@ describe('getMRCA()', () => {
     if (mrca === null) throw new Error('MRCA is null');
     const subTree = tr.getSubtree(mrca);
     expect(writeNewick(subTree)).toBe('(("A":0.0,"B":0.0):0.0,"C":0.0):0.0;');
+  });
+});
+
+describe('getNodeByLabel()', () => {
+  test('returns the correct node by its label', () => {
+    const newick = '((A:1,B:1):1,C:1);';
+    const tree = readNewick(newick);
+
+    const nodeA = tree.getNodeByLabel('A');
+    const nodeB = tree.getNodeByLabel('B');
+    const nodeC = tree.getNodeByLabel('C');
+
+    expect(nodeA).toBeInstanceOf(Node);
+    expect(nodeA?.label).toBe('A');
+
+    expect(nodeB).toBeInstanceOf(Node);
+    expect(nodeB?.label).toBe('B');
+
+    expect(nodeC).toBeInstanceOf(Node);
+    expect(nodeC?.label).toBe('C');
+  });
+
+  test('returns null when there is no node with the given label', () => {
+    const newick = '((A:1,B:1):1,C:1);';
+    const tree = readNewick(newick);
+
+    const nodeD = tree.getNodeByLabel('D');
+
+    expect(nodeD).toBeNull();
   });
 });
 

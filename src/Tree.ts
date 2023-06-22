@@ -4,7 +4,8 @@ import { Node } from './Node';
 export class Tree {
   root: Node;
   nodeList: Node[] | undefined;
-  nodeIDMap: { [key: string]: Node } | undefined;
+  nodeIDMap: { [key: number]: Node } | undefined;
+  labelNodeMap: { [key: string]: Node } | undefined;
   leafList: Node[] | undefined;
   recombEdgeMap: { [key: string]: Node[] } | undefined;
   isTimeTree = false;
@@ -80,6 +81,7 @@ export class Tree {
   clearCaches(): void {
     this.nodeList = undefined;
     this.nodeIDMap = undefined;
+    this.labelNodeMap = undefined;
     this.leafList = undefined;
     this.recombEdgeMap = undefined;
   }
@@ -99,7 +101,7 @@ export class Tree {
   }
 
   // Obtain node having given string representation:
-  getNode(nodeID: string): Node | null {
+  getNode(nodeID: number): Node | null {
     if (this.nodeIDMap === undefined && this.root !== undefined) {
       this.nodeIDMap = {};
       for (let i = 0; i < this.getNodeList().length; i++) {
@@ -119,6 +121,23 @@ export class Tree {
       });
     }
     return this.leafList == undefined ? [] : this.leafList;
+  }
+
+  // Retrieve node having given label
+  getNodeByLabel(label: string): Node | null {
+    if (this.labelNodeMap === undefined && this.root !== undefined) {
+      this.labelNodeMap = {};
+      for (let i = 0; i < this.getLeafList().length; i++) {
+        const node: Node = this.getLeafList()[i];
+        if (node.label !== undefined) {
+          this.labelNodeMap[node.label] = node; // Assume Node has 'label' property
+        }
+      }
+    }
+    return this.labelNodeMap == undefined ||
+      this.labelNodeMap[label] === undefined
+      ? null
+      : this.labelNodeMap[label];
   }
 
   // Retrieve map from recomb edge IDs to src/dest node pairs
