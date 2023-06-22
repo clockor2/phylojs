@@ -134,6 +134,37 @@ describe('getSubtree()', () => {
   });
 });
 
+describe('getMRCA()', () => {
+  test('same node', () => {
+    const tr = readNewick('((((A,B),C),D),E);');
+    const nodeA = tr.getLeafList()[0];
+    const mrca = tr.getMRCA([nodeA, nodeA]);
+    if (mrca === null) throw new Error('MRCA is null');
+    const subTree = tr.getSubtree(mrca);
+    expect(writeNewick(subTree)).toBe('"A":0.0;');
+  });
+
+  test('sibling nodes', () => {
+    const tr = readNewick('((((A,B),C),D),E);');
+    const nodeA = tr.getLeafList()[0];
+    const nodeB = tr.getLeafList()[1];
+    const mrca = tr.getMRCA([nodeA, nodeB]);
+    if (mrca === null) throw new Error('MRCA is null');
+    const subTree = tr.getSubtree(mrca);
+    expect(writeNewick(subTree)).toBe('("A":0.0,"B":0.0):0.0;');
+  });
+
+  test('non-sibling nodes', () => {
+    const tr = readNewick('((((A,B),C),D),E);');
+    const nodeA = tr.getLeafList()[0];
+    const nodeC = tr.getLeafList()[2];
+    const mrca = tr.getMRCA([nodeA, nodeC]);
+    if (mrca === null) throw new Error('MRCA is null');
+    const subTree = tr.getSubtree(mrca);
+    expect(writeNewick(subTree)).toBe('(("A":0.0,"B":0.0):0.0,"C":0.0):0.0;');
+  });
+});
+
 describe('getTipLabels()', () => {
   const tr = readNewick('((((A,B),C),D),E);');
   test('whole tree', () => {
