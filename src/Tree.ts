@@ -178,6 +178,37 @@ export class Tree {
     return new Tree(node);
   }
 
+  // get the most recent common ancestor of a set of nodes
+  getMRCA(nodes: Node[]): Node | null {
+    const leafCount = nodes.length;
+    if (leafCount === 0) return null;
+    if (leafCount === 1) return nodes[0].parent || nodes[0];
+
+    const visitCounts = new Map<Node, number>();
+    let nodesToCheck = nodes.slice();
+
+    while (nodesToCheck.length > 0) {
+      const nextNodes: Node[] = [];
+
+      for (const node of nodesToCheck) {
+        const count = (visitCounts.get(node) || 0) + 1;
+        if (count === leafCount) {
+          // This is the MRCA.
+          return node;
+        }
+
+        visitCounts.set(node, count);
+        if (node.parent) {
+          nextNodes.push(node.parent);
+        }
+      }
+
+      nodesToCheck = nextNodes;
+    }
+
+    return null; // return null if no common ancestor is found
+  }
+
   // get all tip names from tree or from node
   getTipLabels(node?: Node): string[] {
     let tips: string[];
