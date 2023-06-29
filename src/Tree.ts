@@ -46,6 +46,23 @@ export class Tree {
     }
   }
 
+  // Ladderise tree
+  ladderise(): void {
+    this.root.applyPreOrder((node: Node) => {
+      node.children.sort((a, b) => {
+        const lenA = this.getSubtree(a).getTipLabels().length;
+        const lenB = this.getSubtree(b).getTipLabels().length;
+        if (lenA < lenB) {
+          return -1;
+        } else if (lenA > lenB) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
+    });
+  }
+
   // Return branch lengths in order matching .getNodeList()
   getBranchLengths(): (number | undefined)[] {
     return this.getNodeList().map(e => e.branchLength);
