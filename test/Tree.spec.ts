@@ -209,3 +209,27 @@ describe('getTipLabels()', () => {
     expect(JSON.stringify(labs)).toMatch(JSON.stringify(['A', 'B', 'C', 'D']));
   });
 });
+
+describe('ladderise()', () => {
+  const tr = readNewick('((D,E),((A,B),C));');
+  let oldNwk = writeNewick(tr)
+  tr.ladderise()
+  let nwkLadderise = writeNewick(tr)
+
+  test('Actually does something', () => {
+    expect(
+      oldNwk
+    ).not.toMatch(
+      nwkLadderise
+    )
+  });
+  
+  test('Sort simple tree', () => {
+    expect(
+      nwkLadderise
+    ).toMatch(
+      '(("D":0.0,"E":0.0):0.0,("C":0.0,("A":0.0,"B":0.0):0.0):0.0):0.0;'
+    );
+
+  });
+});
