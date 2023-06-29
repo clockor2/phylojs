@@ -54,13 +54,13 @@ export class Tree {
         const lenB = this.getSubtree(b).getTipLabels().length;
         if (lenA < lenB) {
           return -1;
-        } else if (lenA < lenB) {
+        } else if (lenA > lenB) {
           return 1;
         } else {
           return 0;
         }
-      })
-    })
+      });
+    });
   }
 
   // Return branch lengths in order matching .getNodeList()
