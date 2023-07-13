@@ -87,3 +87,14 @@ PhyloJS it derived from Tim Vaughan's [IcyTree](https://icytree.org/) and is sim
 [semantic-release-url]: https://github.com/semantic-release/semantic-release
 [commitizen-img]: https://img.shields.io/badge/commitizen-friendly-brightgreen.svg
 [commitizen-url]: http://commitizen.github.io/cz-cli/
+
+
+## [![Repography logo](https://images.repography.com/logo.svg)](https://repography.com) / Recent activity [![Time period](https://images.repography.com/39585511/clockor2/phylojs/recent-activity/fEpIxSDb_sYUgM2j1bUXjyxlfQUWr4vm0GR4B9KfpZ0/AlnGCAo5heF-BM0bnFaZKQDLWHHjzsmfLVqlVNru6dw_badge.svg)](https://repography.com)
+[![Timeline graph](https://images.repography.com/39585511/clockor2/phylojs/recent-activity/fEpIxSDb_sYUgM2j1bUXjyxlfQUWr4vm0GR4B9KfpZ0/AlnGCAo5heF-BM0bnFaZKQDLWHHjzsmfLVqlVNru6dw_timeline.svg)](https://github.com/clockor2/phylojs/commits)
+[![Issue status graph](https://images.repography.com/39585511/clockor2/phylojs/recent-activity/fEpIxSDb_sYUgM2j1bUXjyxlfQUWr4vm0GR4B9KfpZ0/AlnGCAo5heF-BM0bnFaZKQDLWHHjzsmfLVqlVNru6dw_issues.svg)](https://github.com/clockor2/phylojs/issues)
+[![Pull request status graph](https://images.repography.com/39585511/clockor2/phylojs/recent-activity/fEpIxSDb_sYUgM2j1bUXjyxlfQUWr4vm0GR4B9KfpZ0/AlnGCAo5heF-BM0bnFaZKQDLWHHjzsmfLVqlVNru6dw_prs.svg)](https://github.com/clockor2/phylojs/pulls)
+[![Trending topics](https://images.repography.com/39585511/clockor2/phylojs/recent-activity/fEpIxSDb_sYUgM2j1bUXjyxlfQUWr4vm0GR4B9KfpZ0/AlnGCAo5heF-BM0bnFaZKQDLWHHjzsmfLVqlVNru6dw_words.svg)](https://github.com/clockor2/phylojs/commits)
+[![Top contributors](https://images.repography.com/39585511/clockor2/phylojs/recent-activity/fEpIxSDb_sYUgM2j1bUXjyxlfQUWr4vm0GR4B9KfpZ0/AlnGCAo5heF-BM0bnFaZKQDLWHHjzsmfLVqlVNru6dw_users.svg)](https://github.com/clockor2/phylojs/graphs/contributors)
+[![Activity map](https://images.repography.com/39585511/clockor2/phylojs/recent-activity/fEpIxSDb_sYUgM2j1bUXjyxlfQUWr4vm0GR4B9KfpZ0/AlnGCAo5heF-BM0bnFaZKQDLWHHjzsmfLVqlVNru6dw_map.svg)](https://github.com/clockor2/phylojs/commits)
+
+
