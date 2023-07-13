@@ -19,7 +19,7 @@
 
 **PhyloJS** is a powerful javascript/typescript library for manipulating phylogenetic trees. It allows users to read and write trees in various formats, extract subtrees, and compute properties such as the most recent common ancestor (MRCA) of a set of nodes, among other features.
 
-PhyloJS is especially helpful in situations where you need to analyze large phylogenetic trees, such as when you're studying evolutionary relationships in bioinformatics or computational biology. PhyloJS is lightweight and has zero dep.
+PhyloJS is especially helpful in situations where you need to analyze large phylogenetic trees, such as when you're studying evolutionary relationships in bioinformatics or computational biology. PhyloJS is lightweight and has zero dependencies.
 
 ## Installation
 
