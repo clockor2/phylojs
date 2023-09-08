@@ -1,4 +1,4 @@
-# `readNewick` Function Usage Documentation
+# Read
 
 The `readNewick` function is used to parse a Newick string into a tree data structure. Newick format is a simple way to represent tree data structures, often used in phylogenetics, the study of evolutionary relationships among biological entities.
 

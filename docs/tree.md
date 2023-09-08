@@ -1,4 +1,4 @@
-# Tree Class Usage Documentation
+# Manipulate Trees
 
 The Tree class in the provided code is a fundamental structure for storing and managing phylogenetic trees. It includes methods for manipulating and accessing information about the tree.
 

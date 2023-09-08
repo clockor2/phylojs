@@ -1,0 +1,34 @@
+
+site_name: phylojs
+repo_url: https://github.com/clockor2/phylojs
+
+theme:
+  name: "material"
+  palette: 
+    - scheme: default
+      toggle:
+        icon: material/brightness-7 
+        name: Switch to dark mode
+    - scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  logo: images/logo.png
+  favicon: images/logo-pink.png
+  features:
+    - toc.follow
+    - content.action.edit
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+
+plugins:
+- search
+- mkdocs-video:
+    is_video: True
+    video_muted: True
+    video_controls: True
+    css_style:
+      width: "100%"

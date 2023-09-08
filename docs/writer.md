@@ -1,4 +1,4 @@
-# `writeNewick` and `writeNexus` Functions Usage Documentation
+# Write
 
 The `writeNewick` and `writeNexus` functions are used to convert a tree data structure back into a Newick or Nexus formatted string, respectively. Both Newick and Nexus formats are commonly used in phylogenetics to represent tree data structures.
 
