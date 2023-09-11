@@ -1,6 +1,7 @@
 import { Node } from './Node';
 import { Tree } from './Tree';
 
+/** Writes tree in .newick format. Undefined branch lengths set to 0. */
 export function writeNewick(tree: Tree): string {
   let newickStr = '';
 
@@ -10,6 +11,7 @@ export function writeNewick(tree: Tree): string {
   return newickStr;
 }
 
+/** Writes tree in .nexus format. Undefined branch lengths set to 0. */
 export function writeNexus(tree: Tree): string {
   let nexusStr = '#NEXUS\n\nbegin trees;\n';
 

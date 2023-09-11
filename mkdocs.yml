@@ -18,6 +18,14 @@ theme:
   features:
     - toc.follow
     - content.action.edit
+    - navigation.tabs
+    - navigation.indexes
+    - navigation.top
+    - content.action.edit
+    - content.action.view
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.expand
 
 markdown_extensions:
   - admonition
@@ -32,3 +40,21 @@ plugins:
     video_controls: True
     css_style:
       width: "100%"
+- typedoc:
+    source: './src/'
+    tsconfig: 'tsconfig.json'
+    name: 'API'
+    options: 'typedoc.json'
+    disable_system_check: False
+
+nav:
+  - Home: 'index.md'
+  - Examples:
+    - examples/index.md
+    - Finding the MRCA: examples/mrca.md
+    - Root-to-tip regression: examples/rttr.md
+    - Midpoint Rooting: examples/midpoint.md
+    - Other 1: examples/writer.md
+    - Other 2: examples/tree.md
+  - API: '/typedoc'
+  - Cite: cite.md
