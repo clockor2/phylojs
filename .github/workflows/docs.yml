@@ -13,6 +13,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '18'
+      - run: npm install "typedoc"
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
@@ -21,7 +22,6 @@ jobs:
         with:
           key: ${{ github.ref }}
           path: .cache
-      - run: npm install "typedoc"
       - run: pip install "mkdocs-material"
       - run: pip install "mkdocs-typedoc"
       - run: mkdocs gh-deploy --force
