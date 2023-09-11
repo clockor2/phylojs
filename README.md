@@ -29,45 +29,7 @@ You can install PhyloJS using npm:
 npm install phylojs
 ```
 
-## Usage
-
-Here is an example of how you can use PhyloJS to find the MRCA of a set of nodes and then extract a subtree from that MRCA:
-
-```typescript
-import { readNewick, Tree, Node } from 'phylojs';
-
-function findMRCAandExtractSubtree(newickStr: string, labels: string[]): Tree {
-  const tree: Tree = readNewick(newickStr);
-  const nodes: Node[] = labels.map(label => {
-    const node = tree.getNodeByLabel(label);
-    if (node === null) throw new Error(`No node found with label ${label}`);
-    return node;
-  });
-
-  const mrca = tree.getMRCA(nodes);
-  if (mrca === null) throw new Error('MRCA is null');
-
-  const subtree: Tree = tree.getSubtree(mrca);
-
-  return subtree;
-}
-
-const newickStr: string = '((A:0.1,B:0.2):0.3,(C:0.3,D:0.4):0.5,E:0.6);'; // Newick string as input
-const labels: string[] = ['A', 'B', 'D']; // Leaf labels to find MRCA
-
-try {
-  const subtree: Tree = findMRCAandExtractSubtree(newickStr, labels);
-  // Process the 'subtree' as needed
-  // For example, you might print it to the console
-  // console.log(subtree);
-} catch (error) {
-  console.error(error);
-}
-```
-
-This script reads a Newick string to create a `Tree` object, then uses the `getNodeByLabel` method to find nodes corresponding to the given labels. It then calculates the MRCA of these nodes using `getMRCA`, and finally extracts the corresponding subtree using `getSubtree`.
-
-Please refer to the [API Documentation](#) for more details about the available methods and classes in PhyloJS.
+Please refer to the [Documentation](#) for more API documentation and examples of use for phylojs.
 
 ## IcyTree
 
