@@ -23,5 +23,6 @@ jobs:
           key: ${{ github.ref }}
           path: .cache
       - run: pip install "mkdocs-material"
+      - run: pip install "mkdocs-video"
       - run: pip install "mkdocs-typedoc"
       - run: mkdocs gh-deploy --force
