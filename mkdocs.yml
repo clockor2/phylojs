@@ -56,5 +56,5 @@ nav:
     - Midpoint Rooting: examples/midpoint.md
     - Other 1: examples/writer.md
     - Other 2: examples/tree.md
-  - API: '/typedoc'
+  - API: '/phylojs/typedoc'
   - Cite: cite.md
