@@ -53,7 +53,7 @@ nav:
     - examples/index.md
     - Finding the MRCA: examples/mrca.md
     - Root-to-tip regression: examples/rttr.md
-    - Midpoint Rooting: examples/midpoint.md
+    - Rerooting: examples/reroot.md
     - Other 1: examples/writer.md
     - Other 2: examples/tree.md
   - API: '/phylojs/typedoc'

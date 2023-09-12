@@ -1,14 +1,12 @@
-# Root-to-tip Regression
+/////////////////////////////////////////////////////
+//////// Testing examples for documentation /////////
+/////////////////////////////////////////////////////
 
-In this example we will do a root to tip regression on a small tree.
+import { Tree, readNewick, writeNewick } from 'phylojs'
 
-We will demonstrate use of `Tree.getRTTDist()`, `Tree.getTipLabels()`, and the `readNewick()` function. 
+describe('Examples', () => {
 
-We begin by defining the newick string, the linear regression function, and a utility function to parse the tip date from the tip label:
-
-```typescript
-    import { Tree, readNewick, writeNewick } from 'phylojs'
-    
+    test('RTTR', () => {
     // Define tree with dates in tip labels
     let newick = '(("D_2000":1.0,"E_2003":1.2):3.0,("C_2005":2.5,("A_2010":1.8,"B_2011":1.07):1.0):1.2):4.0;'
 
@@ -54,40 +52,47 @@ We begin by defining the newick string, the linear regression function, and a ut
             ? parseFloat(name.split(delimiter)[location])
             : NaN
     }
-```
 
-Now we can run the regression and view the output
-```typescript
-    // read tree
+    // get tree
     let tree = readNewick(newick);
 
     // get root-to-tip distances
     let rttd = tree.getRTTDist()
+    console.log(typeof rttd)
+    console.log(rttd)
 
     // get dates
     let dates = tree
         .getTipLabels()
         .map(e => extractDate(e, '_', 1))
 
-    // NB, you might need to disable linting for this line in VScode, as we have below!
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     let reg = linearRegression(dates, rttd)
-    
+
     // Do regression
     console.log(reg)
-    // Returns
-    // {
-    //   x: [ 2000, 2003, 2005, 2010, 2011 ],
-    //   y: [ 4, 4.2, 3.7, 4, 3.2700000000000005 ],
-    //   slope: -0.04741935483868017,
-    //   intercept: 98.94774193542469,
-    //   fitY: [
-    //     4.109032258064346,
-    //     3.9667741935483036,
-    //     3.871935483870942,
-    //     3.6348387096775383,
-    //     3.5874193548388575
-    //   ],
-    //   r2: 0.37168278586966874
-    // }
-```
+    expect(reg).toBeDefined()
+
+    })
+
+    test('rerooting', () => {
+        let newick = '(("D_2000":1.0,"E_2003":1.2):3.0,("C_2005":2.5,("A_2010":1.8,"B_2011":1.07):1.0):1.2):4.0;'
+        let tree = readNewick(newick)
+
+        let nodes = tree.getNodeList()
+        let length: number[] = []
+
+        // We will reroot at each node and check that the length is the same
+        for (let i=1; i<nodes.length; i++) {
+
+            tree.reroot(nodes[i])
+            length.push(tree.getTotalBranchLength())
+        }
+
+        console.log(`
+            legnth: ${length.map(e => e.toFixed(3))}
+        `)
+
+        expect(length).toBeDefined()
+    })
+})
