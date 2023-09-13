@@ -3,6 +3,7 @@
 /////////////////////////////////////////////////////
 
 import { Tree } from '../../../src/Tree'
+import { Node } from '../../../src/Node'
 import { readNewick } from '../../../src/Reader'
 import { writeNewick } from '../../../src/Write'
 
