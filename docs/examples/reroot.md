@@ -1,4 +1,4 @@
-# Finding the midpoint root
+# Rerooting and ladderising
 
 In this example we will reroot at each node of a dummy tree and check that the tree length (the sum of all branch lengths) is identical each time.
 
@@ -17,6 +17,8 @@ Node that `.getNodeList()` returns an array of nodes (`Node[]`), the first of wh
         for (let i=1; i<nodes.length; i++) {
 
             tree.reroot(nodes[i])
+            tree.ladderise()  // ladderising should also preserve length
+
             length.push(tree.getTotalBranchLength())
 
         }

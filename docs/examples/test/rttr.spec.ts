@@ -2,7 +2,9 @@
 //////// Testing examples for documentation /////////
 /////////////////////////////////////////////////////
 
-import { Tree, readNewick, writeNewick } from 'phylojs'
+import { Tree } from '../../../src/Tree'
+import { readNewick } from '../../../src/Reader'
+import { writeNewick } from '../../../src/Write'
 
 describe('Examples', () => {
 
@@ -86,6 +88,8 @@ describe('Examples', () => {
         for (let i=1; i<nodes.length; i++) {
 
             tree.reroot(nodes[i])
+            tree.ladderise()
+            
             length.push(tree.getTotalBranchLength())
         }
 
