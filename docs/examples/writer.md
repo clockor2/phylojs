@@ -54,7 +54,7 @@ In the example above, `createTreeObject()` is a hypothetical function that retur
 
 The `writeNewick` function uses recursion to traverse the Tree object and build the corresponding Newick string. The `writeNexus` function, on the other hand, uses the same recursive traversal method, but appends additional Nexus-specific formatting to the output string.
 
-Both functions handle node labels, hybrid IDs, and annotations (in the case of the `writeNexus` function), as well as branch lengths. If a node's branch length is undefined, a default value of 0.0 is used.
+Both functions handle node labels, hybrid IDs, and annotations, as well as branch lengths. If a node's branch length is undefined, a default value of 0.0 is used.
 
 ## Function testing
 
