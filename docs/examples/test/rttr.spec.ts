@@ -5,7 +5,8 @@
 import { Tree } from '../../../src/Tree'
 import { Node } from '../../../src/Node'
 import { readNewick } from '../../../src/Reader'
-import { writeNewick } from '../../../src/Write'
+import { writeNewick, writeNexus } from '../../../src/Write'
+import { read } from 'fs'
 
 describe('Examples', () => {
 
@@ -61,8 +62,6 @@ describe('Examples', () => {
 
     // get root-to-tip distances
     let rttd = tree.getRTTDist()
-    console.log(typeof rttd)
-    console.log(rttd)
 
     // get dates
     let dates = tree
@@ -73,7 +72,7 @@ describe('Examples', () => {
     let reg = linearRegression(dates, rttd)
 
     // Do regression
-    console.log(reg)
+    //console.log(reg)
     expect(reg).toBeDefined()
 
     })
@@ -94,10 +93,45 @@ describe('Examples', () => {
             length.push(tree.getTotalBranchLength())
         }
 
-        console.log(`
-            legnth: ${length.map(e => e.toFixed(3))}
-        `)
+        // console.log(`
+        //     legnth: ${length.map(e => e.toFixed(3))}
+        // `)
 
         expect(length).toBeDefined()
+    })
+
+    test('annotations', () => {
+        let newick = '((A[&Type=Blue],B[&Type=Blue]),C[&Type=Green]);'
+        let tree = readNewick(newick)
+
+        if (tree.leafList !== undefined) {
+            for (let i=0; i<tree.leafList.length; i++) {
+                if(tree.leafList[i].annotation.Type == 'Blue') {
+                    tree.leafList[i].annotation.Type = 'Red'
+                } else {
+                    tree.leafList[i].annotation.Type = 'Yellow'
+                }
+            }
+        }
+        expect(writeNewick(tree)).not.toEqual(newick)
+
+    })
+
+    test('annotations subset', () => {
+        let newick = '((A[&Type=Blue],B),C);'
+        let tree = readNewick(newick)
+
+        if (tree.leafList !== undefined) {
+            for (let i=0; i<tree.leafList.length; i++) {
+                if(tree.leafList[i].annotation.Type == 'Blue') {
+                    tree.leafList[i].annotation.Type = 'Red'
+                } else {
+                    tree.leafList[i].annotation.Type = 'Yellow'
+                }
+            }
+        }
+        
+        expect(writeNewick(tree)).not.toEqual(newick)
+        
     })
 })

@@ -6,7 +6,7 @@ export function writeNewick(tree: Tree): string {
   let newickStr = '';
 
   if (tree.root !== undefined)
-    newickStr += newickRecurse(tree.root, false) + ';';
+    newickStr += newickRecurse(tree.root, true) + ';';
 
   return newickStr;
 }
