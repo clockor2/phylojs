@@ -51,10 +51,11 @@ nav:
   - Home: 'index.md'
   - Examples:
     - examples/index.md
+    - Overview of the Tree Class: examples/tree.md
+    - Visualise: examples/visualise.md
     - Finding the MRCA: examples/mrca.md
     - Root-to-tip regression: examples/rttr.md
     - Rerooting: examples/reroot.md
-    - Other 1: examples/writer.md
-    - Other 2: examples/tree.md
+    - Writing trees: examples/writer.md
   - API: '/phylojs/typedoc'
   - Cite: cite.md
