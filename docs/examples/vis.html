@@ -3,34 +3,50 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta content-type="application/javascript; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Passing phylojs to visualisation</title>
 </head>
 
 <body>
+
+    <button onclick="onClick()">Clock to Randomly Reroot</button>
+    <div id="demo"></div>
+
+    </div>
+
     <!-- Include phylojs and phylocanvas -->
     <script src="https://unpkg.com/@phylocanvas/phylocanvas.gl@latest/dist/bundle.min.js"></script>
-    <script src="https://unpkg.com/browse/phylojs@1.4.0/lib/index.js"></script>
-
-
+    <script src="https://unpkg.com/phylojs@latest/lib/dist/phylojs.min.js"></script>
+    <!-- JS code for tree -->
     <script>
         let newick = `(Bovine:0.69395,(Gibbon:0.36079,(Orangutan:0.33636,(Gorilla:0.17147,(Chimp:1.19268,Human:0.11927):0.08386):0.06124):0.15057):0.54939,Mouse:1.21460);`
         let tree = phylojs.readNewick(newick)
-        // Include some manipulation code here later
+        let nNodes = tree.getNodeList().length
+
+        // Initial rendering
         const treeVis = new phylocanvas.PhylocanvasGL(
             document.querySelector("#demo"),
             {
-                size: { width: 400, height: 300 },
+                size: { width: 800, height: 600 },
                 source: phylojs.writeNewick(tree),
-                type: phylocanvas.TreeTypes.Circular,
+                showLeafLabels: true,
+                showLabels: true
             },
-        );
-        console.log(tree)
-        console.log(treeVis)
-    </script>
+        )
+        // Randomly reroot tree on button click
+        function onClick() {
 
-    <div id="demo"></div>
+            let i = Math.floor(nNodes * Math.random() + 1) // Returns an integer from 1,...,nNodes
+            let node = tree.getNodeList()[i]
+
+            tree.reroot(node)
+
+            treeVis.setProps({
+                source: phylojs.writeNewick(tree)
+            })
+
+        }
+    </script>
 
 </body>
 
