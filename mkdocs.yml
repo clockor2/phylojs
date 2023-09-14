@@ -56,6 +56,7 @@ nav:
     - Finding the MRCA: examples/mrca.md
     - Root-to-tip regression: examples/rttr.md
     - Rerooting: examples/reroot.md
+    - Working with annotations: examples/annotations.md
     - Writing trees: examples/writer.md
   - API: '/phylojs/typedoc'
   - Cite: cite.md
