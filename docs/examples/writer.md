@@ -15,7 +15,7 @@ import { writeNewick, writeNexus } from '../src/Write';
 The `writeNewick` function has the following signature:
 
 ```javascript
-writeNewick(tree: Tree): string
+writeNewick(tree: Tree, annotate: boolean = false): string
 ```
 
 **Parameters**
@@ -29,7 +29,7 @@ writeNewick(tree: Tree): string
 The `writeNexus` function has the following signature:
 
 ```javascript
-writeNexus(tree: Tree): string
+writeNexus(tree: Tree, annotate: boolean = true): string
 ```
 
 **Parameters**

@@ -113,7 +113,7 @@ describe('Examples', () => {
                 }
             }
         }
-        expect(writeNewick(tree)).not.toEqual(newick)
+        expect(writeNewick(tree, true)).not.toEqual(newick)
 
     })
 
@@ -131,7 +131,8 @@ describe('Examples', () => {
             }
         }
         
-        expect(writeNewick(tree)).not.toEqual(newick)
+        expect(writeNewick(tree, true)).not.toEqual(newick)
         
     })
+
 })
