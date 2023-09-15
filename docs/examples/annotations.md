@@ -21,7 +21,7 @@ Altered annotations are then writtedn back to newick or nexus.
             }
         }
 
-        console.log(writeNewick)
+        console.log(writeNewick(tree, true))
         // (("A"[&"Type"="Red"]:0.0,"B"[&"Type"="Red"]:0.0):0.0,"C"[&"Type"="Yellow"]:0.0):0.0;
         // Note types changed ^
 ```

@@ -1,23 +1,30 @@
 import { Node } from './Node';
 import { Tree } from './Tree';
 
-/** Writes tree in .newick format. Undefined branch lengths set to 0. */
-export function writeNewick(tree: Tree): string {
+/** 
+ * Writes tree in .newick format. Undefined branch lengths set to 0.
+ * @param {tree} tree The tree to write
+ * @param {boolean} annotate Boolean to include annotations. Default is false.
+ */
+export function writeNewick(tree: Tree, annotate: boolean = false): string {
   let newickStr = '';
 
   if (tree.root !== undefined)
-    newickStr += newickRecurse(tree.root, true) + ';';
+    newickStr += newickRecurse(tree.root, annotate) + ';';
 
   return newickStr;
 }
 
-/** Writes tree in .nexus format. Undefined branch lengths set to 0. */
-export function writeNexus(tree: Tree): string {
+/** Writes tree in .nexus format. Undefined branch lengths set to 0.
+ * @param {tree} tree The tree to write
+ * @param {boolean} annotate Boolean to include annotations. Default is true.
+ */
+export function writeNexus(tree: Tree, annotate: boolean = true): string {
   let nexusStr = '#NEXUS\n\nbegin trees;\n';
 
   if (tree.root !== undefined)
     nexusStr +=
-      `\ttree tree_1 = [&R] ${newickRecurse(tree.root, true)};` + '\n';
+      `\ttree tree_1 = [&R] ${newickRecurse(tree.root, annotate)};` + '\n';
 
   nexusStr += 'end;';
 
