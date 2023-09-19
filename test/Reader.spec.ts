@@ -1,5 +1,11 @@
 import { writeNewick } from '../src/Write';
-import { readNewick, readPhyloXML, readNeXML } from '../src/Reader';
+import {
+  readNewick,
+  readPhyloXML,
+  readNeXML,
+  readTreesFromNewick,
+  readNexus,
+} from '../src/Reader';
 
 describe('TreeFromNewick', () => {
   test('init', () => {
@@ -7,6 +13,26 @@ describe('TreeFromNewick', () => {
     const tree = readNewick(inNewick);
     const outNewick = writeNewick(tree);
     expect(outNewick).toBe(inNewick);
+  });
+  test('readTreesFromNewick', () => {
+    const inNewick =
+      '("A":1,("B":1,"C":1):1):0.0;\n("A":1,("B":1,"C":1):1):0.0;';
+    const trees = readTreesFromNewick(inNewick);
+    const outNewick = trees.map(tree => writeNewick(tree)).join('\n');
+    expect(outNewick).toBe(inNewick);
+  });
+});
+
+describe('TreeFromNexus', () => {
+  test('init', () => {
+    const inNexus = `#NEXUS
+    Begin trees;
+    tree tree1 = (A:1,(B:1,C:1):1);
+    End;`;
+    const tree = readNexus(inNexus);
+    const outNewick = writeNewick(tree[0]);
+    const newick = '("A":1,("B":1,"C":1):1):0.0;';
+    expect(outNewick).toBe(newick);
   });
 });
 
