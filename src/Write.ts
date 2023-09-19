@@ -1,12 +1,12 @@
 import { Node } from './Node';
 import { Tree } from './Tree';
 
-/** 
+/**
  * Writes tree in .newick format. Undefined branch lengths set to 0.
  * @param {tree} tree The tree to write
  * @param {boolean} annotate Boolean to include annotations. Default is false.
  */
-export function writeNewick(tree: Tree, annotate: boolean = false): string {
+export function writeNewick(tree: Tree, annotate = false): string {
   let newickStr = '';
 
   if (tree.root !== undefined)
@@ -19,7 +19,7 @@ export function writeNewick(tree: Tree, annotate: boolean = false): string {
  * @param {tree} tree The tree to write
  * @param {boolean} annotate Boolean to include annotations. Default is true.
  */
-export function writeNexus(tree: Tree, annotate: boolean = true): string {
+export function writeNexus(tree: Tree, annotate = true): string {
   let nexusStr = '#NEXUS\n\nbegin trees;\n';
 
   if (tree.root !== undefined)
