@@ -24,10 +24,10 @@ export class Node {
   cartoon: boolean | undefined;
 
   /**
-     * The constructor of the `Node` class.
-     *
-     * @param {number} id node `id` number
-  */
+   * The constructor of the `Node` class.
+   *
+   * @param {number} id node `id` number
+   */
   constructor(id: number) {
     this.id = id;
 
@@ -47,10 +47,10 @@ export class Node {
     return `node#${this.id}`;
   }
 
-  /** 
+  /**
    * Appends child node to `children`
    * @param {Node} child
-  */
+   */
   addChild(child: Node): void {
     this.children.push(child);
     child.parent = this;
@@ -59,7 +59,7 @@ export class Node {
   /**
    * Removes a node from `children`
    * @param {Node} child
-  */
+   */
   removeChild(child: Node): void {
     const idx = this.children.indexOf(child);
     this.children.splice(idx, 1);
@@ -86,10 +86,10 @@ export class Node {
     return this.hybridID !== undefined;
   }
 
-  /** 
+  /**
    * Gets ancestral nodes
    * @param {Node} node
-  */
+   */
   private _getAncestors(node: Node): Node[] {
     if (node.isRoot()) {
       return [node];
@@ -106,12 +106,12 @@ export class Node {
 
   /**
    * Returns true if this node is left of the argument on the
-   * tree.  If one node is the direct ancestor of the other, 
+   * tree.  If one node is the direct ancestor of the other,
    * the result is undefined.
-   * 
+   *
    * @param {Node} other
-   * 
-  */
+   *
+   */
   isLeftOf(other: Node): boolean | undefined {
     const ancestors = this.getAncestors().reverse();
     const otherAncestors = other.getAncestors().reverse();
@@ -151,10 +151,10 @@ export class Node {
     return nodeCopy;
   }
 
-  /** 
+  /**
    * Apply a function `f()` to each node in a subtree descending from `node` in post-order
-   * @param {Node} node Node from which to apply `f()` post-order 
-  */
+   * @param {Node} node Node from which to apply `f()` post-order
+   */
   applyPreOrder(f: (node: Node) => any): any[] {
     let res: any[] = [];
 
