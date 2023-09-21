@@ -1,5 +1,5 @@
-import { Tree, Node } from '../../';
-import { SkipTreeException } from '../../utils/error';
+import { Tree, Node } from '@phylojs';
+import { SkipTreeException } from '@phylojs/utils/error';
 
 function parse(phyloxml: string): HTMLCollectionOf<Element> {
   const parser = new DOMParser();

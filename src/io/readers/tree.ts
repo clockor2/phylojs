@@ -4,7 +4,7 @@ import {
   readTreesFromNeXML,
   readTreesFromPhyloXML,
   readTreesFromNexus,
-} from '../../';
+} from '@phylojs';
 
 type Schema = 'newick' | 'nexus' | 'phyloxml' | 'nexml';
 

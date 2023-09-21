@@ -1,4 +1,4 @@
-import { Tree } from '../../';
+import { Tree } from '@phylojs';
 import { newickRecurse } from './newick';
 
 /** Writes tree in .nexus format. Undefined branch lengths set to 0.
