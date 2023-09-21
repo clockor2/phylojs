@@ -1,6 +1,5 @@
-import { Tree } from '../../tree';
-import { Node } from '../../node';
-import { SkipTreeException } from '../../utils/Error';
+import { Tree, Node } from '@phylojs';
+import { SkipTreeException } from '@phylojs/utils/error';
 
 const neXMLNS = 'http://www.nexml.org/2009';
 

@@ -1,6 +1,5 @@
-import { Tree } from '../../tree';
-import { Node } from '../../node';
-import { SkipTreeException, ParseException } from '../../utils/Error';
+import { Tree, Node } from '@phylojs';
+import { SkipTreeException, ParseException } from '@phylojs/utils/error';
 
 export function readNewick(newick: string): Tree {
   const tokenList = doLex(newick);

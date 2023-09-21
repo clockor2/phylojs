@@ -1,8 +1,10 @@
-import { readTreesFromNewick } from './newick';
-import { readTreesFromNeXML } from './neXML';
-import { readTreesFromPhyloXML } from './phyloXML';
-import { readTreesFromNexus } from './nexus';
-import { Tree } from '../../tree';
+import {
+  Tree,
+  readTreesFromNewick,
+  readTreesFromNeXML,
+  readTreesFromPhyloXML,
+  readTreesFromNexus,
+} from '@phylojs';
 
 type Schema = 'newick' | 'nexus' | 'phyloxml' | 'nexml';
 

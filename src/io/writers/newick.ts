@@ -1,5 +1,4 @@
-import { Node } from '../../node';
-import { Tree } from '../../tree';
+import { Node, Tree } from '@phylojs';
 
 /**
  * Writes tree in .newick format. Undefined branch lengths set to 0.

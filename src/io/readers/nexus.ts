@@ -1,6 +1,6 @@
-import { Tree } from '../../tree';
-import { SkipTreeException } from '../../utils/Error';
-import { readNewick } from './newick';
+import { Tree } from '@phylojs';
+import { SkipTreeException } from '@phylojs/utils/error';
+import { readNewick } from '@phylojs';
 
 // Function to extract the translate mapping
 export function getTranslateFromNexus(nexus: string): {
