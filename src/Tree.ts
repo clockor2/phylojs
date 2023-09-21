@@ -1,5 +1,5 @@
 // Tree constructor
-import { Node } from './Node';
+import { Node } from './node';
 
 export class Tree {
   /** Public property used to construct tree */

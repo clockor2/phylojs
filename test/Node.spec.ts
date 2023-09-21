@@ -1,4 +1,4 @@
-import { Node } from '../src/Node';
+import { Node } from '../src/node';
 
 describe('Node', () => {
   test('create node and check basic properties', () => {
