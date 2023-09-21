@@ -62,6 +62,7 @@
     "ts-jest": "^27.0.5",
     "ts-loader": "^9.4.4",
     "ts-node": "^10.2.1",
+    "tsconfig-paths-jest": "^0.0.1",
     "tsconfig-paths-webpack-plugin": "^4.1.0",
     "typedoc": "^0.25.1",
     "typedoc-gitlab-wiki-theme": "^1.1.1",

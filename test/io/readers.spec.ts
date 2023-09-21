@@ -1,4 +1,4 @@
-import { writeNewick } from '../../src/index';
+import { writeNewick } from '@phylojs';
 import {
   readNewick,
   readNexus,
@@ -8,7 +8,7 @@ import {
   readTreesFromNexus,
   readTreesFromPhyloXML,
   readTreesFromNeXML,
-} from '../../src/index';
+} from '@phylojs';
 
 describe('Newick', () => {
   test('read', () => {

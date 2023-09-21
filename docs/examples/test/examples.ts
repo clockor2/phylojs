@@ -2,8 +2,8 @@
 //////// Testing examples for documentation /////////
 /////////////////////////////////////////////////////
 
-import { readNewick } from '../../../src/';
-import { writeNewick } from '../../../src/';
+import { readNewick } from '../@phylojs';
+import { writeNewick } from '../@phylojs';
 
 describe('Examples', () => {
   test('RTTR', () => {

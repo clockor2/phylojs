@@ -1,7 +1,7 @@
-import { readNewick } from '../../src/index';
-import { Node } from '../../src/tree/node';
-import { Tree } from '../../src/tree';
-import { writeNewick } from '../../src/index';
+import { readNewick } from '@phylojs';
+import { Node } from '@phylojs/tree/node';
+import { Tree } from '@phylojs/tree';
+import { writeNewick } from '@phylojs';
 import { readFileSync } from 'fs';
 
 describe('Tree', () => {
