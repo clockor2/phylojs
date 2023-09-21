@@ -4,16 +4,17 @@ import { SkipTreeException } from '../../utils/Error';
 
 const neXMLNS = 'http://www.nexml.org/2009';
 
-export function readNeXML(neXMLString: string): Tree {
+function parse(nexml: string): HTMLCollectionOf<Element> {
   const parser = new DOMParser();
-  const doc = parser.parseFromString(neXMLString, 'application/xml');
-  const treeElements = doc.getElementsByTagName('tree');
+  const doc = parser.parseFromString(nexml, 'application/xml');
+  return doc.getElementsByTagName('tree');
+}
+
+export function readNeXML(nexml: string): Tree {
+  const treeElements = parse(nexml);
 
   if (treeElements.length === 0) {
     throw new Error('No tree element found in NeXML.');
-  }
-  if (treeElements.length > 1) {
-    throw new Error('Multiple tree elements found in NeXML.');
   }
   const treeElement = treeElements[0];
   const neXML = new NeXML(treeElement);
@@ -22,6 +23,24 @@ export function readNeXML(neXMLString: string): Tree {
     throw new Error('Failed to parse the NeXML data correctly.');
   }
   return new Tree(neXML.root);
+}
+
+export function readTreesFromNeXML(nexml: string): Tree[] {
+  const trees: Tree[] = [];
+  const treeElements = parse(nexml);
+
+  for (let i = 0; i < treeElements.length; i++) {
+    const treeElement = treeElements[i];
+    const neXML = new NeXML(treeElement);
+
+    if (!neXML.root) {
+      console.log('Skipping NeXML tree: Unrooted tree.');
+      continue;
+    }
+    trees.push(new Tree(neXML.root));
+  }
+
+  return trees;
 }
 
 export class NeXML {

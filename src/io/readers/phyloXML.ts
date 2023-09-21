@@ -2,20 +2,41 @@ import { Tree } from '../../tree';
 import { Node } from '../../node';
 import { SkipTreeException } from '../../utils/Error';
 
-export function readPhyloXML(phyloXMLString: string): Tree {
+function parse(phyloxml: string): HTMLCollectionOf<Element> {
   const parser = new DOMParser();
-  const doc = parser.parseFromString(phyloXMLString, 'application/xml');
-  const phylogenyElements = doc.getElementsByTagName('phylogeny');
+  const doc = parser.parseFromString(phyloxml, 'application/xml');
+  return doc.getElementsByTagName('phylogeny');
+}
+
+export function readPhyloXML(phyloxml: string): Tree {
+  const phylogenyElements = parse(phyloxml);
 
   if (phylogenyElements.length === 0) {
     throw new Error('No phylogeny element found in phyloXML.');
   }
-  if (phylogenyElements.length > 1) {
-    throw new Error('Multiple phylogeny elements found in phyloXML.');
-  }
   const phylogenyElement = phylogenyElements[0];
   const phyloXML = new PhyloXML(phylogenyElement);
+  if (!phyloXML.root) {
+    throw new Error('Failed to parse the phyloXML data correctly.');
+  }
   return new Tree(phyloXML.root);
+}
+
+export function readTreesFromPhyloXML(phyloxml: string): Tree[] {
+  const trees: Tree[] = [];
+  const phylogenyElements = parse(phyloxml);
+
+  for (let i = 0; i < phylogenyElements.length; i++) {
+    const phylogenyElement = phylogenyElements[i];
+    try {
+      const phyloXML = new PhyloXML(phylogenyElement);
+      trees.push(new Tree(phyloXML.root));
+    } catch (SkipTreeException) {
+      console.log(`Skipping phyloXML tree ${i}: Unrooted tree.`);
+    }
+  }
+
+  return trees;
 }
 
 // TreeFromPhyloXML constructor
