@@ -1,30 +1,41 @@
-import { Tree } from './Tree';
-import { Node } from './Node';
+import { Tree, Node } from '@phylojs';
+import { SkipTreeException, ParseException } from '@phylojs/utils/error';
 
-type Token = [string, string, number];
+export function readNewick(newick: string): Tree {
+  const tokenList = doLex(newick);
+  const rootNode = doParse(tokenList, newick);
 
-class ParseException {
-  message: string;
+  const tree = new Tree(rootNode);
+  if (tree.root.branchLength === 0.0) {
+    tree.root.branchLength = undefined;
+  }
 
-  constructor(
-    message: string,
-    context?: { left: string; at: string; right: string }
-  ) {
-    this.message = message;
+  return tree;
+}
 
-    if (context !== undefined) {
-      this.message +=
-        '<br><br>' +
-        'Error context:<br> "... ' +
-        context.left +
-        "<span class='cursor'>" +
-        context.at +
-        '</span>' +
-        context.right +
-        ' ... "';
+export function readTreesFromNewick(newick: string): Tree[] {
+  const trees: Tree[] = [];
+  const lines = newick.split(/;\s*\n/);
+
+  for (let thisLine of lines) {
+    thisLine = thisLine.trim();
+    if (thisLine.length === 0) continue;
+
+    try {
+      trees.push(readNewick(thisLine));
+    } catch (e) {
+      if (e instanceof SkipTreeException) {
+        console.log('Skipping Newick tree: ' + e.message);
+      } else {
+        throw e;
+      }
     }
   }
+
+  return trees;
 }
+
+type Token = [string, string, number];
 
 const tokens: [string, RegExp, boolean, number?][] = [
   ['OPENP', /^\(/, false],
@@ -43,18 +54,6 @@ const tokens: [string, RegExp, boolean, number?][] = [
   ['STRING', /^[^,():;[\]#]+(?:\([^)]*\))?/, true, 0],
   ['STRING', /^[^,[\]{}=]+/, true, 1],
 ];
-
-export function readNewick(newick: string): Tree {
-  const tokenList = doLex(newick);
-  const rootNode = doParse(tokenList, newick);
-
-  const tree = new Tree(rootNode);
-  if (tree.root.branchLength === 0.0) {
-    tree.root.branchLength = undefined;
-  }
-
-  return tree;
-}
 
 function doLex(newick: string): Token[] {
   const tokenList: Token[] = [];

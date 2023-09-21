@@ -1,7 +1,7 @@
-import { readNewick } from '../src/Reader';
-import { Node } from '../src/Node';
-import { Tree } from '../src/Tree';
-import { writeNewick } from '../src/Write';
+import { readNewick } from '@phylojs';
+import { Node } from '@phylojs/tree/node';
+import { Tree } from '@phylojs/tree';
+import { writeNewick } from '@phylojs';
 import { readFileSync } from 'fs';
 
 describe('Tree', () => {
@@ -212,24 +212,17 @@ describe('getTipLabels()', () => {
 
 describe('ladderise()', () => {
   const tr = readNewick('((D,E),((A,B),C));');
-  let oldNwk = writeNewick(tr)
-  tr.ladderise()
-  let nwkLadderise = writeNewick(tr)
+  const oldNwk = writeNewick(tr);
+  tr.ladderise();
+  const nwkLadderise = writeNewick(tr);
 
   test('Actually does something', () => {
-    expect(
-      oldNwk
-    ).not.toMatch(
-      nwkLadderise
-    )
+    expect(oldNwk).not.toMatch(nwkLadderise);
   });
-  
+
   test('Sort simple tree', () => {
-    expect(
-      nwkLadderise
-    ).toMatch(
+    expect(nwkLadderise).toMatch(
       '(("D":0.0,"E":0.0):0.0,("C":0.0,("A":0.0,"B":0.0):0.0):0.0):0.0;'
     );
-
   });
 });

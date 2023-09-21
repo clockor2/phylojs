@@ -1,12 +1,11 @@
-import { Node } from './Node';
-import { Tree } from './Tree';
+import { Node, Tree } from '@phylojs';
 
-/** 
+/**
  * Writes tree in .newick format. Undefined branch lengths set to 0.
  * @param {tree} tree The tree to write
  * @param {boolean} annotate Boolean to include annotations. Default is false.
  */
-export function writeNewick(tree: Tree, annotate: boolean = false): string {
+export function writeNewick(tree: Tree, annotate = false): string {
   let newickStr = '';
 
   if (tree.root !== undefined)
@@ -15,23 +14,7 @@ export function writeNewick(tree: Tree, annotate: boolean = false): string {
   return newickStr;
 }
 
-/** Writes tree in .nexus format. Undefined branch lengths set to 0.
- * @param {tree} tree The tree to write
- * @param {boolean} annotate Boolean to include annotations. Default is true.
- */
-export function writeNexus(tree: Tree, annotate: boolean = true): string {
-  let nexusStr = '#NEXUS\n\nbegin trees;\n';
-
-  if (tree.root !== undefined)
-    nexusStr +=
-      `\ttree tree_1 = [&R] ${newickRecurse(tree.root, annotate)};` + '\n';
-
-  nexusStr += 'end;';
-
-  return nexusStr;
-}
-
-function newickRecurse(node: Node, annotate: boolean): string {
+export function newickRecurse(node: Node, annotate: boolean): string {
   let res = '';
   if (!node.isLeaf()) {
     res += '(';

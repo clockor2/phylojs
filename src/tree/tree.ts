@@ -1,5 +1,5 @@
 // Tree constructor
-import { Node } from './Node';
+import { Node } from './node';
 
 export class Tree {
   /** Public property used to construct tree */
@@ -18,10 +18,10 @@ export class Tree {
   isTimeTree = false;
 
   /**
-     * The constructor of the `Tree` class.
-     *
-     * @param {Node} root Root node
-  */
+   * The constructor of the `Tree` class.
+   *
+   * @param {Node} root Root node
+   */
   constructor(root: Node) {
     this.root = root;
     this.computeNodeAges();
@@ -58,9 +58,9 @@ export class Tree {
     }
   }
 
-  /** Ladderises the tree. 
+  /** Ladderises the tree.
    * Applies a pre-order search.For each node, child nodes are ordered by increasing number of descending tips
-  */
+   */
   ladderise(): void {
     this.root.applyPreOrder((node: Node) => {
       node.children.sort((a, b) => {
@@ -130,10 +130,10 @@ export class Tree {
     return this.nodeList;
   }
 
-  /** 
+  /**
    * Get node given its numerical `id`
    * @param {number} nodeID Numerical id of node
-  */
+   */
   getNode(nodeID: number): Node | null {
     if (this.nodeIDMap === undefined && this.root !== undefined) {
       this.nodeIDMap = {};
@@ -156,7 +156,7 @@ export class Tree {
     return this.leafList == undefined ? [] : this.leafList;
   }
 
-  /** 
+  /**
    * Retrieve node having given label
    * @param {string} label Node's label
    */
@@ -228,10 +228,10 @@ export class Tree {
     return this.recombEdgeMap;
   }
 
-  /** 
+  /**
    * Return sub-stree descending from a given `node`
    * @parm {Node} node root of desired subtree
-  */
+   */
   getSubtree(node: Node): Tree {
     return new Tree(node);
   }
@@ -239,7 +239,7 @@ export class Tree {
   /**
    * Get the most recent common ancestor of a set of nodes
    * @param {Node[]} nodes Nodes for which the MRCA is sought
-  */
+   */
   getMRCA(nodes: Node[]): Node | null {
     const leafCount = nodes.length;
     if (leafCount === 0) return null;
@@ -270,10 +270,10 @@ export class Tree {
     return null; // return null if no common ancestor is found
   }
 
-  /** 
-   * Get all tip names from tree or escending from a `node`
+  /**
+   * Get all tip names from tree or descending from a `node`
    * @param {Node | undefined} node Optional node whose descending tips are returned. Defaults to root
-  */
+   */
   getTipLabels(node?: Node): string[] {
     let tips: string[];
     if (node !== undefined) {
@@ -300,11 +300,11 @@ export class Tree {
     return totalLength;
   }
 
-  /** 
+  /**
    * Reroot a tree at a given node.
    * @param {Node} edgeBaseNode `Node` to reroot at
    * @param {number|undefined} prop Proportion of the branch descending from `edgeBaseNode` at which to cut and place the root. Defaults ot 0.5
-  */
+   */
   reroot(edgeBaseNode: Node, prop?: number): void {
     this.recombEdgeMap = undefined;
     const currentRecombEdgeMap = this.getRecombEdgeMap();
