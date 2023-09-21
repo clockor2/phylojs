@@ -1,5 +1,4 @@
-export { Node } from './node';
-export { Tree } from './tree';
+export { Tree, Node } from './tree';
 export { writeNewick } from './io/writers/newick';
 export { writeNexus } from './io/writers/nexus';
 export { readNewick, readTreesFromNewick } from './io/readers/newick';
