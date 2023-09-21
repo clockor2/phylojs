@@ -1,5 +1,5 @@
 // Tree constructor
-import { Node } from '@phylojs';
+import { Node } from './node';
 
 export class Tree {
   /** Public property used to construct tree */
