@@ -1,4 +1,4 @@
-import { Node } from '../src/node';
+import { Node } from '@phylojs';
 
 describe('Node', () => {
   test('create node and check basic properties', () => {
