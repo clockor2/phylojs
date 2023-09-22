@@ -6,7 +6,7 @@ Arrays of trees (`Tree[]`) can be read in with any of the `readTrees*()` functio
 In the below example, we parse two trees from phyloXML format, reroot them, rescale their branches randomly, and ladderise. Output is then written to newick where it could, for example, be passed to visualisation code.
 
 ```typescript
-    // Using two small trees here
+    // Using two small trees here. 3 tips, all branch lengths set to 1.
     const inPhyloXML = `<phyloxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.phyloxml.org" xsi:schemaLocation="http://www.phyloxml.org http://www.phyloxml.org/1.10/phyloxml.xsd">
     <phylogeny rooted="true">
       <clade>
@@ -47,9 +47,8 @@ In the below example, we parse two trees from phyloXML format, reroot them, resc
     // Read trees
     let trees = readTreesFromPhyloXML(inPhyloXML);
 
-    // Operate on trees using array methods. E.g. Reroot, ladderise, and scale branch lengths randomly
-
-    trees.forEach(t => t.reroot(t.nodeList[4])) // arbitrarily to 4th node
+    // Operate on trees using array methods. E.g. reroot, ladderise, and scale branch lengths randomly
+    trees.forEach(t => t.reroot(t.nodeList[4])) // arbitrarily on branch to 4th node
     trees.forEach(t => t.ladderise())
     trees.forEach(t => t.nodeList.forEach(
       n => n.branchLength ? n.branchLength *= Math.floor(10*Math.random() + 1) : 0
