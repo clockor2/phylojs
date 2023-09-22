@@ -94,6 +94,11 @@ function _getTreesFromNexus(nexus: string, singleTree?: boolean): Tree[] {
   return trees;
 }
 
+/**
+ * Reads a tree from nexus format.
+ * @param {string} nexus
+ * @returns {Tree}
+ */
 export function readNexus(nexus: string): Tree {
   const trees = _getTreesFromNexus(nexus, true);
   if (trees.length === 0) {
@@ -102,6 +107,11 @@ export function readNexus(nexus: string): Tree {
   return trees[0];
 }
 
+/**
+ * Reads trees from from nexus format.
+ * @param {string} nexus
+ * @returns {Tree[]}
+ */
 export function readTreesFromNexus(nexus: string): Tree[] {
   const trees = _getTreesFromNexus(nexus, false);
   return trees;

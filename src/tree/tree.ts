@@ -4,15 +4,15 @@ import { Node } from './node';
 export class Tree {
   /** Public property used to construct tree */
   root: Node;
-  /** A public property that is accessed via a getter */
+  /** A public property */
   nodeList: Node[] | undefined;
-  /** A public property that is accessed via a getter */
+  /** A public property */
   nodeIDMap: { [key: number]: Node } | undefined;
-  /** A public property that is accessed via a getter */
+  /** A public property */
   labelNodeMap: { [key: string]: Node } | undefined;
-  /** A public property that is accessed via a getter */
+  /** A public property */
   leafList: Node[] | undefined;
-  /** A public property that is accessed via a getter */
+  /** A public property */
   recombEdgeMap: { [key: string]: Node[] } | undefined;
   /** A protected property */
   isTimeTree = false;
