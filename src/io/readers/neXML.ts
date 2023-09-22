@@ -9,6 +9,11 @@ function parse(nexml: string): HTMLCollectionOf<Element> {
   return doc.getElementsByTagName('tree');
 }
 
+/**
+ * Reads NeXML string and returns tree.
+ * @param {string} nexml
+ * @returns {Tree}
+ */
 export function readNeXML(nexml: string): Tree {
   const treeElements = parse(nexml);
 
@@ -24,6 +29,11 @@ export function readNeXML(nexml: string): Tree {
   return new Tree(neXML.root);
 }
 
+/**
+ * Reads NeXML strings and returns tree array.
+ * @param {string} nexml
+ * @returns {Tree[]}
+ */
 export function readTreesFromNeXML(nexml: string): Tree[] {
   const trees: Tree[] = [];
   const treeElements = parse(nexml);

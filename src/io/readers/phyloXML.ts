@@ -7,6 +7,11 @@ function parse(phyloxml: string): HTMLCollectionOf<Element> {
   return doc.getElementsByTagName('phylogeny');
 }
 
+/**
+ * Read a tree from phyloXML format. If a list of trees is 
+ * @param {string} phyloxml
+ * @returns {Tree}
+ */
 export function readPhyloXML(phyloxml: string): Tree {
   const phylogenyElements = parse(phyloxml);
 
@@ -21,6 +26,11 @@ export function readPhyloXML(phyloxml: string): Tree {
   return new Tree(phyloXML.root);
 }
 
+/**
+ * Reads multiple trees from phyloXML format.
+ * @param {string} phyloxml
+ * @returns {Tree[]}
+ */
 export function readTreesFromPhyloXML(phyloxml: string): Tree[] {
   const trees: Tree[] = [];
   const phylogenyElements = parse(phyloxml);

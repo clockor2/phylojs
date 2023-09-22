@@ -2,8 +2,8 @@
 //////// Testing examples for documentation /////////
 /////////////////////////////////////////////////////
 
-import { readNewick } from '../@phylojs';
-import { writeNewick } from '../@phylojs';
+import { readNewick, readTreesFromPhyloXML } from '@phylojs';
+import { writeNewick } from '@phylojs';
 
 describe('Examples', () => {
   test('RTTR', () => {
@@ -135,4 +135,61 @@ describe('Examples', () => {
 
     expect(writeNewick(tree, true)).not.toEqual(newick);
   });
+
+  test('multiple trees', () => {
+    // Using two small trees here
+    const inPhyloXML = `<phyloxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.phyloxml.org" xsi:schemaLocation="http://www.phyloxml.org http://www.phyloxml.org/1.10/phyloxml.xsd">
+    <phylogeny rooted="true">
+      <clade>
+          <branch_length>1</branch_length>
+          <name>A</name>
+      </clade>
+      <clade>
+          <branch_length>1</branch_length>
+          <clade>
+              <branch_length>1</branch_length>
+              <name>B</name>
+          </clade>
+          <clade>
+              <branch_length>1</branch_length>
+              <name>C</name>
+          </clade>
+      </clade>
+    </phylogeny>
+    <phylogeny rooted="true">
+      <clade>
+          <branch_length>1</branch_length>
+          <name>A</name>
+      </clade>
+      <clade>
+          <branch_length>1</branch_length>
+          <clade>
+              <branch_length>1</branch_length>
+              <name>B</name>
+          </clade>
+          <clade>
+              <branch_length>1</branch_length>
+              <name>C</name>
+          </clade>
+      </clade>
+    </phylogeny>
+    </phyloxml>`;
+
+    let trees = readTreesFromPhyloXML(inPhyloXML);
+
+    let inNewick = trees.map(t => writeNewick(t)).join('\n')
+
+    // Operate on trees using array methods. E.g. Reroot, ladderise, and scale branch lengths randomly
+
+    trees.forEach(t => t.reroot(t.nodeList[4])) // arbitrarily to 4th node
+    trees.forEach(t => t.ladderise())
+    trees.forEach(t => t.nodeList.forEach(
+      n => n.branchLength ? n.branchLength *= Math.floor(10*Math.random() + 1) : 0
+    ))
+
+    // write output
+    let outNewick = trees.map(t => writeNewick(t)).join('\n')
+
+    expect(inNewick).not.toEqual(outNewick)
+  })
 });

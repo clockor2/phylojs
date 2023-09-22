@@ -1,6 +1,12 @@
 import { Tree, Node } from '@phylojs';
 import { SkipTreeException, ParseException } from '@phylojs/utils/error';
 
+
+/**
+ * Reads .newick string and returns a tree.
+ * @param {string} newick
+ * @returns {Tree} Tree
+ */
 export function readNewick(newick: string): Tree {
   const tokenList = doLex(newick);
   const rootNode = doParse(tokenList, newick);
@@ -13,6 +19,11 @@ export function readNewick(newick: string): Tree {
   return tree;
 }
 
+/**
+ * Reads .newick strings, separated by ';' and returns an array of Trees.
+ * @param {string} newick
+ * @returns {Tree[]} Tree
+ */
 export function readTreesFromNewick(newick: string): Tree[] {
   const trees: Tree[] = [];
   const lines = newick.split(/;\s*\n/);
