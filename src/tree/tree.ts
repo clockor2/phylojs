@@ -5,13 +5,13 @@ export class Tree {
   /** Public property used to construct tree */
   root: Node;
   /** A public property */
-  nodeList: Node[] | undefined;
+  private _nodeList: Node[] | undefined;
   /** A public property */
   nodeIDMap: { [key: number]: Node } | undefined;
   /** A public property */
   labelNodeMap: { [key: string]: Node } | undefined;
   /** A public property */
-  leafList: Node[] | undefined;
+  private _leafList: Node[] | undefined;
   /** A public property */
   recombEdgeMap: { [key: string]: Node[] } | undefined;
   /** A protected property */
@@ -50,8 +50,8 @@ export class Tree {
       !Number.isNaN(youngestHeight) &&
       (heights.length > 1 || this.root.branchLength !== undefined);
 
-    for (let i = 0; i < this.getNodeList().length; i++) {
-      const node = this.getNodeList()[i];
+    for (let i = 0; i < this.nodeList.length; i++) {
+      const node = this.nodeList[i];
       if (node.height !== undefined) {
         node.height -= youngestHeight;
       }
@@ -77,9 +77,9 @@ export class Tree {
     });
   }
 
-  /** Return branch lengths in order matching .getNodeList() */
+  /** Return branch lengths in order matching .nodeList */
   getBranchLengths(): (number | undefined)[] {
-    return this.getNodeList().map(e => e.branchLength);
+    return this.nodeList.map(e => e.branchLength);
   }
 
   /** Returns root to tip distances. Counts undefined branch lengths as zero */
@@ -104,30 +104,30 @@ export class Tree {
   /** Assign new node IDs (use with care!) */
   reassignNodeIDs(): void {
     let nodeID = 0;
-    for (let i = 0; i < this.getNodeList().length; i++)
-      this.getNodeList()[i].id = nodeID++;
+    for (let i = 0; i < this.nodeList.length; i++)
+      this.nodeList[i].id = nodeID++;
   }
 
   /** Clear various node caches */
   clearCaches(): void {
-    this.nodeList = undefined;
+    this._nodeList = undefined;
     this.nodeIDMap = undefined;
     this.labelNodeMap = undefined;
-    this.leafList = undefined;
+    this._leafList = undefined;
     this.recombEdgeMap = undefined;
   }
 
-  /** Retrieve list of nodes in tree. */
-  getNodeList(): Node[] {
-    if (this.nodeList === undefined && this.root !== undefined) {
-      this.nodeList = this.root.applyPreOrder((node: Node) => {
+  /** A getter that returns an array of nodes (`Node[]`) from private `_nodeList` property in order determined by a pre-order search*/
+  get nodeList(): Node[] {
+    if (this._nodeList === undefined && this.root !== undefined) {
+      this._nodeList = this.root.applyPreOrder((node: Node) => {
         return node;
       });
     }
-    if (!this.nodeList) {
+    if (!this._nodeList) {
       return [];
     }
-    return this.nodeList;
+    return this._nodeList;
   }
 
   /**
@@ -137,23 +137,23 @@ export class Tree {
   getNode(nodeID: number): Node | null {
     if (this.nodeIDMap === undefined && this.root !== undefined) {
       this.nodeIDMap = {};
-      for (let i = 0; i < this.getNodeList().length; i++) {
-        const node: Node = this.getNodeList()[i];
+      for (let i = 0; i < this.nodeList.length; i++) {
+        const node: Node = this.nodeList[i];
         this.nodeIDMap[node.id] = node;
       }
     }
     return this.nodeIDMap == undefined ? null : this.nodeIDMap[nodeID];
   }
 
-  /** Retrieve list of leaves in tree. Order determined by pre-order search */
-  getLeafList(): Node[] {
-    if (this.leafList === undefined && this.root !== undefined) {
-      this.leafList = this.root.applyPreOrder((node: Node) => {
+  /** A getter that returns an array of nodes (`Node[]`) from private `_nodeList` property in order determined by a pre-order search*/
+  get leafList(): Node[] {
+    if (this._leafList === undefined && this.root !== undefined) {
+      this._leafList = this.root.applyPreOrder((node: Node) => {
         if (node.isLeaf()) return node;
         else return null;
       });
     }
-    return this.leafList == undefined ? [] : this.leafList;
+    return this._leafList == undefined ? [] : this._leafList;
   }
 
   /**
@@ -163,8 +163,8 @@ export class Tree {
   getNodeByLabel(label: string): Node | null {
     if (this.labelNodeMap === undefined && this.root !== undefined) {
       this.labelNodeMap = {};
-      for (let i = 0; i < this.getLeafList().length; i++) {
-        const node: Node = this.getLeafList()[i];
+      for (let i = 0; i < this.leafList.length; i++) {
+        const node: Node = this.leafList[i];
         if (node.label !== undefined) {
           this.labelNodeMap[node.label] = node; // Assume Node has 'label' property
         }
@@ -278,10 +278,10 @@ export class Tree {
     let tips: string[];
     if (node !== undefined) {
       tips = this.getSubtree(node)
-        .getLeafList()
+        .leafList
         .map(e => e.label ?? e.id.toString());
     } else {
-      tips = this.getLeafList().map(e => e.label ?? e.id.toString());
+      tips = this.leafList.map(e => e.label ?? e.id.toString());
     }
     return tips;
   }
@@ -289,7 +289,7 @@ export class Tree {
   /** Sum of all defined branch lengths. Elsewhere referred to tree "length" if all baranch lengths are defined */
   getTotalBranchLength(): number {
     let totalLength = 0.0;
-    const nodeList = this.getNodeList();
+    const nodeList = this.nodeList;
 
     for (const node of nodeList) {
       if (node.branchLength !== undefined) {

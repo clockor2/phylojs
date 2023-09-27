@@ -9,8 +9,8 @@ function Tree(root) {
 // Tree methods
 
 // Compute node ages
-Tree.prototype.computeNodeAges = function() {
-    var heights = this.root.applyPreOrder(function(node) {
+Tree.prototype.computeNodeAges = function () {
+    var heights = this.root.applyPreOrder(function (node) {
         if (node.parent === undefined)
             node.height = 0.0;
         else {
@@ -25,21 +25,21 @@ Tree.prototype.computeNodeAges = function() {
     });
     var youngestHeight = Math.min.apply(null, heights);
 
-    this.isTimeTree = !Number.isNaN(youngestHeight) && (heights.length>1 || this.root.branchLength !== undefined);
+    this.isTimeTree = !Number.isNaN(youngestHeight) && (heights.length > 1 || this.root.branchLength !== undefined);
 
-    for (var i=0; i<this.getNodeList().length; i++)
-        this.getNodeList()[i].height -= youngestHeight;
+    for (var i = 0; i < this.nodeList().length; i++)
+        this.nodeList()[i].height -= youngestHeight;
 };
 
 // Assign new node IDs (use with care!)
-Tree.prototype.reassignNodeIDs = function() {
+Tree.prototype.reassignNodeIDs = function () {
     var nodeID = 0;
-    for (var i=0; i<this.getNodeList().length; i++)
-        this.getNodeList()[i].id = nodeID++;
+    for (var i = 0; i < this.nodeList().length; i++)
+        this.nodeList()[i].id = nodeID++;
 };
 
 // Clear various node caches:
-Tree.prototype.clearCaches = function() {
+Tree.prototype.clearCaches = function () {
     this.nodeList = undefined;
     this.nodeIDMap = undefined;
     this.leafList = undefined;
@@ -48,9 +48,9 @@ Tree.prototype.clearCaches = function() {
 
 // Retrieve list of nodes in tree.
 // (Should maybe use accessor function for this.)
-Tree.prototype.getNodeList = function() {
+Tree.prototype.getNodeList = function () {
     if (this.nodeList === undefined && this.root !== undefined) {
-        this.nodeList = this.root.applyPreOrder(function(node) {
+        this.nodeList = this.root.applyPreOrder(function (node) {
             return node;
         });
     }
@@ -59,11 +59,11 @@ Tree.prototype.getNodeList = function() {
 };
 
 // Obtain node having given string representation:
-Tree.prototype.getNode = function(nodeID) {
+Tree.prototype.getNode = function (nodeID) {
     if (this.nodeIDMap === undefined && this.root !== undefined) {
         this.nodeIDMap = {};
-        for (var i=0; i<this.getNodeList().length; i++) {
-            var node = this.getNodeList()[i];
+        for (var i = 0; i < this.nodeList().length; i++) {
+            var node = this.nodeList()[i];
             this.nodeIDMap[node] = node;
         }
     }
@@ -72,9 +72,9 @@ Tree.prototype.getNode = function(nodeID) {
 };
 
 // Retrieve list of leaves in tree, in correct order.
-Tree.prototype.getLeafList = function() {
+Tree.prototype.getLeafList = function () {
     if (this.leafList === undefined && this.root !== undefined) {
-        this.leafList = this.root.applyPreOrder(function(node) {
+        this.leafList = this.root.applyPreOrder(function (node) {
             if (node.isLeaf())
                 return node;
             else
@@ -86,13 +86,13 @@ Tree.prototype.getLeafList = function() {
 };
 
 // Retrieve map from recomb edge IDs to src/dest node pairs
-Tree.prototype.getRecombEdgeMap = function() {
+Tree.prototype.getRecombEdgeMap = function () {
     if (this.recombEdgeMap === undefined) {
 
         var node, i;
         var hybridNodeList;
         if (this.root !== undefined) {
-            hybridNodeList = this.root.applyPreOrder(function(node) {
+            hybridNodeList = this.root.applyPreOrder(function (node) {
                 if (node.isHybrid())
                     return node;
                 else
@@ -104,7 +104,7 @@ Tree.prototype.getRecombEdgeMap = function() {
 
         var srcHybridIDMap = {};
         var destHybridIDMap = {};
-        for (i=0; i<hybridNodeList.length; i++) {
+        for (i = 0; i < hybridNodeList.length; i++) {
             node = hybridNodeList[i];
             if (node.isLeaf()) {
                 if (node.hybridID in destHybridIDMap)
@@ -136,37 +136,37 @@ Tree.prototype.getRecombEdgeMap = function() {
     return this.recombEdgeMap;
 };
 
-Tree.prototype.isRecombSrcNode = function(node) {
+Tree.prototype.isRecombSrcNode = function (node) {
     return node.isHybrid() && this.getRecombEdgeMap()[node.hybridID][0] == node;
 };
 
-Tree.prototype.isRecombDestNode = function(node) {
+Tree.prototype.isRecombDestNode = function (node) {
     return node.isHybrid() && this.getRecombEdgeMap()[node.hybridID][0] != node;
 };
 
-Tree.prototype.isNetwork = function() {
+Tree.prototype.isNetwork = function () {
     return Object.keys(this.getRecombEdgeMap()).length > 0;
 };
 
 // Sort nodes according to clade sizes.
-Tree.prototype.sortNodes = function(decending) {
+Tree.prototype.sortNodes = function (decending) {
     if (this.root === undefined)
         return;
 
     function sortNodesRecurse(node) {
         var size = 1;
         var childSizes = {};
-        for (var i=0; i<node.children.length; i++) {
+        for (var i = 0; i < node.children.length; i++) {
             var thisChildSize = sortNodesRecurse(node.children[i]);
             size += thisChildSize;
             childSizes[node.children[i]] = thisChildSize;
         }
 
-        node.children.sort(function(a,b) {
+        node.children.sort(function (a, b) {
             if (decending)
-                return childSizes[b]-childSizes[a];
+                return childSizes[b] - childSizes[a];
             else
-                return childSizes[a]-childSizes[b];
+                return childSizes[a] - childSizes[b];
         });
 
         return size;
@@ -179,7 +179,7 @@ Tree.prototype.sortNodes = function(decending) {
 };
 
 // Shuffle nodes
-Tree.prototype.shuffleNodes = function() {
+Tree.prototype.shuffleNodes = function () {
     if (this.root === undefined)
         return;
 
@@ -191,7 +191,7 @@ Tree.prototype.shuffleNodes = function() {
     }
 
     function shuffleNodesRecurse(node) {
-        for (let i=0; i<node.children.length; i++)
+        for (let i = 0; i < node.children.length; i++)
             shuffleNodesRecurse(node.children[i]);
 
         shuffleArray(node.children);
@@ -201,20 +201,20 @@ Tree.prototype.shuffleNodes = function() {
 }
 
 // Minimize distance between hybrid pairs
-Tree.prototype.minimizeHybridSeparation = function() {
+Tree.prototype.minimizeHybridSeparation = function () {
 
     var recombEdgeMap = this.getRecombEdgeMap();
 
     for (var recombID in recombEdgeMap) {
         var srcNode = recombEdgeMap[recombID][0];
 
-        for (var i=1; i<recombEdgeMap[recombID].length; i++) {
+        for (var i = 1; i < recombEdgeMap[recombID].length; i++) {
             var destNode = recombEdgeMap[recombID][i];
             var destNodeP = destNode.parent;
 
             destNodeP.removeChild(destNode);
             if (srcNode.isLeftOf(destNodeP)) {
-                destNodeP.children.splice(0,0,destNode);
+                destNodeP.children.splice(0, 0, destNode);
             } else {
                 destNodeP.children.push(destNode);
             }
@@ -223,9 +223,9 @@ Tree.prototype.minimizeHybridSeparation = function() {
 };
 
 // Collapse zero-length edges:
-Tree.prototype.collapseZeroLengthEdges = function() {
+Tree.prototype.collapseZeroLengthEdges = function () {
 
-    this.root.applyPreOrder(function(node) {
+    this.root.applyPreOrder(function (node) {
 
         var childrenToConsider = node.children.slice();
         while (childrenToConsider.length > 0) {
@@ -238,7 +238,7 @@ Tree.prototype.collapseZeroLengthEdges = function() {
                 node.annotation = child.annotation;
                 node.label = child.label;
 
-                for (var j=0; j<child.children.length; j++) {
+                for (var j = 0; j < child.children.length; j++) {
                     var grandChild = child.children[j];
                     node.addChild(grandChild);
                     childrenToConsider.push(grandChild);
@@ -253,7 +253,7 @@ Tree.prototype.collapseZeroLengthEdges = function() {
 };
 
 // Re-root tree:
-Tree.prototype.reroot = function(edgeBaseNode) {
+Tree.prototype.reroot = function (edgeBaseNode) {
 
     this.recombEdgeMap = undefined;
     var currentRecombEdgeMap = this.getRecombEdgeMap();
@@ -324,14 +324,14 @@ Tree.prototype.reroot = function(edgeBaseNode) {
             var destNodePs = [];
 
             destNodes = currentRecombEdgeMap[node.hybridID].slice(1);
-            destNodePs = destNodes.map(function(destNode) {
+            destNodePs = destNodes.map(function (destNode) {
                 return destNode.parent;
             });
 
             // Node will no longer be hybrid
             node.hybridID = undefined;
 
-            for (var i=0; i<destNodes.length; i++) {
+            for (var i = 0; i < destNodes.length; i++) {
                 destNodePs[i].removeChild(destNodes[i]);
 
                 recurseReroot(destNodePs[i], node, seenNodes, destNodes[i].branchLength);
@@ -366,7 +366,7 @@ Tree.prototype.reroot = function(edgeBaseNode) {
     // Ensure destNode leaf heights match those of corresponding srcNodes
     for (recombID in this.getRecombEdgeMap()) {
         var srcNode = this.getRecombEdgeMap()[recombID][0];
-        for (i=1; i<this.getRecombEdgeMap()[recombID].length; i++) {
+        for (i = 1; i < this.getRecombEdgeMap()[recombID].length; i++) {
             var destNode = this.getRecombEdgeMap()[recombID][i];
             destNode.branchLength += destNode.height - srcNode.height;
         }
@@ -375,15 +375,15 @@ Tree.prototype.reroot = function(edgeBaseNode) {
 
 // Retrieve list of traits defined on tree.  Optional filter function can
 // be used to disregard traits defined on a particular subset of nodes.
-Tree.prototype.getTraitList = function(filter) {
+Tree.prototype.getTraitList = function (filter) {
     if (this.root === undefined)
         return [];
 
     var trait; // Define iteration variable
 
     var traitSet = {};
-    for (var i=0; i<this.getNodeList().length; i++) {
-        var thisNode = this.getNodeList()[i];
+    for (var i = 0; i < this.nodeList().length; i++) {
+        var thisNode = this.nodeList()[i];
         for (trait in thisNode.annotation) {
             if (filter !== undefined && !filter(thisNode, trait))
                 continue;
@@ -401,26 +401,26 @@ Tree.prototype.getTraitList = function(filter) {
 
 
 // Return deep copy of tree:
-Tree.prototype.copy = function() {
+Tree.prototype.copy = function () {
     return new Tree(this.root.copy());
 };
 
 
 // Translate labels using provided map:
-Tree.prototype.translate = function(tmap) {
+Tree.prototype.translate = function (tmap) {
 
-    var nodeList = this.getNodeList();
-    for (var i=0; i<nodeList.length; i++) {
+    var nodeList = this.nodeList();
+    for (var i = 0; i < nodeList.length; i++) {
         if (tmap.hasOwnProperty(nodeList[i].label))
             nodeList[i].label = tmap[nodeList[i].label];
     }
 };
 
 // Get total length of all edges in tree
-Tree.prototype.getLength = function() {
+Tree.prototype.getLength = function () {
     var totalLength = 0.0;
-    for (var i=0; i<this.getNodeList().length; i++) {
-        var node = this.getNodeList()[i];
+    for (var i = 0; i < this.nodeList().length; i++) {
+        var node = this.nodeList()[i];
         if (node.isRoot())
             continue;
         totalLength += node.parent.height - node.height;
@@ -431,24 +431,24 @@ Tree.prototype.getLength = function() {
 
 // Return list of nodes belonging to monophyletic groups involving
 // the provided node list
-Tree.prototype.getCladeNodes = function(nodes) {
+Tree.prototype.getCladeNodes = function (nodes) {
 
     function getCladeMembers(node, nodes) {
 
         var cladeMembers = [];
 
         var allChildrenAreMembers = true;
-        for (var cidx=0; cidx<node.children.length; cidx++) {
+        for (var cidx = 0; cidx < node.children.length; cidx++) {
             var child = node.children[cidx];
 
             var childCladeMembers = getCladeMembers(child, nodes);
-            if (childCladeMembers.indexOf(child)<0)
+            if (childCladeMembers.indexOf(child) < 0)
                 allChildrenAreMembers = false;
 
             cladeMembers = cladeMembers.concat(childCladeMembers);
         }
 
-        if (nodes.indexOf(node)>=0 || (node.children.length>0 && allChildrenAreMembers))
+        if (nodes.indexOf(node) >= 0 || (node.children.length > 0 && allChildrenAreMembers))
             cladeMembers = cladeMembers.concat(node);
 
         return cladeMembers;
@@ -458,18 +458,18 @@ Tree.prototype.getCladeNodes = function(nodes) {
 };
 
 // Return list of all nodes ancestral to those in the provided node list
-Tree.prototype.getAncestralNodes = function(nodes) {
+Tree.prototype.getAncestralNodes = function (nodes) {
 
     function getAncestors(node, nodes) {
         var ancestors = [];
 
-        for (var cidx=0; cidx<node.children.length; cidx++) {
+        for (var cidx = 0; cidx < node.children.length; cidx++) {
             var child = node.children[cidx];
 
             ancestors = ancestors.concat(getAncestors(child, nodes));
         }
 
-        if (nodes.indexOf(node)>=0 || ancestors.length>0)
+        if (nodes.indexOf(node) >= 0 || ancestors.length > 0)
             ancestors = ancestors.concat(node);
 
         return ancestors;
@@ -478,22 +478,22 @@ Tree.prototype.getAncestralNodes = function(nodes) {
     return getAncestors(this.root, nodes);
 };
 
-Tree.prototype.getLineagesThroughTime = function() {
-    var nodeList = this.getNodeList().slice(0);
+Tree.prototype.getLineagesThroughTime = function () {
+    var nodeList = this.nodeList().slice(0);
 
-    nodeList.sort(function(nodeA, nodeB) {return nodeA.height - nodeB.height})
+    nodeList.sort(function (nodeA, nodeB) { return nodeA.height - nodeB.height })
 
-    res = {lineages: [], ages: []};
+    res = { lineages: [], ages: [] };
 
     var k = 0;
-    for (var i=0; i<nodeList.length; i++) {
-	var node = nodeList[i];
+    for (var i = 0; i < nodeList.length; i++) {
+        var node = nodeList[i];
 
-	k += 1 - node.children.length;
+        k += 1 - node.children.length;
 
-	res.lineages.push(k);
-	res.ages.push(node.height);
+        res.lineages.push(k);
+        res.ages.push(node.height);
     }
 
-    return(res);
+    return (res);
 }

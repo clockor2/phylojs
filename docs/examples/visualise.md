@@ -71,7 +71,7 @@ Finally, we can add the phylojs code to parse and reroot the tree as well as the
     <script>
         let newick = `(Bovine:0.69395,(Gibbon:0.36079,(Orangutan:0.33636,(Gorilla:0.17147,(Chimp:1.19268,Human:0.11927):0.08386):0.06124):0.15057):0.54939,Mouse:1.21460);`
         let tree = phylojs.readNewick(newick)
-        let nNodes = tree.getNodeList().length
+        let nNodes = tree.nodeList().length
 
         // Initial rendering
         const treeVis = new phylocanvas.PhylocanvasGL(
@@ -87,7 +87,7 @@ Finally, we can add the phylojs code to parse and reroot the tree as well as the
         function onClick() {
 
             let i = Math.floor(nNodes * Math.random() + 1) // Returns an integer from 1,...,nNodes
-            let node = tree.getNodeList()[i]
+            let node = tree.nodeList()[i]
 
             tree.reroot(node)
 

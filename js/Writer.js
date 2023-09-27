@@ -29,8 +29,8 @@ var Write = (function () {
         var res = "";
         if (!node.isLeaf()) {
             res += "(";
-            for (var i=0; i<node.children.length; i++) {
-                if (i>0)
+            for (var i = 0; i < node.children.length; i++) {
+                if (i > 0)
                     res += ",";
                 res += newickRecurse(node.children[i], annotate);
             }
@@ -45,12 +45,12 @@ var Write = (function () {
 
         if (annotate) {
             var keys = Object.keys(node.annotation);
-            if (keys.length>0) {
+            if (keys.length > 0) {
                 res += "[&";
-                for (var idx=0; idx<keys.length; idx++) {
+                for (var idx = 0; idx < keys.length; idx++) {
                     var key = keys[idx];
 
-                    if (idx>0)
+                    if (idx > 0)
                         res += ",";
                     res += "\"" + key + "\"=";
                     if (node.annotation[key] instanceof Array)
@@ -115,7 +115,7 @@ var Write = (function () {
         if (node.branchLength !== undefined)
             clade.setAttribute("branch_length", node.branchLength);
 
-        for (var i=0; i<node.children.length; i++)
+        for (var i = 0; i < node.children.length; i++)
             clade.appendChild(phyloXMLRecurse(node.children[i], doc));
 
         return clade;
@@ -152,7 +152,7 @@ var Write = (function () {
         if (node.label !== undefined && node.label !== "")
             nodeEl.setAttribute("label", node.label);
 
-        if (Object.keys(node.annotation).length>0) {
+        if (Object.keys(node.annotation).length > 0) {
             nodeEl.setAttribute("about", "#n" + node.id);
 
             var metaID = 0;
@@ -171,7 +171,7 @@ var Write = (function () {
 
         treeEl.appendChild(nodeEl);
 
-        for (var i=0; i<node.children.length; i++) {
+        for (var i = 0; i < node.children.length; i++) {
             var child = node.children[i];
 
 
@@ -185,7 +185,7 @@ var Write = (function () {
                 edgeEl.setAttribute("length", child.branchLength);
 
             treeEl.appendChild(edgeEl);
-            
+
             neXMLRecurse(child, doc, treeEl);
         }
 
@@ -203,9 +203,9 @@ var Write = (function () {
             var otus = doc.createElementNS(neXMLNS, "otus");
             otus.setAttribute("id", "taxa");
             otus.setAttribute("label", "RootTaxaBlock");
-            for (var i=0; i<tree.getLeafList().length; i++) {
+            for (var i = 0; i < tree.leafList().length; i++) {
                 var otu = doc.createElementNS(neXMLNS, "otu");
-                otu.setAttribute("id", "t" + tree.getLeafList()[i].id);
+                otu.setAttribute("id", "t" + tree.leafList()[i].id);
                 otus.appendChild(otu);
             }
             doc.documentElement.appendChild(otus);
@@ -231,4 +231,4 @@ var Write = (function () {
         phyloXML: phyloXMLWriter,
         neXML: neXMLWriter
     };
-}) ();
+})();
