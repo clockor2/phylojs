@@ -29,7 +29,7 @@ You can install PhyloJS using npm:
 npm install phylojs
 ```
 
-Please refer to the [Documentation](#) for more API documentation and examples of use for phylojs.
+Please refer to the [Documentation](clockor2.github.io/phylojs/) for more API documentation and examples of use for phylojs.
 
 ## IcyTree
 

@@ -60,5 +60,6 @@ nav:
     - Working with annotations: examples/annotations.md
     - Working with arrays of trees: examples/treeArray.md
     - Writing trees: examples/writer.md
+    - Summary statistics: examples/ieRatio.md
   - API: 'typedoc'
   - Cite: cite.md
