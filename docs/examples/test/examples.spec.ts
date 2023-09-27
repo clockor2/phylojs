@@ -247,7 +247,6 @@ describe('Examples', () => {
     });
 
     // Expect annotations in newick with `true` flag
-    console.log(writeNewick(tree, true))
     expect(writeNewick(tree, true)).not.toBe(nwk)
   })
 
