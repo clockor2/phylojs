@@ -2,8 +2,7 @@
 //////// Testing examples for documentation /////////
 /////////////////////////////////////////////////////
 
-import { readNewick, readTreesFromPhyloXML } from '@phylojs';
-import { writeNewick } from '@phylojs';
+import { readNewick, readTreesFromPhyloXML, writeNewick, Tree } from '@phylojs';
 
 describe('Examples', () => {
   test('RTTR', () => {
@@ -192,4 +191,64 @@ describe('Examples', () => {
 
     expect(inNewick).not.toEqual(outNewick)
   })
+
+  test('getBranchLengthRatio()', () => {
+    function getBranchLengthRatio(tree: Tree): number {
+
+      let sumInternal: number = 0.0;
+      let sumExternal: number = 0.0;
+
+      for (let i=0; i<tree.nodeList.length; i++) {
+        if(tree.nodeList[i].branchLength !== undefined){
+          if (tree.nodeList[i].isLeaf()) {
+            sumExternal += tree.nodeList[i].branchLength
+          } else {
+            sumInternal += tree.nodeList[i].branchLength
+          }
+        }
+      }
+      return sumInternal / sumExternal;
+    }
+
+    let nwk = `((a:2,b:2):1,(c:2,d:2):1);`
+    let tree = readNewick(nwk)
+
+    expect(getBranchLengthRatio(tree)).toEqual(0.25)
+  })
+
+  test('IE BL ratio statistic', () => {
+    // Internal to external branch length ratio
+    function getBranchLengthRatio(tree: Tree): number {
+
+      let sumInternal: number = 0.0;
+      let sumExternal: number = 0.0;
+
+      for (let i=0; i<tree.nodeList.length; i++) {
+        if(tree.nodeList[i].branchLength !== undefined){
+          if (tree.nodeList[i].isLeaf()) {
+            sumExternal += tree.nodeList[i].branchLength
+          } else {
+            sumInternal += tree.nodeList[i].branchLength
+          }
+        }
+      }
+      return sumInternal / sumExternal;
+    }
+
+    let nwk = `((a:2,b:2):1,(c:1,d:1):4);`
+    let tree = readNewick(nwk)
+
+    // IE ratio for subtrees descending from each node, except tips
+    tree.root.applyPreOrder((node: Node) => {
+      if(!node.isLeaf()) {
+        let ieRatio = getBranchLengthRatio(tree.getSubtree(node))
+        node.annotation = {ieRatio: ieRatio.toFixed(2)}
+      }
+    });
+
+    // Expect annotations in newick with `true` flag
+    console.log(writeNewick(tree, true))
+    expect(writeNewick(tree, true)).not.toBe(nwk)
+  })
+
 });
