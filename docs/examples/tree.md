@@ -48,7 +48,7 @@ const rootNode = new Node(0);
 const tree = new Tree(rootNode);
 
 // Access nodes
-const nodes = tree.nodeList();
+const nodes = tree.nodeList;
 
 // Reroot the tree at the second node
 tree.reroot(nodes[1]);

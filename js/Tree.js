@@ -27,15 +27,15 @@ Tree.prototype.computeNodeAges = function () {
 
     this.isTimeTree = !Number.isNaN(youngestHeight) && (heights.length > 1 || this.root.branchLength !== undefined);
 
-    for (var i = 0; i < this.nodeList().length; i++)
-        this.nodeList()[i].height -= youngestHeight;
+    for (var i = 0; i < this.nodeList.length; i++)
+        this.nodeList[i].height -= youngestHeight;
 };
 
 // Assign new node IDs (use with care!)
 Tree.prototype.reassignNodeIDs = function () {
     var nodeID = 0;
-    for (var i = 0; i < this.nodeList().length; i++)
-        this.nodeList()[i].id = nodeID++;
+    for (var i = 0; i < this.nodeList.length; i++)
+        this.nodeList[i].id = nodeID++;
 };
 
 // Clear various node caches:
@@ -62,8 +62,8 @@ Tree.prototype.getNodeList = function () {
 Tree.prototype.getNode = function (nodeID) {
     if (this.nodeIDMap === undefined && this.root !== undefined) {
         this.nodeIDMap = {};
-        for (var i = 0; i < this.nodeList().length; i++) {
-            var node = this.nodeList()[i];
+        for (var i = 0; i < this.nodeList.length; i++) {
+            var node = this.nodeList[i];
             this.nodeIDMap[node] = node;
         }
     }
@@ -382,8 +382,8 @@ Tree.prototype.getTraitList = function (filter) {
     var trait; // Define iteration variable
 
     var traitSet = {};
-    for (var i = 0; i < this.nodeList().length; i++) {
-        var thisNode = this.nodeList()[i];
+    for (var i = 0; i < this.nodeList.length; i++) {
+        var thisNode = this.nodeList[i];
         for (trait in thisNode.annotation) {
             if (filter !== undefined && !filter(thisNode, trait))
                 continue;
@@ -409,7 +409,7 @@ Tree.prototype.copy = function () {
 // Translate labels using provided map:
 Tree.prototype.translate = function (tmap) {
 
-    var nodeList = this.nodeList();
+    var nodeList = this.nodeList;
     for (var i = 0; i < nodeList.length; i++) {
         if (tmap.hasOwnProperty(nodeList[i].label))
             nodeList[i].label = tmap[nodeList[i].label];
@@ -419,8 +419,8 @@ Tree.prototype.translate = function (tmap) {
 // Get total length of all edges in tree
 Tree.prototype.getLength = function () {
     var totalLength = 0.0;
-    for (var i = 0; i < this.nodeList().length; i++) {
-        var node = this.nodeList()[i];
+    for (var i = 0; i < this.nodeList.length; i++) {
+        var node = this.nodeList[i];
         if (node.isRoot())
             continue;
         totalLength += node.parent.height - node.height;
@@ -479,7 +479,7 @@ Tree.prototype.getAncestralNodes = function (nodes) {
 };
 
 Tree.prototype.getLineagesThroughTime = function () {
-    var nodeList = this.nodeList().slice(0);
+    var nodeList = this.nodeList.slice(0);
 
     nodeList.sort(function (nodeA, nodeB) { return nodeA.height - nodeB.height })
 

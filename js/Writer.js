@@ -203,9 +203,9 @@ var Write = (function () {
             var otus = doc.createElementNS(neXMLNS, "otus");
             otus.setAttribute("id", "taxa");
             otus.setAttribute("label", "RootTaxaBlock");
-            for (var i = 0; i < tree.leafList().length; i++) {
+            for (var i = 0; i < tree.leafList.length; i++) {
                 var otu = doc.createElementNS(neXMLNS, "otu");
-                otu.setAttribute("id", "t" + tree.leafList()[i].id);
+                otu.setAttribute("id", "t" + tree.leafList[i].id);
                 otus.appendChild(otu);
             }
             doc.documentElement.appendChild(otus);

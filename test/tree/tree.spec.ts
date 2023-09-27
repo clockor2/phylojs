@@ -28,7 +28,7 @@ describe('Tree', () => {
   test('reroot', () => {
     expect(
       tree
-        .nodeList()
+        .nodeList
         .map(n => n.label)
         .filter(n => n !== undefined)
     ).toStrictEqual(['A', 'B', 'C']);
@@ -38,7 +38,7 @@ describe('Tree', () => {
     expect(tree.root.children.length).toBe(2);
     expect(
       tree
-        .nodeList()
+        .nodeList
         .map(n => n.label)
         .filter(n => n !== undefined)
     ).toStrictEqual(['C', 'B', 'A']);
@@ -48,7 +48,7 @@ describe('Tree', () => {
 describe('reroot() - basic', () => {
   test('updates nwk', () => {
     const tr = readNewick('((A:1,B:1):1,C:1);');
-    tr.reroot(tr.nodeList()[3]);
+    tr.reroot(tr.nodeList[3]);
     const nwkPrime = writeNewick(tr);
 
     expect(nwkPrime).not.toBe('((A:1,B:1):1,C:1);');
@@ -66,7 +66,7 @@ describe('reroot() - basic', () => {
     const tol = 1e-10; // smaller than smallest branch length here
 
     for (let i = 0; i < tr.length; i++) {
-      nodes = tr[i].nodeList().slice(1); // exclude root (0th id)
+      nodes = tr[i].nodeList.slice(1); // exclude root (0th id)
       for (let j = 0; j < nodes.length; j++) {
         originalLength.push(tr[i].getTotalBranchLength());
 
@@ -125,7 +125,7 @@ describe('getRTTDist()', () => {
 describe('getSubtree()', () => {
   test('simple tree', () => {
     const tr = readNewick('((((A,B),C),D),E);');
-    const subTree = tr.getSubtree(tr.nodeList()[1]);
+    const subTree = tr.getSubtree(tr.nodeList[1]);
 
     expect(writeNewick(subTree)).toBe(
       '((("A":0.0,"B":0.0):0.0,"C":0.0):0.0,"D":0.0):0.0;'
@@ -136,7 +136,7 @@ describe('getSubtree()', () => {
 describe('getMRCA()', () => {
   test('same node', () => {
     const tr = readNewick('((((A,B),C),D),E);');
-    const nodeA = tr.leafList()[0];
+    const nodeA = tr.leafList[0];
     const mrca = tr.getMRCA([nodeA, nodeA]);
     if (mrca === null) throw new Error('MRCA is null');
     const subTree = tr.getSubtree(mrca);
@@ -145,8 +145,8 @@ describe('getMRCA()', () => {
 
   test('sibling nodes', () => {
     const tr = readNewick('((((A,B),C),D),E);');
-    const nodeA = tr.leafList()[0];
-    const nodeB = tr.leafList()[1];
+    const nodeA = tr.leafList[0];
+    const nodeB = tr.leafList[1];
     const mrca = tr.getMRCA([nodeA, nodeB]);
     if (mrca === null) throw new Error('MRCA is null');
     const subTree = tr.getSubtree(mrca);
@@ -155,8 +155,8 @@ describe('getMRCA()', () => {
 
   test('non-sibling nodes', () => {
     const tr = readNewick('((((A,B),C),D),E);');
-    const nodeA = tr.leafList()[0];
-    const nodeC = tr.leafList()[2];
+    const nodeA = tr.leafList[0];
+    const nodeC = tr.leafList[2];
     const mrca = tr.getMRCA([nodeA, nodeC]);
     if (mrca === null) throw new Error('MRCA is null');
     const subTree = tr.getSubtree(mrca);
@@ -204,7 +204,7 @@ describe('getTipLabels()', () => {
   });
 
   test('subtree', () => {
-    const labs = tr.getSubtree(tr.nodeList()[1]).getTipLabels();
+    const labs = tr.getSubtree(tr.nodeList[1]).getTipLabels();
 
     expect(JSON.stringify(labs)).toMatch(JSON.stringify(['A', 'B', 'C', 'D']));
   });
