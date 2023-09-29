@@ -84,7 +84,7 @@ describe('Examples', () => {
       '(("D_2000":1.0,"E_2003":1.2):3.0,("C_2005":2.5,("A_2010":1.8,"B_2011":1.07):1.0):1.2):4.0;';
     const tree = readNewick(newick);
 
-    const nodes = tree.getNodeList();
+    const nodes = tree.nodeList;
     const length: number[] = [];
 
     // We will reroot at each node and check that the length is the same
@@ -247,7 +247,6 @@ describe('Examples', () => {
     });
 
     // Expect annotations in newick with `true` flag
-    console.log(writeNewick(tree, true))
     expect(writeNewick(tree, true)).not.toBe(nwk)
   })
 

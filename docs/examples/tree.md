@@ -35,9 +35,9 @@ Here are the key methods for the Tree class:
 
 - `getTipLabels()`: Returns an array of labels of all leaf nodes in the tree.
 
-- `getNodeList()`: Returns an array of all nodes in the tree.
+- `nodeList()`: Returns an array of all nodes in the tree.
 
-- `getLeafList()`: Returns an array of all leaf nodes in the tree.
+- `leafList()`: Returns an array of all leaf nodes in the tree.
 
 ## Function usage
 
@@ -48,7 +48,7 @@ const rootNode = new Node(0);
 const tree = new Tree(rootNode);
 
 // Access nodes
-const nodes = tree.getNodeList();
+const nodes = tree.nodeList;
 
 // Reroot the tree at the second node
 tree.reroot(nodes[1]);
