@@ -44,9 +44,12 @@ In the below example, we parse two trees from phyloXML format, reroot them, resc
     </phylogeny>
     </phyloxml>`;
 
+    let in = fetch('https://raw.githubusercontent.com/clockor2/phylojs/main/test/data/egTree.nwk')
+        .then(res => res.text())
+        .then(nwk => console.log(nwk))
     // Read trees
-    let trees = readTreesFromPhyloXML(inPhyloXML);
-
+    //let trees = readTreesFromPhyloXML(inPhyloXML);
+    
     // Operate on trees using array methods. E.g. reroot, ladderise, and scale branch lengths randomly
     trees.forEach(t => t.reroot(t.nodeList[4])) // arbitrarily on branch to 4th node
     trees.forEach(t => t.ladderise())

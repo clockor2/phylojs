@@ -2,7 +2,7 @@
 //////// Testing examples for documentation /////////
 /////////////////////////////////////////////////////
 
-import { readNewick, readTreesFromPhyloXML, writeNewick, Tree } from '@phylojs';
+import { readNewick, readTreesFromPhyloXML, readTreesFromNewick, writeNewick, Tree } from '@phylojs';
 
 describe('Examples', () => {
   test('RTTR', () => {
@@ -191,6 +191,43 @@ describe('Examples', () => {
 
     expect(inNewick).not.toEqual(outNewick)
   })
+
+  test('multiple trees with newick', () => {
+    // Using two small trees here
+
+    const inNewick = '((A:1,B:1):1,C:1);\n((A:1,B:1):1,C:1);'
+    let trees = readTreesFromNewick(inNewick);
+
+    // Operate on trees using array methods. E.g. Reroot, ladderise, and scale branch lengths randomly
+
+    trees.forEach(t => t.reroot(t.nodeList[4])) // arbitrarily to 4th node
+    trees.forEach(t => t.ladderise())
+    trees.forEach(t => t.nodeList.forEach(
+      n => n.branchLength ? n.branchLength *= Math.floor(10*Math.random() + 1) : 0
+    ))
+
+    // write output
+    let outNewick = trees.map(t => writeNewick(t)).join('\n')
+
+    expect(inNewick).not.toEqual(outNewick)
+  })
+
+  // COMMENTED OUT BC JEST DOESN'T LIKE FETCH API
+  // test('multiple trees with fetch', () => {
+  //   // Using two small trees here
+
+  //   let url = 'https://raw.githubusercontent.com/clockor2/phylojs/main/test/data/egTree.nwk'
+  //   let newick;
+    
+  //   fetch(url)
+  //     .then(res => res.text())
+  //     .then(txt => {newick = txt})
+
+  //   // log first 99 characters to show newick is defined
+  //   console.log(newick.slice(0,99))
+  //   // Returns:
+  //   // (Jeddah-1_KF917527_camel_2013-11-08:0.0000013865,Jeddah-1_KF958702_human_2013-11-05:0.0000013652,((
+  // })
 
   test('getBranchLengthRatio()', () => {
     function getBranchLengthRatio(tree: Tree): number {

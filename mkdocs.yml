@@ -54,6 +54,7 @@ nav:
     - examples/index.md
     - Overview of the Tree Class: examples/tree.md
     - Visualise: examples/visualise.md
+    - Fetching Trees fron a URL: examples/fetch.md
     - Finding the MRCA: examples/mrca.md
     - Root-to-tip regression: examples/rttr.md
     - Rerooting: examples/reroot.md
