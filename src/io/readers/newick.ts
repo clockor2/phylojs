@@ -1,6 +1,5 @@
-import { Tree, Node } from '@phylojs';
-import { SkipTreeException, ParseException } from '@phylojs/utils/error';
-
+import { Tree, Node } from '../../';
+import { SkipTreeException, ParseException } from '../../utils/error';
 
 /**
  * Reads .newick string and returns a tree.
