@@ -62,5 +62,6 @@ nav:
     - Working with arrays of trees: examples/treeArray.md
     - Writing trees: examples/writer.md
     - Summary statistics: examples/ieRatio.md
+    - Pruning and Grafting: examples/pruneGraft.md
   - API: 'typedoc'
   - Cite: cite.md
