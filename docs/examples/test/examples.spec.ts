@@ -287,4 +287,53 @@ describe('Examples', () => {
     expect(writeNewick(tree, true)).not.toBe(nwk)
   })
 
+  test('Pruning', () => {
+    let nwk = "((A,B),(C,D));"
+    let tree = readNewick(nwk)  
+
+    // Get ancestor of tips A and B
+    let node = tree.getMRCA(tree.leafList.slice(0,2))
+    // Prune
+    tree
+      .nodeList[node.parent.id] // Select node's parent by `id`
+      .removeChild(node) // Pruning step
+
+    console.log(`
+      Original Nwk: ${nwk}
+      Pruned Tree: ${writeNewick(tree)}
+    `)
+    // Returns
+    // Original Nwk: ((A,B),(C,D));
+    // Pruned Tree: (("C":0.0,"D":0.0):0.0):0.0;
+    
+    expect(writeNewick(tree)).not.toBe(nwk)
+
+  })
+  test('Grafting', () => {
+    let nwk = "((A,B),(C,D));"
+    let tree = readNewick(nwk)  
+
+    // Get ancestor of tips A and B. NB this is a `cherry` (A,B)
+    let node = tree.getMRCA(tree.leafList.slice(0,2))
+
+    // Graft cherry onto tip `A` 2 times
+    for (let i=0; i<2; i++) {
+      tree
+        //.nodeList[node.parent.id] // Select node's parent by `id`
+        .leafList[i]
+        .addChild(node.copy()) // .copy() to ensure we don't bump into recursion issues
+    }
+
+    console.log(`
+      Original Nwk: ${nwk}
+      Pruned Tree: ${writeNewick(tree)}
+    `)
+    // Return
+    // Original Nwk: ((A,B),(C,D));
+    // Pruned Tree: (((("A":0.0,"B":0.0):0.0)"A":0.0,(((("A":0.0,"B":0.0):0.0)"A":0.0,"B":0.0):0.0)"B":0.0):0.0,("C":0.0,"D":0.0):0.0):0.0;
+    
+    expect(writeNewick(tree)).not.toBe(nwk)
+
+  })
+
 });
