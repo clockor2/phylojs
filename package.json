@@ -3,11 +3,15 @@
   "version": "0.0.0-development",
   "description": "A simple typescript library for phylogenetic trees",
   "main": "./lib/index.js",
+  "module": "./lib/esm/index.js",
+  "browser": "./lib/dist/phylojs.min.js",
   "files": [
     "lib/**/*"
   ],
   "scripts": {
-    "build": "webpack",
+    "build": "npm run clean && npm run build:cjs && npm run build:esm && webpack",
+    "build:cjs": "tsc --module commonjs --outDir ./lib",
+    "build:esm": "tsc --module ESNext --outDir ./lib/esm",
     "clean": "rm -rf ./lib/",
     "cm": "cz",
     "lint": "eslint ./src/ --fix",
