@@ -1,5 +1,5 @@
-import { Tree, Node } from '@phylojs';
-import { SkipTreeException } from '@phylojs/utils/error';
+import { Tree, Node } from '../../';
+import { SkipTreeException } from '../../utils/error';
 
 function parse(phyloxml: string): HTMLCollectionOf<Element> {
   const parser = new DOMParser();
@@ -8,7 +8,7 @@ function parse(phyloxml: string): HTMLCollectionOf<Element> {
 }
 
 /**
- * Read a tree from phyloXML format. If a list of trees is 
+ * Read a tree from phyloXML format. If a list of trees is
  * @param {string} phyloxml
  * @returns {Tree}
  */

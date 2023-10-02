@@ -1,7 +1,7 @@
-import { readNewick } from '@phylojs';
-import { Node } from '@phylojs/tree/node';
-import { Tree } from '@phylojs/tree';
-import { writeNewick } from '@phylojs';
+import { readNewick } from '../../src';
+import { Node } from '../../src/tree/node';
+import { Tree } from '../../src/tree';
+import { writeNewick } from '../../src';
 import { readFileSync } from 'fs';
 
 describe('Tree', () => {
@@ -27,20 +27,14 @@ describe('Tree', () => {
 
   test('reroot', () => {
     expect(
-      tree
-        .nodeList
-        .map(n => n.label)
-        .filter(n => n !== undefined)
+      tree.nodeList.map(n => n.label).filter(n => n !== undefined)
     ).toStrictEqual(['A', 'B', 'C']);
     tree.reroot(childNode4);
     const newick = writeNewick(tree);
     expect(newick).toBe('("C":0.5,("B":1,"A":2):0.5):0.0;');
     expect(tree.root.children.length).toBe(2);
     expect(
-      tree
-        .nodeList
-        .map(n => n.label)
-        .filter(n => n !== undefined)
+      tree.nodeList.map(n => n.label).filter(n => n !== undefined)
     ).toStrictEqual(['C', 'B', 'A']);
   });
 });

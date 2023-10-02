@@ -1,3 +1,4 @@
 src/types/global.d.ts
 webpack.config.js
 docs
+test

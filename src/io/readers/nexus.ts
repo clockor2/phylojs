@@ -1,5 +1,5 @@
-import { Tree } from '@phylojs';
-import { SkipTreeException } from '@phylojs/utils/error';
+import { Tree } from '../../';
+import { SkipTreeException } from '../../utils/error';
 import { readNewick } from './newick';
 
 // Function to extract the translate mapping

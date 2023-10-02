@@ -1,5 +1,5 @@
 // phyloWriter.test.ts
-import { Node, Tree, writeNewick, writeNexus } from '@phylojs';
+import { Node, Tree, writeNewick, writeNexus } from '../../src';
 
 describe('PhyloWriter', () => {
   const rootNode = new Node(0);
