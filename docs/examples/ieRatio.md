@@ -1,4 +1,4 @@
-Here, we demonstrate how we can caluclate a tree summary statistic at each internal node of a tree. We calculate the internal to external branch length ratio for the subtree descending from each internal node and add it as an annotation to each node. We define a function to calculate the internal to external branch length ratio `getBranchLengthRatio()` as well as demonstrate use of the `.isLeaf()` and `.applyPreOrder()` methods on the `Node` class.
+Here, we demonstrate how we can calculate a tree summary statistic at each internal node of a tree. We calculate the internal to external branch length ratio for the subtree descending from each internal node and add it as an annotation to each node. We define a function to calculate the internal to external branch length ratio `getBranchLengthRatio()` as well as demonstrate use of the `.isLeaf()` and `.applyPreOrder()` methods on the `Node` class.
 
 The internal to external branch length ratio is defined as the ratio of the sum of internal branch lenghts to the sum of external branch lengths (leading to tips). It is a commonly used statistic that describes how 'tippy' or 'stemmy' trees appear.
 
