@@ -2,6 +2,7 @@
 site_name: phylojs
 site_url: https://clockor2.github.io/phylojs/
 repo_url: https://github.com/clockor2/phylojs
+edit_uri: https://github.com/clockor2/phylojs/edit/main/docs/
 
 theme:
   name: "material"
@@ -54,7 +55,7 @@ nav:
     - examples/index.md
     - Overview of the Tree Class: examples/tree.md
     - Visualise: examples/visualise.md
-    - Fetching Trees fron a URL: examples/fetch.md
+    - Fetching Trees from a URL: examples/fetch.md
     - Finding the MRCA: examples/mrca.md
     - Root-to-tip regression: examples/rttr.md
     - Rerooting: examples/reroot.md
