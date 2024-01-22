@@ -1,5 +1,5 @@
 # Working with arrays of trees
-This examples demonstrates how once can manipulate an array of trees for efficient bulk processing.
+This example demonstrates how one can manipulate an array of trees for efficient bulk processing.
 
 Arrays of trees (`Tree[]`) can be read in with any of the `readTrees*()` functions. That is, `readTreesFromNewick()`, `readTreesFromNexus()`, `readTreesFromPhyloXML()`, and `readTreesFromNeXML()`. the `read()` function also returns an array of trees, taking flags for the input string and expected file format.
 
