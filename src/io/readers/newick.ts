@@ -1,7 +1,19 @@
 import { Tree, Node } from '../../';
 import { SkipTreeException, ParseException } from '../../utils/error';
 
-/* Parse a string in the New Hampshire format and return a pointer to the tree. */
+/* 
+	Parse a string in the New Hampshire format and return a pointer to the tree. 
+
+	Is a slight modification of code written by Heng Li for jstreeview: at
+	https://github.com/lh3/jstreeview/blob/main/knhx.js
+
+	Modifications are for compatability with our tree object, and to avoid assigning
+	';' as the root label.
+
+	Function works by reding a .nwk string left to right. Where an open bracket is encountered,
+	we venture deeper into the tree which is reflected in pushing -1 to the stack array.
+*/
+
 /**
  * Description
  * @param {string} str
@@ -24,10 +36,12 @@ export function readNewick(str: string) { // formerly kn_parse
 		} else if (c == ')') {
 			var x, m, i;
 			x = nodes.length;
-			for (i = stack.length - 1; i >= 0; --i)
+			for (i = stack.length - 1; i >= 0; --i) {
 				if (stack[i] < 0) break;
+			}
 			if (i < 0) {
 				//tree.error |= 1; break;
+				break; // TODO: Add error
 			}
 			m = stack.length - 1 - i;
 			l = kn_add_node(str, l + 1, nodes, m);
@@ -49,6 +63,10 @@ export function readNewick(str: string) { // formerly kn_parse
 	return tree;
 }
 
+/**
+ * Function constructs nodes.
+ * Also originates from Heng Li's jstreeview.
+ */
 /**
  * Description
  * @param {any} str
