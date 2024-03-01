@@ -50,7 +50,7 @@ export function newickRecurse(node: Node, annotate: boolean): string {
   }
 
   if (node.branchLength !== undefined) res += `:${node.branchLength}`;
-  else res += ':0.0';
+  //else res += ':0.0';
 
   return res;
 }

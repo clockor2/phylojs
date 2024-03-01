@@ -1,22 +1,103 @@
 import { Tree, Node } from '../../';
 import { SkipTreeException, ParseException } from '../../utils/error';
 
+/* Parse a string in the New Hampshire format and return a pointer to the tree. */
 /**
- * Reads .newick string and returns a tree.
- * @param {string} newick
- * @returns {Tree} Tree
+ * Description
+ * @param {string} str
+ * @returns {Tree}
  */
-export function readNewick(newick: string): Tree {
-  const tokenList = doLex(newick);
-  const rootNode = doParse(tokenList, newick);
+export function readNewick(str: string) { // formerly kn_parse
 
-  const tree = new Tree(rootNode);
-  if (tree.root.branchLength === 0.0) {
-    tree.root.branchLength = undefined;
-  }
-
-  return tree;
+	var stack: number[] = [];
+	//var tree = new Object();
+	//tree.error = tree.n_tips = 0;
+	//tree.node = new Array();
+	var nodes: Node[] = [];
+	for (var l = 0; l < str.length;) {
+		while (l < str.length && (str.charAt(l) < '!' || str.charAt(l) > '~')) ++l;
+		if (l == str.length) break;
+		var c = str.charAt(l);
+		if (c == ',') ++l;
+		else if (c == '(') {
+			stack.push(-1); ++l;
+		} else if (c == ')') {
+			var x, m, i;
+			x = nodes.length;
+			for (i = stack.length - 1; i >= 0; --i)
+				if (stack[i] < 0) break;
+			if (i < 0) {
+				//tree.error |= 1; break;
+			}
+			m = stack.length - 1 - i;
+			l = kn_add_node(str, l + 1, nodes, m);
+			for (i = stack.length - 1, m = m - 1; m >= 0; --m, --i) {
+				nodes[x].children[m] = nodes[stack[i]];
+				nodes[stack[i]].parent = nodes[x];
+			}
+			stack.length = i;
+			stack.push(x);
+		} else {
+			//++tree.n_tips;
+			stack.push(nodes.length);
+			l = kn_add_node(str, l, nodes, 0); // leaps l to index after non ',' or '{' or ')'
+		}
+	}
+	//if (stack.length > 1) tree.error |= 2;
+	//tree.root = nodes[nodes.length - 1];
+	var tree = new Tree(nodes[nodes.length - 1]);
+	return tree;
 }
+
+/**
+ * Description
+ * @param {any} str
+ * @param {any} l
+ * @param {any} tree
+ * @param {any} x
+ * @returns {any}
+ */
+function kn_add_node(str: string, l: number, nodes: Node[], x: number) // private method
+{
+	var r, beg: number, end: number = 0, z: Node;
+	var z = new Node(x); // TODO: Unsure if x is righ index
+	for (var i = l, beg = l; i < str.length && str.charAt(i) != ',' && str.charAt(i) != ')'; ++i) {
+		var c = str.charAt(i);
+		if (c == '[') { // TODO: Annotations
+			var meta_beg = i;
+			if (end == 0) end = i;
+			do ++i; while (i < str.length && str.charAt(i) != ']');
+			if (i == str.length) {
+				//tree.error |= 4; // <-- unfinished annotation
+				break;
+			}
+			//z.annotation = {["all_annotations"]: str.slice(meta_beg, i - meta_beg + 1)};
+			z.annotation = {["all_annotations"]: str.slice(meta_beg, i + 1)};
+		} else if (c == ':') { // Parse branch length
+			if (end == 0) end = i;
+			for (var j = ++i; i < str.length; ++i) {
+				var cc = str.charAt(i);
+				if ((cc < '0' || cc > '9') && cc != 'e' && cc != 'E' && cc != '+' && cc != '-' && cc != '.')
+					break;
+			}
+			//z.branchLength = parseFloat(str.slice(j, i - j));
+			console.log(str.slice(j, i))
+			z.branchLength = parseFloat(str.slice(j, i));
+			--i;
+		} else if (c < '!' && c > '~' && end == 0) end = i;
+	}
+	if (end == 0) end = i;
+	//if (end > beg) z.label = str.slice(beg, end - beg);
+	if (end > beg) z.label = str.slice(beg, end)
+		.replace(/;$/g, "")
+		.replace(/^"|"$/g, "")
+		.replace(/^'|'$/g, "") // remove quotes
+	if (z.label?.length === 0) z.label = undefined;
+	nodes.push(z);
+	console.log(z)
+	return i;
+}
+
 
 /**
  * Reads .newick strings, separated by ';' and returns an array of Trees.
@@ -43,255 +124,4 @@ export function readTreesFromNewick(newick: string): Tree[] {
   }
 
   return trees;
-}
-
-type Token = [string, string, number];
-
-const tokens: [string, RegExp, boolean, number?][] = [
-  ['OPENP', /^\(/, false],
-  ['CLOSEP', /^\)/, false],
-  ['COLON', /^:/, false],
-  ['COMMA', /^,/, false],
-  ['SEMI', /^;/, false],
-  ['OPENA', /^\[&/, false],
-  ['CLOSEA', /^\]/, false],
-  ['OPENV', /^{/, false],
-  ['CLOSEV', /^}/, false],
-  ['EQ', /^=/, false],
-  ['HASH', /#/, false],
-  ['STRING', /^"(?:[^"]|"")+"/, true],
-  ['STRING', /^'(?:[^']|'')+'/, true],
-  ['STRING', /^[^,():;[\]#]+(?:\([^)]*\))?/, true, 0],
-  ['STRING', /^[^,[\]{}=]+/, true, 1],
-];
-
-function doLex(newick: string): Token[] {
-  const tokenList: Token[] = [];
-  let idx = 0;
-
-  // Lexer has two modes: 0 (default) and 1 (attribute mode)
-  let lexMode = 0;
-
-  while (idx < newick.length) {
-    // Skip over whitespace:
-    const wsMatch = /^\s/.exec(newick.slice(idx));
-    if (wsMatch !== null && wsMatch.index === 0) {
-      idx += wsMatch[0].length;
-      continue;
-    }
-
-    let matchFound = false;
-    for (let k = 0; k < tokens.length; k++) {
-      // Skip lexer rules not applying to mode:
-      if (tokens[k].length > 3 && tokens[k][3] !== lexMode) {
-        continue;
-      }
-
-      const match = tokens[k][1].exec(newick.slice(idx));
-      if (match !== null && match.index === 0) {
-        let value = match[0];
-
-        if (tokens[k][2]) {
-          if (tokens[k][0] === 'STRING') {
-            value = value.replace(/^"(.*)"$/, '$1').replace(/^'(.*)'$/, '$1');
-            value = value.replace("''", "'").replace('""', '"');
-          }
-        }
-
-        tokenList.push([tokens[k][0], value, idx]);
-
-        switch (tokens[k][0]) {
-          case 'OPENA':
-            lexMode = 1;
-            break;
-          case 'CLOSEA':
-            lexMode = 0;
-            break;
-          default:
-            break;
-        }
-
-        matchFound = true;
-        idx += match[0].length;
-        break;
-      }
-    }
-
-    if (!matchFound) {
-      throw new ParseException(
-        `Error reading character ${newick[idx]} at position ${idx}`
-      );
-    }
-  }
-
-  return tokenList;
-}
-
-function doParse(tokenList: Token[], newick: string): Node {
-  let thisNodeID = 0;
-
-  let idx = 0;
-  const treeRoot = ruleT();
-  return treeRoot;
-
-  function getContext(flank: number) {
-    const strIdx = tokenList[idx][2];
-    const startIdx = strIdx >= flank ? strIdx - flank : 0;
-    const stopIdx =
-      newick.length - strIdx >= flank ? strIdx + flank : newick.length;
-
-    return {
-      left: newick.slice(startIdx, strIdx),
-      at: newick[strIdx],
-      right: newick.slice(strIdx + 1, stopIdx),
-    };
-  }
-
-  function acceptToken(token: string, mandatory: boolean) {
-    if (idx < tokenList.length && tokenList[idx][0] === token) {
-      idx += 1;
-      return true;
-    } else {
-      if (mandatory)
-        if (idx < tokenList.length) {
-          throw new ParseException(
-            `Expected token <b>${token}</b> but found <b>${tokenList[idx][0]}</b> (${tokenList[idx][1]}) at string position <b>${tokenList[idx][2]}</b>.`,
-            getContext(15)
-          );
-        } else {
-          throw new ParseException(
-            'Newick string terminated early. Expected token ' + token + '.'
-          );
-        }
-      else return false;
-    }
-  }
-
-  function ruleT() {
-    const node = ruleN(undefined);
-
-    if (!acceptToken('SEMI', false) && acceptToken('COMMA', false))
-      throw new ParseException('Tree/network with multiple roots found.');
-
-    return node;
-  }
-
-  function ruleN(parent?: Node) {
-    const node = new Node(thisNodeID++);
-    if (parent !== undefined) parent.addChild(node);
-
-    ruleC(node);
-    ruleL(node);
-    ruleH(node);
-    ruleA(node);
-    ruleB(node);
-
-    return node;
-  }
-
-  function ruleC(node: Node) {
-    if (acceptToken('OPENP', false)) {
-      ruleN(node);
-      ruleM(node);
-      acceptToken('CLOSEP', true);
-    }
-  }
-
-  function ruleM(node: Node) {
-    if (acceptToken('COMMA', false)) {
-      ruleN(node);
-      ruleM(node);
-    }
-  }
-
-  function ruleL(node: Node) {
-    if (acceptToken('STRING', false)) {
-      node.label = tokenList[idx - 1][1];
-    }
-  }
-
-  function ruleH(node: Node) {
-    if (acceptToken('HASH', false)) {
-      acceptToken('STRING', true);
-      node.hybridID = Number(tokenList[idx - 1][1]);
-    }
-  }
-  function ruleA(node: Node) {
-    if (acceptToken('OPENA', false)) {
-      ruleD(node);
-      ruleE(node);
-      acceptToken('CLOSEA', true);
-    }
-  }
-  function isStringOrStringArrayOrNull(
-    value: RuleQResult
-  ): value is string | string[] {
-    return (
-      typeof value === 'string' ||
-      (Array.isArray(value) && value.every(item => typeof item === 'string')) ||
-      value == null
-    );
-  }
-  function ruleD(node: Node) {
-    acceptToken('STRING', true);
-    const key = tokenList[idx - 1][1];
-    acceptToken('EQ', true);
-    const value = ruleQ();
-    if (isStringOrStringArrayOrNull(value)) {
-      node.annotation[key] = value;
-    }
-  }
-
-  type RuleQResult = string | RuleQResult[] | null;
-
-  function ruleQ(): RuleQResult {
-    let value;
-    if (acceptToken('STRING', false)) value = tokenList[idx - 1][1];
-    else if (acceptToken('OPENV', false)) {
-      value = [ruleQ()].concat(ruleW());
-      acceptToken('CLOSEV', true);
-    } else value = null;
-
-    return value;
-  }
-
-  function ruleW(): RuleQResult {
-    if (acceptToken('COMMA', false)) {
-      return [ruleQ()].concat(ruleW());
-    } else return [];
-  }
-
-  function ruleE(node: Node) {
-    if (acceptToken('COMMA', false)) {
-      ruleD(node);
-      ruleE(node);
-    }
-  }
-
-  function ruleB(node: Node) {
-    if (acceptToken('COLON', false)) {
-      acceptToken('STRING', true);
-
-      const length = Number(tokenList[idx - 1][1]);
-      if (String(length) !== 'NaN') node.branchLength = length;
-      else
-        throw new ParseException(
-          'Expected numerical branch length. Found ' +
-            tokenList[idx - 1][1] +
-            ' instead.'
-        );
-
-      ruleR();
-
-      ruleA(node);
-    }
-  }
-
-  function ruleR() {
-    if (acceptToken('COLON', false)) {
-      acceptToken('STRING', false);
-
-      ruleR();
-    }
-  }
 }

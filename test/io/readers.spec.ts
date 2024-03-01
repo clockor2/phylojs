@@ -12,14 +12,21 @@ import {
 
 describe('Newick', () => {
   test('read', () => {
-    const inNewick = '("A":1,("B":1,"C":1):1):0.0;';
+    const inNewick = '("A":1,("B":1,"C":1):1):0;';
     const tree = readNewick(inNewick);
     const outNewick = writeNewick(tree);
     expect(outNewick).toBe(inNewick);
   });
   test('readTrees', () => {
     const inNewick =
-      '("A":1,("B":1,"C":1):1):0.0;\n("A":1,("B":1,"C":1):1):0.0;';
+      '("A":1,("B":1,"C":1):1):0;\n("A":1,("B":1,"C":1):1):0;';
+    const trees = readTreesFromNewick(inNewick);
+    const outNewick = trees.map(tree => writeNewick(tree)).join('\n');
+    expect(outNewick).toBe(inNewick);
+  });
+  test('readTreesDecimalBL', () => {
+    const inNewick =
+      '("A":1.2,("B":1.3,"C":1.4):1.5):0;\n("A":1.6,("B":1.7,"C":1.8):1.9):0.8;';
     const trees = readTreesFromNewick(inNewick);
     const outNewick = trees.map(tree => writeNewick(tree)).join('\n');
     expect(outNewick).toBe(inNewick);
@@ -34,7 +41,7 @@ describe('Nexus', () => {
     End;`;
     const tree = readNexus(inNexus);
     const outNewick = writeNewick(tree);
-    const newick = '("A":1,("B":1,"C":1):1):0.0;';
+    const newick = '("A":1,("B":1,"C":1):1);';
     expect(outNewick).toBe(newick);
   });
   test('readTrees', () => {
@@ -45,7 +52,7 @@ describe('Nexus', () => {
     End;`;
     const trees = readTreesFromNexus(inNexus);
     const outNewick = trees.map(tree => writeNewick(tree)).join('\n');
-    const newick = '("A":1,("B":1,"C":1):1):0.0;\n("A":1,("B":1,"C":1):1):0.0;';
+    const newick = '("A":1,("B":1,"C":1):1);\n("A":1,("B":1,"C":1):1);';
     expect(outNewick).toBe(newick);
   });
 });
@@ -73,7 +80,7 @@ describe('PhyloXML', () => {
     </phyloxml>`;
     const tree = readPhyloXML(inPhyloXML);
     const outNewick = writeNewick(tree);
-    const newick = '("A":1,("B":1,"C":1):1):0.0;';
+    const newick = '("A":1,("B":1,"C":1):1);';
     expect(outNewick).toBe(newick);
   });
   test('readTrees', () => {
@@ -115,7 +122,7 @@ describe('PhyloXML', () => {
     </phyloxml>`;
     const trees = readTreesFromPhyloXML(inPhyloXML);
     const outNewick = trees.map(tree => writeNewick(tree)).join('\n');
-    const newick = '("A":1,("B":1,"C":1):1):0.0;\n("A":1,("B":1,"C":1):1):0.0;';
+    const newick = '("A":1,("B":1,"C":1):1);\n("A":1,("B":1,"C":1):1);';
     expect(outNewick).toBe(newick);
   });
 });
@@ -146,7 +153,7 @@ describe('NeXML', () => {
     </nexml>`;
     const tree = readNeXML(inNeXML);
     const outNewick = writeNewick(tree);
-    const newick = '("A":1,("B":1,"C":1):1):0.0;';
+    const newick = '("A":1,("B":1,"C":1):1);';
     expect(outNewick).toBe(newick);
   });
   test('readTrees', () => {
@@ -186,7 +193,7 @@ describe('NeXML', () => {
     </nexml>`;
     const trees = readTreesFromNeXML(inNeXML);
     const outNewick = trees.map(tree => writeNewick(tree)).join('\n');
-    const newick = '("A":1,("B":1,"C":1):1):0.0;\n("A":1,("B":1,"C":1):1):0.0;';
+    const newick = '("A":1,("B":1,"C":1):1);\n("A":1,("B":1,"C":1):1);';
     expect(outNewick).toBe(newick);
   });
 });
