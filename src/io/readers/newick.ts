@@ -1,5 +1,5 @@
 import { Tree, Node } from '../../';
-import { SkipTreeException, ParseException } from '../../utils/error';
+import { SkipTreeException } from '../../utils/error';
 
 /* 
 	Parse a string in the New Hampshire format and return a pointer to the tree. 
@@ -22,10 +22,8 @@ import { SkipTreeException, ParseException } from '../../utils/error';
 export function readNewick(str: string) { // formerly kn_parse
 
 	var stack: number[] = [];
-	//var tree = new Object();
-	//tree.error = tree.n_tips = 0;
-	//tree.node = new Array();
 	var nodes: Node[] = [];
+
 	for (var l = 0; l < str.length;) {
 		while (l < str.length && (str.charAt(l) < '!' || str.charAt(l) > '~')) ++l;
 		if (l == str.length) break;
@@ -52,7 +50,6 @@ export function readNewick(str: string) { // formerly kn_parse
 			stack.length = i;
 			stack.push(x);
 		} else {
-			//++tree.n_tips;
 			stack.push(nodes.length);
 			l = kn_add_node(str, l, nodes, 0); // leaps l to index after non ',' or '{' or ')'
 		}
@@ -64,19 +61,45 @@ export function readNewick(str: string) { // formerly kn_parse
 }
 
 /**
- * Function constructs nodes.
+ * Reads .newick strings, separated by ';' and returns an array of Trees.
+ * @param {string} newick
+ * @returns {Tree[]} Tree
+ */
+export function readTreesFromNewick(newick: string): Tree[] {
+  const trees: Tree[] = [];
+  const lines = newick.split(/;\s*\n/);
+
+  for (let thisLine of lines) {
+    thisLine = thisLine.trim();
+    if (thisLine.length === 0) continue;
+
+    try {
+      trees.push(readNewick(thisLine));
+    } catch (e) {
+      if (e instanceof SkipTreeException) {
+        console.log('Skipping Newick tree: ' + e.message);
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  return trees;
+}
+
+/**
+ * Function constructs nodes. Returns index of furthest character read in nwk string.
  * Also originates from Heng Li's jstreeview.
  */
 /**
  * Description
- * @param {any} str
- * @param {any} l
- * @param {any} tree
- * @param {any} x
- * @returns {any}
+ * @param {string} str
+ * @param {number} l
+ * @param {Tree} tree
+ * @param {number} x
+ * @returns {number}
  */
-function kn_add_node(str: string, l: number, nodes: Node[], x: number) // private method
-{
+function kn_add_node(str: string, l: number, nodes: Node[], x: number) {
 	var r, beg: number, end: number = 0, z: Node;
 	var z = new Node(x); // TODO: Unsure if x is righ index
 	for (var i = l, beg = l; i < str.length && str.charAt(i) != ',' && str.charAt(i) != ')'; ++i) {
@@ -114,32 +137,4 @@ function kn_add_node(str: string, l: number, nodes: Node[], x: number) // privat
 	nodes.push(z);
 	console.log(z)
 	return i;
-}
-
-
-/**
- * Reads .newick strings, separated by ';' and returns an array of Trees.
- * @param {string} newick
- * @returns {Tree[]} Tree
- */
-export function readTreesFromNewick(newick: string): Tree[] {
-  const trees: Tree[] = [];
-  const lines = newick.split(/;\s*\n/);
-
-  for (let thisLine of lines) {
-    thisLine = thisLine.trim();
-    if (thisLine.length === 0) continue;
-
-    try {
-      trees.push(readNewick(thisLine));
-    } catch (e) {
-      if (e instanceof SkipTreeException) {
-        console.log('Skipping Newick tree: ' + e.message);
-      } else {
-        throw e;
-      }
-    }
-  }
-
-  return trees;
 }
