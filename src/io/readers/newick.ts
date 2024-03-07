@@ -54,8 +54,7 @@ export function readNewick(str: string) { // formerly kn_parse
 			l = kn_add_node(str, l, nodes, 0); // leaps l to index after non ',' or '{' or ')'
 		}
 	}
-	//if (stack.length > 1) tree.error |= 2;
-	//tree.root = nodes[nodes.length - 1];
+	//if (stack.length > 1) tree.error |= 2; // TODO: Add error message
 	var tree = new Tree(nodes[nodes.length - 1]);
 	return tree;
 }
@@ -109,11 +108,11 @@ function kn_add_node(str: string, l: number, nodes: Node[], x: number) {
 			if (end == 0) end = i;
 			do ++i; while (i < str.length && str.charAt(i) != ']');
 			if (i == str.length) {
-				//tree.error |= 4; // <-- unfinished annotation
+				//tree.error |= 4; // <-- TODO: add unfinished annotation error
 				break;
 			}
 			//z.annotation = {["all_annotations"]: str.slice(meta_beg, i - meta_beg + 1)};
-			z.annotation = {["all_annotations"]: str.slice(meta_beg, i + 1)};
+			z.annotation = parseAnnotations(str.slice(meta_beg + 1, i))
 		} else if (c == ':') { // Parse branch length
 			if (end == 0) end = i;
 			for (var j = ++i; i < str.length; ++i) {
@@ -122,7 +121,6 @@ function kn_add_node(str: string, l: number, nodes: Node[], x: number) {
 					break;
 			}
 			//z.branchLength = parseFloat(str.slice(j, i - j));
-			console.log(str.slice(j, i))
 			z.branchLength = parseFloat(str.slice(j, i));
 			--i;
 		} else if (c < '!' && c > '~' && end == 0) end = i;
@@ -135,6 +133,29 @@ function kn_add_node(str: string, l: number, nodes: Node[], x: number) {
 		.replace(/^'|'$/g, "") // remove quotes
 	if (z.label?.length === 0) z.label = undefined;
 	nodes.push(z);
-	console.log(z)
 	return i;
+}
+
+/**
+ * Description
+ * @param {string} metadata
+ * @returns {any}
+ */
+function parseAnnotations(metadata: string) {
+	//if (metadata.charAt(0) != '&') // Throw error
+	var annotations = metadata.split(/,(?![^{]*\})/g)
+		.map(e => e.split('='))
+		// .map(e => {
+		// 	e[1].replace(/{|}/g, '')
+		// 		.split(',')
+		// })
+	
+	let annotation_object: any = {};
+	
+	for (let i = 0; i < annotations.length; i += 1){
+		annotation_object[annotations[i][0]] = annotations[i][1]
+	}
+
+	return annotation_object;
+	//return { [key: string]: string | string[] | null }
 }

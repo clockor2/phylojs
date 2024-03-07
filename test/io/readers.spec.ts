@@ -31,6 +31,13 @@ describe('Newick', () => {
     const outNewick = trees.map(tree => writeNewick(tree)).join('\n');
     expect(outNewick).toBe(inNewick);
   });
+  test('parseAnnotations', () => {
+    const inNewick =
+      '("A":[&col=Red,hand={left,right}]1.2,("B":1.3,"C":1.4):1.5):0;';
+    const trees = readTreesFromNewick(inNewick);
+    const outNewick = trees.map(tree => writeNewick(tree)).join('\n');
+    expect(outNewick).toBe(inNewick);
+  });
 });
 
 describe('Nexus', () => {
