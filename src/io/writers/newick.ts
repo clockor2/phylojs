@@ -25,7 +25,7 @@ export function newickRecurse(node: Node, annotate: boolean): string {
     res += ')';
   }
 
-  if (node.label !== undefined) res += `"${node.label}"`;
+  if (node.label !== undefined) res += `${node.label}`;
 
   if (node.hybridID !== undefined) res += `#${node.hybridID}`;
 
@@ -37,12 +37,12 @@ export function newickRecurse(node: Node, annotate: boolean): string {
         const key = keys[idx];
 
         if (idx > 0) res += ',';
-        res += `"${key}"=`;
+        res += `${key}=`;
         const value = node.annotation[key];
         if (Array.isArray(value)) {
           res += `{${String(value.join(','))}}`; // Convert the array to a comma-separated string
         } else {
-          res += `"${String(value)}"`; // Explicitly convert the value to a string
+          res += `${String(value)}`; // Explicitly convert the value to a string
         }
       }
       res += ']';

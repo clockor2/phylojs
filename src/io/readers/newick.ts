@@ -111,7 +111,6 @@ function kn_add_node(str: string, l: number, nodes: Node[], x: number) {
 				//tree.error |= 4; // <-- TODO: add unfinished annotation error
 				break;
 			}
-			//z.annotation = {["all_annotations"]: str.slice(meta_beg, i - meta_beg + 1)};
 			z.annotation = parseAnnotations(str.slice(meta_beg + 1, i))
 		} else if (c == ':') { // Parse branch length
 			if (end == 0) end = i;
@@ -120,13 +119,11 @@ function kn_add_node(str: string, l: number, nodes: Node[], x: number) {
 				if ((cc < '0' || cc > '9') && cc != 'e' && cc != 'E' && cc != '+' && cc != '-' && cc != '.')
 					break;
 			}
-			//z.branchLength = parseFloat(str.slice(j, i - j));
 			z.branchLength = parseFloat(str.slice(j, i));
 			--i;
 		} else if (c < '!' && c > '~' && end == 0) end = i;
 	}
 	if (end == 0) end = i;
-	//if (end > beg) z.label = str.slice(beg, end - beg);
 	if (end > beg) z.label = str.slice(beg, end)
 		.replace(/;$/g, "")
 		.replace(/^"|"$/g, "")
@@ -137,25 +134,39 @@ function kn_add_node(str: string, l: number, nodes: Node[], x: number) {
 }
 
 /**
- * Description
- * @param {string} metadata
+ * Parses newick annotations to object for storage
+ * in `Tree` object. 
+ * @param {string} annotations
  * @returns {any}
  */
-function parseAnnotations(metadata: string) {
-	//if (metadata.charAt(0) != '&') // Throw error
-	var annotations = metadata.split(/,(?![^{]*\})/g)
-		.map(e => e.split('='))
-		// .map(e => {
-		// 	e[1].replace(/{|}/g, '')
-		// 		.split(',')
-		// })
-	
-	let annotation_object: any = {};
-	
-	for (let i = 0; i < annotations.length; i += 1){
-		annotation_object[annotations[i][0]] = annotations[i][1]
-	}
+export function parseAnnotations(annotations: string) {
 
-	return annotation_object;
-	//return { [key: string]: string | string[] | null }
+    // Remove the '&' at the start if it exists
+    if (annotations.startsWith('&')) {
+        annotations = annotations.slice(1);
+    }
+
+	const annotation_object: any = {};
+
+	const pairs = annotations.split(/,(?![^{]*\})/g);
+
+    pairs.forEach(pair => {
+        const keyValue: string[] = pair.split('=');
+        const key: string = keyValue[0];
+        let value: string = keyValue[1];
+
+        // Handling array-like values enclosed in {}
+        if (value.includes('{') && value.includes('}')) {
+
+			annotation_object[key] = value
+				.replace(/{|}/g, '')
+				.split(',');
+				
+        } else {
+			annotation_object[key] = value
+        }
+
+    });
+
+    return annotation_object;
 }
