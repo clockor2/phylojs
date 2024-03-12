@@ -25,15 +25,13 @@ export function newickRecurse(node: Node, annotate: boolean): string {
     res += ')';
   }
 
-  //if (node.label !== undefined) res += `${node.label}`;
-  //if (node.hybridID !== undefined) node.label !== undefined ? res += `${node.label}`: res += `#${node.hybridID}`;
-  // TODO: Affirm is hybrid node labels with '#' and hybridID can be substituted
-  // Previous flow above ^
-  
-  if (node.label !== undefined) {
-    res += `"${node.label}"`;
+  // TODO: Add hybrid type to node labels - H, LGT, or R
+  if (node.label !== undefined && node.hybridID == undefined) {
+    res += `"${node.label}"`
+  } else if (node.label !== undefined && node.hybridID !== undefined) {
+    res += `"${node.label}"#${node.hybridID}`
   } else if (node.label == undefined && node.hybridID !== undefined) {
-    res += `${node.hybridID}`
+    res += `#${node.hybridID}`;
   }
   
   if (annotate) {

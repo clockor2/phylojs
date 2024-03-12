@@ -29,8 +29,8 @@ describe('Util', () => {
     var inLabel = 'x#H21'
     var outLabel = parseHybridLabels(inLabel)
 
-    expect(outLabel).toBe(
-      { label: 'x', hybridID: 21 }
+    expect(JSON.stringify(outLabel)).toBe(
+      JSON.stringify({ label: 'x', hybridID: 21 })
     )
   })
 })
@@ -40,10 +40,10 @@ describe('Extended Newick', () => {
     const inNHX = '((C,(Y)x#H1)c,(x#H1,D)d)e;'
     const network = readNewick(inNHX);
     const outNewick = writeNewick(network)
-    expect(outNewick).toBe('(("C",("Y")x#H1)"c",(x#H1,"D")"d")"e";')
+    expect(outNewick).toBe('(("C",("Y")"x"#1)"c",("x"#1,"D")"d")"e";')
   })
   test('parseEmpiricalARGNetwork', () => {
-    const inNHX = readFileSync('test/data/ARG.newick', 'utf-8');
+    const inNHX = readFileSync('test/data/ARG.newick', 'utf-8').split("\n")[0];
     const network = readNewick(inNHX);
     const outNewick = writeNewick(network)
     expect(outNewick).toBe(inNHX)
