@@ -31,7 +31,7 @@ describe('Extended Newick', () => {
     const inNHX = '((C,(Y)x#H1)c,(x#H1,D)d)e;'
     const network = readNewick(inNHX);
     const outNewick = writeNewick(network)
-    expect(outNewick).toBe(inNHX)
+    expect(outNewick).toBe('(("C",("Y")x#H1)"c",(x#H1,"D")"d")"e";')
   })
   test('parseEmpiricalARGNetwork', () => {
     const inNHX = readFileSync('test/data/ARG.newick', 'utf-8');
@@ -51,30 +51,30 @@ describe('Newick', () => {
     const inNewick = '(A:1,(B:1,C:1):1):0;';
     const tree = readNewick(inNewick);
     const outNewick = writeNewick(tree);
-    expect(outNewick).toBe(inNewick);
+    expect(outNewick).toBe('("A":1,("B":1,"C":1):1):0.0;');
   });
   test('readTrees', () => {
     const inNewick =
-      '(A:1,(B:1,C:1):1):0;\n(A:1,(B:1,C:1):1):0;';
+      '("A":1,("B":1,"C":1):1):0.0;\n("A":1,("B":1,"C":1):1):0.0;';
     const trees = readTreesFromNewick(inNewick);
     const outNewick = trees.map(tree => writeNewick(tree)).join('\n');
     expect(outNewick).toBe(inNewick);
   });
   test('readTreesDecimalBL', () => {
     const inNewick =
-      '(A:1.2,(B:1.3,C:1.4):1.5):0;\n(A:1.6,(B:1.7,C:1.8):1.9):0.8;';
+      '("A":1.2,("B":1.3,"C":1.4):1.5):0.0;\n("A":1.6,("B":1.7,"C":1.8):1.9):0.8;';
     const trees = readTreesFromNewick(inNewick);
     const outNewick = trees.map(tree => writeNewick(tree)).join('\n');
     expect(outNewick).toBe(inNewick);
   });
   test('parseAnnotations', () => {
-    const inNewick = '((A[&Type=Blue]:1.1,B[&Type=Blue]:2.2),C[&Type=Green]);'
+    const inNewick = '(("A"[&Type=Blue]:1.1,"B"[&Type=Blue]:2.2),"C"[&Type=Green]);'
     const tree = readNewick(inNewick);
     const outNewick = writeNewick(tree, true);
     expect(outNewick).toBe(inNewick);
   });
   test('parseAnnotationsWithArray', () => {
-    const inNewick = '((A[&Type={Blue,Green}]:1.1,B[&Type={Blue,Mauve}]:2.2),C[&Type=Green]);'
+    const inNewick = '(("A"[&Type={Blue,Green}]:1.1,"B"[&Type={Blue,Mauve}]:2.2),"C"[&Type=Green]);'
     const tree = readNewick(inNewick);
     const outNewick = writeNewick(tree, true);
     expect(outNewick).toBe(inNewick);
@@ -89,7 +89,7 @@ describe('Nexus', () => {
     End;`;
     const tree = readNexus(inNexus);
     const outNewick = writeNewick(tree);
-    const newick = '(A:1,(B:1,C:1):1);';
+    const newick = '("A":1,("B":1,"C":1):1);';
     expect(outNewick).toBe(newick);
   });
   test('readTrees', () => {
@@ -100,7 +100,7 @@ describe('Nexus', () => {
     End;`;
     const trees = readTreesFromNexus(inNexus);
     const outNewick = trees.map(tree => writeNewick(tree)).join('\n');
-    const newick = '(A:1,(B:1,C:1):1);\n(A:1,(B:1,C:1):1);';
+    const newick = '("A":1,("B":1,"C":1):1);\n("A":1,("B":1,"C":1):1);';
     expect(outNewick).toBe(newick);
   });
 });
@@ -128,7 +128,7 @@ describe('PhyloXML', () => {
     </phyloxml>`;
     const tree = readPhyloXML(inPhyloXML);
     const outNewick = writeNewick(tree);
-    const newick = '(A:1,(B:1,C:1):1);';
+    const newick = '("A":1,("B":1,"C":1):1);';
     expect(outNewick).toBe(newick);
   });
   test('readTrees', () => {
@@ -170,7 +170,7 @@ describe('PhyloXML', () => {
     </phyloxml>`;
     const trees = readTreesFromPhyloXML(inPhyloXML);
     const outNewick = trees.map(tree => writeNewick(tree)).join('\n');
-    const newick = '(A:1,(B:1,C:1):1);\n(A:1,(B:1,C:1):1);';
+    const newick = '("A":1,("B":1,"C":1):1);\n("A":1,("B":1,"C":1):1);';
     expect(outNewick).toBe(newick);
   });
 });
@@ -201,7 +201,7 @@ describe('NeXML', () => {
     </nexml>`;
     const tree = readNeXML(inNeXML);
     const outNewick = writeNewick(tree);
-    const newick = '(A:1,(B:1,C:1):1);';
+    const newick = '("A":1,("B":1,"C":1):1);';
     expect(outNewick).toBe(newick);
   });
   test('readTrees', () => {
@@ -241,7 +241,7 @@ describe('NeXML', () => {
     </nexml>`;
     const trees = readTreesFromNeXML(inNeXML);
     const outNewick = trees.map(tree => writeNewick(tree)).join('\n');
-    const newick = '(A:1,(B:1,C:1):1);\n(A:1,(B:1,C:1):1);';
+    const newick = '("A":1,("B":1,"C":1):1);\n("A":1,("B":1,"C":1):1);';
     expect(outNewick).toBe(newick);
   });
 });

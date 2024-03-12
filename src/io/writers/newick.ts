@@ -31,7 +31,7 @@ export function newickRecurse(node: Node, annotate: boolean): string {
   // Previous flow above ^
   
   if (node.label !== undefined) {
-    res += `${node.label}`;
+    res += `"${node.label}"`;
   } else if (node.label == undefined && node.hybridID !== undefined) {
     res += `${node.hybridID}`
   }
