@@ -129,7 +129,7 @@ function kn_add_node(str: string, l: number, nodes: Node[], x: number) {
 		.replace(/^'|'$/g, "") // remove quotes
 	if (z.label?.length === 0) z.label = undefined;
 
-	// Check if hybrid node
+	// Handle hybrid nodes
 	if (z.label?.includes('#')) {
 		let matchedHybrids = nodes
 			.map((e, i) => {
@@ -141,7 +141,7 @@ function kn_add_node(str: string, l: number, nodes: Node[], x: number) {
 			.filter((e, i, a) => a.indexOf(e) == i) // Unique values
 		
 		if (matchedHybrids.length > 1) {
-			throw "Warning: Hybrid node name repeated more than once"
+			throw "Warning: Hybrid node name repeated more than twice"
 		}
 		// Match existing hybrid ID or assign new one
 		z.hybridID = matchedHybrids[0] !== undefined ? matchedHybrids[0] : nodes.length
