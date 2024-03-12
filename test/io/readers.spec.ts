@@ -7,9 +7,10 @@ import {
   readTreesFromNewick,
   readTreesFromNexus,
   readTreesFromPhyloXML,
-  readTreesFromNeXML,
+  readTreesFromNeXML
+  
 } from '../../src';
-import { parseAnnotations } from '../../src/io/readers/newick';
+import { parseAnnotations, parseHybridLabels } from '../../src/io/readers/newick';
 import { readFileSync } from 'fs';
 
 describe('Util', () => {
@@ -22,6 +23,14 @@ describe('Util', () => {
         col: 'Red',
         hand: ['left', 'right']
       }
+    )
+  })
+  test('parseHybridLabels', () => {
+    var inLabel = 'x#H21'
+    var outLabel = parseHybridLabels(inLabel)
+
+    expect(outLabel).toBe(
+      { label: 'x', hybridID: 21 }
     )
   })
 })

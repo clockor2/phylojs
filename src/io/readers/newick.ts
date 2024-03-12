@@ -100,6 +100,7 @@ export function readTreesFromNewick(newick: string): Tree[] {
 function kn_add_node(str: string, l: number, nodes: Node[], x: number) {
 	var r, beg: number, end: number = 0, z: Node;
 	var z = new Node(x); // TODO: Unsure if x is righ index
+	var label: string; // Node label
 	for (var i = l, beg = l; i < str.length && str.charAt(i) != ',' && str.charAt(i) != ')'; ++i) {
 		var c = str.charAt(i);
 		if (c == '[') { // TODO: Annotations
@@ -123,32 +124,51 @@ function kn_add_node(str: string, l: number, nodes: Node[], x: number) {
 		} else if (c < '!' && c > '~' && end == 0) end = i;
 	}
 	if (end == 0) end = i;
-	if (end > beg) z.label = str.slice(beg, end)
-		.replace(/;$/g, "")
-		.replace(/^"|"$/g, "")
-		.replace(/^'|'$/g, "") // remove quotes
-	if (z.label?.length === 0) z.label = undefined;
+	if (end > beg) {
+		label = str.slice(beg, end)
+			.replace(/;$/g, "")
+			.replace(/^"|"$/g, "")
+			.replace(/^'|'$/g, "") // remove quotes
 
-	// Handle hybrid nodes
-	if (z.label?.includes('#')) {
-		let matchedHybrids = nodes
-			.map((e, i) => {
-				if(e.label == z.label) {
-					return i;
-				} 
-			})
-			.filter(e => { return e !== undefined })
-			.filter((e, i, a) => a.indexOf(e) == i) // Unique values
-		
-		if (matchedHybrids.length > 1) {
-			throw "Warning: Hybrid node name repeated more than twice"
+		if(label.includes('#')) { // Hybrid case
+			let parsedLabel = parseHybridLabels(label)
+			z.label = parsedLabel['label']
+			z.hybridID = parsedLabel['hybridID']
+		} else {
+			label.length > 0 ? z.label = label : z.label = undefined
 		}
-		// Match existing hybrid ID or assign new one
-		z.hybridID = matchedHybrids[0] !== undefined ? matchedHybrids[0] : nodes.length
 	}
-
+	
 	nodes.push(z);
 	return i;
+}
+
+/**
+ * Function parses hybrid id labels. Expects hybrid labels to contain #.
+ * Following Cardona et al. 2008, (https://doi.org/10.1186/1471-2105-9-532),
+ * function expects unparsed labels to be of the form [label]#[type]i[:branch-length]
+ * where '#' and i, the hybrid ID are mandatory. PhyloJS ignores the type annotation
+ * (H for hybridisation, LGT for lateral gene transfer, R for recombination) and extracts only
+ * the label and hybridID, following icyTREE.
+ * @param {string} label
+ * @returns {any}
+ */
+export function parseHybridLabels(label: string) {
+	if (!label.includes('#')) throw 'No hash(#), in hybrid label.'
+
+	let parsed: any = {}
+	let splitLabel = label.split('#')
+
+	parsed['label'] = splitLabel[0].length > 0 ? splitLabel[0] : undefined;
+
+	let hybridID = Number(splitLabel[1].replace(/H|LGT|R/g, ""));
+	if (Number.isInteger(hybridID)) { // hybridID must be integer
+		parsed['hybridID'] = hybridID
+	} else {
+		throw 'Hybrid index not an integer!'
+	}
+
+	return parsed;
 }
 
 /**
