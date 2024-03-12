@@ -38,7 +38,6 @@ export function readNewick(str: string) { // formerly kn_parse
 				if (stack[i] < 0) break;
 			}
 			if (i < 0) {
-				//tree.error |= 1; break;
 				break; // TODO: Add error
 			}
 			m = stack.length - 1 - i;
@@ -129,6 +128,25 @@ function kn_add_node(str: string, l: number, nodes: Node[], x: number) {
 		.replace(/^"|"$/g, "")
 		.replace(/^'|'$/g, "") // remove quotes
 	if (z.label?.length === 0) z.label = undefined;
+
+	// Check if hybrid node
+	if (z.label?.includes('#')) {
+		let matchedHybrids = nodes
+			.map((e, i) => {
+				if(e.label == z.label) {
+					return i;
+				} 
+			})
+			.filter(e => { return e !== undefined })
+			.filter((e, i, a) => a.indexOf(e) == i) // Unique values
+		
+		if (matchedHybrids.length > 1) {
+			throw "Warning: Hybrid node name repeated more than once"
+		}
+		// Match existing hybrid ID or assign new one
+		z.hybridID = matchedHybrids[0] !== undefined ? matchedHybrids[0] : nodes.length
+	}
+
 	nodes.push(z);
 	return i;
 }

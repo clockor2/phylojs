@@ -10,6 +10,7 @@ import {
   readTreesFromNeXML,
 } from '../../src';
 import { parseAnnotations } from '../../src/io/readers/newick';
+import { readFileSync } from 'fs';
 
 describe('Util', () => {
   test('parseAnnotations', () => {
@@ -22,6 +23,26 @@ describe('Util', () => {
         hand: ['left', 'right']
       }
     )
+  })
+})
+
+describe('Extended Newick', () => {
+  test('parseSimpleNetwork', () => {
+    const inNHX = '((C,(Y)x#H1)c,(x#H1,D)d)e;'
+    const network = readNewick(inNHX);
+    const outNewick = writeNewick(network)
+    expect(outNewick).toBe(inNHX)
+  })
+  test('parseEmpiricalARGNetwork', () => {
+    const inNHX = readFileSync('test/data/ARG.newick', 'utf-8');
+    const network = readNewick(inNHX);
+    const outNewick = writeNewick(network)
+    expect(outNewick).toBe(inNHX)
+  })
+  test('hybridMapExists', () => {
+    const inNHX = '((C,(Y)x#H1)c,(x#H1,D)d)e;'
+    const network = readNewick(inNHX);
+    expect(network.getRecombEdgeMap()).toBeDefined()
   })
 })
 

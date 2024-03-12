@@ -25,10 +25,17 @@ export function newickRecurse(node: Node, annotate: boolean): string {
     res += ')';
   }
 
-  if (node.label !== undefined) res += `${node.label}`;
-
-  if (node.hybridID !== undefined) res += `#${node.hybridID}`;
-
+  //if (node.label !== undefined) res += `${node.label}`;
+  //if (node.hybridID !== undefined) node.label !== undefined ? res += `${node.label}`: res += `#${node.hybridID}`;
+  // TODO: Affirm is hybrid node labels with '#' and hybridID can be substituted
+  // Previous flow above ^
+  
+  if (node.label !== undefined) {
+    res += `${node.label}`;
+  } else if (node.label == undefined && node.hybridID !== undefined) {
+    res += `${node.hybridID}`
+  }
+  
   if (annotate) {
     const keys = Object.keys(node.annotation);
     if (keys.length > 0) {
@@ -49,8 +56,9 @@ export function newickRecurse(node: Node, annotate: boolean): string {
     }
   }
 
-  if (node.branchLength !== undefined) res += `:${node.branchLength}`;
-  //else res += ':0.0';
+  if (node.branchLength !== undefined) {
+    node.branchLength == 0 ? res += ':0.0' : res += `:${node.branchLength}`
+  }
 
   return res;
 }
