@@ -42,16 +42,29 @@ describe('Extended Newick', () => {
     const outNewick = writeNewick(network)
     expect(outNewick).toBe('(("C",("Y")"x"#1)"c",("x"#1,"D")"d")"e";')
   })
+  test('hybridMapExists', () => {
+    const inNHX = '((C,(Y)x#H1)c,(x#H1,D)d)e;'
+    const network = readNewick(inNHX);
+    expect(network.getRecombEdgeMap()).toBeDefined()
+  })
+  test('parseWithBL', () => {
+    const inNHX = '((C,(Y)x#H1:3)c:3,(x#H1,D)d)e;'
+    const network = readNewick(inNHX);
+    const outNewick = writeNewick(network, true)
+    expect(outNewick).toBe('(("C",("Y")"x"#1:3)"c":3,("x"#1,"D")"d")"e";')
+  })
+  // TODO: Add NHX reading and writing
+  // test('parsesWithAnnotationsAndBL', () => {
+  //   const inNHX = '((C,(Y)x#H1[&&NHX:type=H:arr=T]:3)c:3,(x#H1,D)d)e;'
+  //   const network = readNewick(inNHX);
+  //   const outNewick = writeNewick(network, true)
+  //   expect(outNewick).toBe('(("C",("Y")"x"#1[&&NHX:type=H:arr=T]:3)"c":3,("x"#1,"D")"d")"e";')
+  // })
   test('parseEmpiricalARGNetwork', () => {
     const inNHX = readFileSync('test/data/ARG.newick', 'utf-8').split("\n")[0];
     const network = readNewick(inNHX);
     const outNewick = writeNewick(network)
     expect(outNewick).toBe(inNHX)
-  })
-  test('hybridMapExists', () => {
-    const inNHX = '((C,(Y)x#H1)c,(x#H1,D)d)e;'
-    const network = readNewick(inNHX);
-    expect(network.getRecombEdgeMap()).toBeDefined()
   })
 })
 

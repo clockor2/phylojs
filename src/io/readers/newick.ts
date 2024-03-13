@@ -173,7 +173,7 @@ export function parseHybridLabels(label: string) {
 
 /**
  * Parses newick annotations to object for storage
- * in `Tree` object. 
+ * in `Tree` object.
  * @param {string} annotations
  * @returns {any}
  */
@@ -198,7 +198,7 @@ export function parseAnnotations(annotations: string) {
 
 			annotation_object[key] = value
 				.replace(/{|}/g, '')
-				.split(',');
+				.split(','); // TODO: Split on ':' and parse NHX annotations
 				
         } else {
 			annotation_object[key] = value

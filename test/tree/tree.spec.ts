@@ -4,6 +4,16 @@ import { Tree } from '../../src/tree';
 import { writeNewick } from '../../src';
 import { readFileSync } from 'fs';
 
+describe('Netowrks', () => {
+    test('empiricalARGNetworkRecombMap', () => {
+    const inNHX = readFileSync('test/data/ARG.newick', 'utf-8').split("\n")[0];
+    const network = readNewick(inNHX);
+    const edgeMap = network.getRecombEdgeMap();
+    console.log(edgeMap)
+    expect(edgeMap).toBeDefined()
+  })
+})
+
 describe('Tree', () => {
   const rootNode = new Node(0);
   const childNode1 = new Node(1);
