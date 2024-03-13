@@ -24,13 +24,13 @@ describe('PhyloWriter', () => {
 
   test('newickWriter', () => {
     const newick = writeNewick(tree);
-    expect(newick).toBe('("A":1,("B":1,"C":1):1):0.0;');
+    expect(newick).toBe('("A":1,("B":1,"C":1):1);');
   });
 
   test('nexusWriter', () => {
     const nexus = writeNexus(tree);
     expect(nexus).toBe(
-      '#NEXUS\n\nbegin trees;\n\ttree tree_1 = [&R] ("A":1,("B":1,"C":1):1):0.0;\nend;'
+      '#NEXUS\n\nbegin trees;\n\ttree tree_1 = [&R] ("A":1,("B":1,"C":1):1);\nend;'
     );
   });
 });

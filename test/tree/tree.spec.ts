@@ -6,12 +6,36 @@ import { readFileSync } from 'fs';
 
 describe('Netowrks', () => {
     test('empiricalARGNetworkRecombMap', () => {
-    const inNHX = readFileSync('test/data/ARG.newick', 'utf-8').split("\n")[0];
-    const network = readNewick(inNHX);
-    const edgeMap = network.getRecombEdgeMap();
-    console.log(edgeMap)
-    expect(edgeMap).toBeDefined()
-  })
+      const inNHX = readFileSync('test/data/ARG.newick', 'utf-8').split("\n")[0];
+      const network = readNewick(inNHX);
+      const edgeMap = network.getRecombEdgeMap();
+      expect(Object.values(edgeMap).map(e => e.length)).toBe([2])
+    })
+    test('empiricalTestSrcNode', () => {
+      const inNHX = readFileSync('test/data/ARG.newick', 'utf-8').split("\n")[0];
+      const network = readNewick(inNHX);
+      const edgeMap = network.getRecombEdgeMap();
+      console.log(network.nodeList)
+      expect(edgeMap).toBeDefined()
+      const node = network.nodeList[3]
+      expect(network.isRecombDestNode(node)).toBe(true)
+    })
+    test('empiricalTestDestNode', () => {
+      const inNHX = readFileSync('test/data/ARG.newick', 'utf-8').split("\n")[0];
+      const network = readNewick(inNHX);
+      const node = network.nodeList[3]
+      expect(network.isRecombDestNode(node)).toBe(true)
+    })
+    test('empiricalIsNetwork', () => {
+      const inNHX = readFileSync('test/data/ARG.newick', 'utf-8').split("\n")[0];
+      const network = readNewick(inNHX);
+      expect(network.isNetwork()).toBe(true)
+    })
+    test('isNotNetwork', () => {
+      const inNHX = '(A,B);';
+      const network = readNewick(inNHX);
+      expect(network.isNetwork()).toBe(false)
+    })
 })
 
 describe('Tree', () => {
