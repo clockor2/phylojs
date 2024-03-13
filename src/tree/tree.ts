@@ -228,6 +228,42 @@ export class Tree {
     return this.recombEdgeMap;
   }
 
+
+/**
+ * Check if node is a source node for a hybrid edge in the tree.
+ * @param {Node} node
+ * @returns {boolean}
+ */
+  isRecombSrcNode(node: Node): boolean {
+    if (node.hybridID !== undefined) {
+      return node.isHybrid() && this.getRecombEdgeMap()[node.hybridID][0] == node;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+ * Check if node is a destination node for a hybrid edge in the tree.
+ * @param {Node} node
+ * @returns {boolean}
+ */
+  isRecombDestNode(node: Node): boolean {
+    if (node.hybridID !== undefined) {
+      return node.isHybrid() && this.getRecombEdgeMap()[node.hybridID][0] != node;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+ * Check if the tree is a phylogenetic network.
+ * @param {Node} node
+ * @returns {boolean}
+ */
+  isNetwork(): boolean {
+    return Object.keys(this.getRecombEdgeMap()).length > 0;
+  }
+
   /**
    * Return sub-stree descending from a given `node`
    * @parm {Node} node root of desired subtree
