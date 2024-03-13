@@ -27,13 +27,13 @@ export function newickRecurse(node: Node, annotate: boolean): string {
 
   // TODO: Add hybrid type to node labels - H, LGT, or R
   if (node.label !== undefined && node.hybridID == undefined) {
-    res += `"${node.label}"`
+    res += `"${node.label}"`;
   } else if (node.label !== undefined && node.hybridID !== undefined) {
-    res += `"${node.label}"#${node.hybridID}`
+    res += `"${node.label}"#${node.hybridID}`;
   } else if (node.label == undefined && node.hybridID !== undefined) {
     res += `#${node.hybridID}`;
   }
-  
+
   if (annotate) {
     const keys = Object.keys(node.annotation);
     if (keys.length > 0) {
@@ -55,7 +55,7 @@ export function newickRecurse(node: Node, annotate: boolean): string {
   }
 
   if (node.branchLength !== undefined) {
-    node.branchLength == 0 ? res += ':0.0' : res += `:${node.branchLength}`
+    node.branchLength == 0 ? (res += ':0.0') : (res += `:${node.branchLength}`);
   }
 
   return res;
