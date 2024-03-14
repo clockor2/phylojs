@@ -3,6 +3,7 @@
 /////////////////////////////////////////////////////
 
 import { readNewick, readTreesFromPhyloXML, readTreesFromNewick, writeNewick, Tree } from '@phylojs';
+import { beastAnnotation } from '../../../src/io/writers/newick';
 
 describe('Examples', () => {
   test('RTTR', () => {
@@ -115,7 +116,7 @@ describe('Examples', () => {
         }
       }
     }
-    expect(writeNewick(tree, true)).not.toEqual(newick);
+    expect(writeNewick(tree, beastAnnotation)).not.toEqual(newick);
   });
 
   test('annotations subset', () => {
@@ -132,7 +133,7 @@ describe('Examples', () => {
       }
     }
 
-    expect(writeNewick(tree, true)).not.toEqual(newick);
+    expect(writeNewick(tree, beastAnnotation)).not.toEqual(newick);
   });
 
   test('multiple trees', () => {
@@ -284,7 +285,7 @@ describe('Examples', () => {
     });
 
     // Expect annotations in newick with `true` flag
-    expect(writeNewick(tree, true)).not.toBe(nwk)
+    expect(writeNewick(tree, beastAnnotation)).not.toBe(nwk)
   })
 
   test('Pruning', () => {
@@ -298,10 +299,10 @@ describe('Examples', () => {
       .nodeList[node.parent.id] // Select node's parent by `id`
       .removeChild(node) // Pruning step
 
-    console.log(`
-      Original Nwk: ${nwk}
-      Pruned Tree: ${writeNewick(tree)}
-    `)
+    // console.log(`
+    //   Original Nwk: ${nwk}
+    //   Pruned Tree: ${writeNewick(tree)}
+    // `)
     // Returns
     // Original Nwk: ((A,B),(C,D));
     // Pruned Tree: (("C":0.0,"D":0.0):0.0):0.0;
@@ -324,10 +325,10 @@ describe('Examples', () => {
         .addChild(node.copy()) // .copy() to ensure we don't bump into recursion issues
     }
 
-    console.log(`
-      Original Nwk: ${nwk}
-      Pruned Tree: ${writeNewick(tree)}
-    `)
+    // console.log(`
+    //   Original Nwk: ${nwk}
+    //   Pruned Tree: ${writeNewick(tree)}
+    // `)
     // Return
     // Original Nwk: ((A,B),(C,D));
     // Pruned Tree: (((("A":0.0,"B":0.0):0.0)"A":0.0,(((("A":0.0,"B":0.0):0.0)"A":0.0,"B":0.0):0.0)"B":0.0):0.0,("C":0.0,"D":0.0):0.0):0.0;

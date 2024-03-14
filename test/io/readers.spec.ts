@@ -10,13 +10,25 @@ import {
   readTreesFromNeXML
   
 } from '../../src';
-import { parseAnnotations, parseHybridLabels } from '../../src/io/readers/newick';
+import { parseNewickAnnotations, parseHybridLabels } from '../../src/io/readers/newick';
 import { readFileSync } from 'fs';
+import { beastAnnotation, nhxAnnotation } from '../../src/io/writers/newick';
 
-describe('Util', () => {
-  test('parseAnnotations', () => {
+describe('parseAnnotations', () => {
+  test('parseBEASTStyleAnnotations', () => {
     var a = '&col=Red,hand={left,right}';
-    var parsed = parseAnnotations(a);
+    var parsed = parseNewickAnnotations(a);
+
+    expect(parsed).toEqual(
+      {
+        col: 'Red',
+        hand: ['left', 'right']
+      }
+    )
+  })
+  test('parseNHXAnnotations', () => {
+    var a = '&&NHX:col=Red:hand={left,right}';
+    var parsed = parseNewickAnnotations(a);
 
     expect(parsed).toEqual(
       {
@@ -50,21 +62,25 @@ describe('Extended Newick', () => {
   test('parseWithBL', () => {
     const inNHX = '((C,(Y)x#H1:3)c:3,(x#H1,D)d)e;'
     const network = readNewick(inNHX);
-    const outNewick = writeNewick(network, true)
+    const outNewick = writeNewick(network)
     expect(outNewick).toBe('(("C",("Y")"x"#1:3)"c":3,("x"#1,"D")"d")"e";')
   })
-  // TODO: Add NHX reading and writing
-  // test('parsesWithAnnotationsAndBL', () => {
-  //   const inNHX = '((C,(Y)x#H1[&&NHX:type=H:arr=T]:3)c:3,(x#H1,D)d)e;'
-  //   const network = readNewick(inNHX);
-  //   const outNewick = writeNewick(network, true)
-  //   expect(outNewick).toBe('(("C",("Y")"x"#1[&&NHX:type=H:arr=T]:3)"c":3,("x"#1,"D")"d")"e";')
-  // })
   test('parseEmpiricalARGNetwork', () => {
     const inNHX = readFileSync('test/data/ARG.newick', 'utf-8').split("\n")[0];
     const network = readNewick(inNHX);
     const outNewick = writeNewick(network)
     expect(outNewick).toBe(inNHX)
+  })
+})
+
+describe('NHX', () => {
+  test('parseEmpiricalNHX', () => {
+    const inNHX = readFileSync('test/data/testNHX.nhx', 'utf-8').split("\n")[0];
+    const network = readNewick(inNHX);
+    const outNewick = writeNewick(network, nhxAnnotation)
+    // TODO: For now am assuming that order of branch lenght and annotations isn't important
+    const expected = "(((\"ADH2\"[&&NHX:S=human]:0.1,\"ADH1\"[&&NHX:S=human]:0.11)[&&NHX:S=primates:D=Y:B=100]:0.05,\"ADHY\"[&&NHX:S=nematode]:0.1,\"ADHX\"[&&NHX:S=insect]:0.12)[&&NHX:S=metazoa:D=N]:0.1,(\"ADH4\"[&&NHX:S=yeast]:0.09,\"ADH3\"[&&NHX:S=yeast]:0.13,\"ADH2\"[&&NHX:S=yeast]:0.12,\"ADH1\"[&&NHX:S=yeast]:0.11)[&&NHX:S=Fungi]:0.1)[&&NHX:D=N];"
+    expect(outNewick).toBe(expected)
   })
 })
 
@@ -92,13 +108,13 @@ describe('Newick', () => {
   test('parseAnnotations', () => {
     const inNewick = '(("A"[&Type=Blue]:1.1,"B"[&Type=Blue]:2.2),"C"[&Type=Green]);'
     const tree = readNewick(inNewick);
-    const outNewick = writeNewick(tree, true);
+    const outNewick = writeNewick(tree, beastAnnotation);
     expect(outNewick).toBe(inNewick);
   });
   test('parseAnnotationsWithArray', () => {
     const inNewick = '(("A"[&Type={Blue,Green}]:1.1,"B"[&Type={Blue,Mauve}]:2.2),"C"[&Type=Green]);'
     const tree = readNewick(inNewick);
-    const outNewick = writeNewick(tree, true);
+    const outNewick = writeNewick(tree, beastAnnotation);
     expect(outNewick).toBe(inNewick);
   });
 });

@@ -1,5 +1,23 @@
 // phyloWriter.test.ts
 import { Node, Tree, writeNewick, writeNexus } from '../../src';
+import { beastAnnotation, nhxAnnotation } from '../../src/io/writers/newick';
+
+describe('annotationWriters', () => {
+  test('beastAnnotation', () => {
+    let ann = {
+      col: 'Blue',
+      hand: ['left', 'right']
+    }
+    expect(beastAnnotation(ann)).toBe('[&col=Blue,hand={left,right}]')
+  })
+  test('nhxAnnotation', () => {
+    let ann = {
+      col: 'Blue',
+      hand: 'left'
+    }
+    expect(nhxAnnotation(ann)).toBe('[&&NHX:col=Blue:hand=left]')
+  })
+})
 
 describe('PhyloWriter', () => {
   const rootNode = new Node(0);

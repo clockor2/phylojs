@@ -111,7 +111,7 @@ function kn_add_node(str: string, l: number, nodes: Node[], x: number) {
 				//tree.error |= 4; // <-- TODO: add unfinished annotation error
 				break;
 			}
-			z.annotation = parseAnnotations(str.slice(meta_beg + 1, i))
+			z.annotation = parseNewickAnnotations(str.slice(meta_beg + 1, i))
 		} else if (c == ':') { // Parse branch length
 			if (end == 0) end = i;
 			for (var j = ++i; i < str.length; ++i) {
@@ -127,7 +127,7 @@ function kn_add_node(str: string, l: number, nodes: Node[], x: number) {
 	if (end > beg) {
 		label = str.slice(beg, end)
 			.replace(/;$/g, "")
-			.replace(/^"|"$/g, "")
+			.replace(/^"|"$/g, "") // remove quotes
 			.replace(/^'|'$/g, "") // remove quotes
 
 		if(label.includes('#')) { // Hybrid case
@@ -144,10 +144,10 @@ function kn_add_node(str: string, l: number, nodes: Node[], x: number) {
 }
 
 /**
- * Function parses hybrid id labels. Expects hybrid labels to contain #.
- * Following Cardona et al. 2008, (https://doi.org/10.1186/1471-2105-9-532),
- * function expects unparsed labels to be of the form [label]#[type]i[:branch-length]
- * where '#' and i, the hybrid ID are mandatory. PhyloJS ignores the type annotation
+ * Function parses hybrid id labels, which are assumed to contain '#'.
+ * Following Cardona et al. 2008, (https://doi.org/10.1186/1471-2105-9-532).
+ * Function expects unparsed labels to be of the form [label]#[type]i[:branch-length]
+ * where '#' and i (the hybrid node ID) are mandatory. PhyloJS ignores the type annotation
  * (H for hybridisation, LGT for lateral gene transfer, R for recombination) and extracts only
  * the label and hybridID, following icyTREE.
  * @param {string} label
@@ -161,7 +161,7 @@ export function parseHybridLabels(label: string) {
 
 	parsed['label'] = splitLabel[0].length > 0 ? splitLabel[0] : undefined;
 
-	let hybridID = Number(splitLabel[1].replace(/H|LGT|R/g, ""));
+	let hybridID = Number(splitLabel[1].replace(/H|LGT|R/g, "")); // remove hybridisation types
 	if (Number.isInteger(hybridID)) { // hybridID must be integer
 		parsed['hybridID'] = hybridID
 	} else {
@@ -173,20 +173,26 @@ export function parseHybridLabels(label: string) {
 
 /**
  * Parses newick annotations to object for storage
- * in `Tree` object.
+ * in `Tree` object. Parses annotations in BEAST-type format [&...]
+ * and in NHX type [&&NHX:..], such as from RevBayes. Annotations in
+ * arrays are expected to be stored in braces, and separaged by ',' or ':'.
+ * For example ...Type={Blue,Res} or ...Type={Blue:Red}
  * @param {string} annotations
  * @returns {any}
  */
-export function parseAnnotations(annotations: string) {
+export function parseNewickAnnotations(annotations: string) {
 
-    // Remove the '&' at the start if it exists
-    if (annotations.startsWith('&')) {
+    // Remove the '&' at the start or '&&NHX' in the case of NHX
+    if (annotations.startsWith('&&NHX:')) {
+        annotations = annotations.slice(6);
+    }
+    else if (annotations.startsWith('&')) {
         annotations = annotations.slice(1);
     }
 
 	const annotation_object: any = {};
 
-	const pairs = annotations.split(/,(?![^{]*\})/g);
+	const pairs = annotations.split(/[,:](?![^{]*\})/g); // Split on all ',' and ':' not in braces '{}'
 
     pairs.forEach(pair => {
         const keyValue: string[] = pair.split('=');
@@ -198,7 +204,7 @@ export function parseAnnotations(annotations: string) {
 
 			annotation_object[key] = value
 				.replace(/{|}/g, '')
-				.split(','); // TODO: Split on ':' and parse NHX annotations
+				.split(/,|:/g);
 				
         } else {
 			annotation_object[key] = value
