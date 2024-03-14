@@ -6,16 +6,19 @@ import { newickRecurse } from './newick';
  * @param {boolean} annotate Boolean to include annotations. Default is true.
  */
 export function writeNexus(
-    tree: Tree,
-    annotationWriter: (annotation: typeof Node.prototype.annotation) => string = annotation => ''
+  tree: Tree,
+  annotationWriter: (
+    annotation: typeof Node.prototype.annotation
+  ) => string = _annotation => ''
 ): string {
-    let nexusStr = '#NEXUS\n\nbegin trees;\n';
+  let nexusStr = '#NEXUS\n\nbegin trees;\n';
 
-    if (tree.root !== undefined)
-        nexusStr +=
-            `\ttree tree_1 = [&R] ${newickRecurse(tree.root, annotationWriter)};` + '\n';
+  if (tree.root !== undefined)
+    nexusStr +=
+      `\ttree tree_1 = [&R] ${newickRecurse(tree.root, annotationWriter)};` +
+      '\n';
 
-    nexusStr += 'end;';
+  nexusStr += 'end;';
 
-    return nexusStr;
+  return nexusStr;
 }
