@@ -1,4 +1,3 @@
-import { writeNewick } from 'phylojs';
 import { Tree } from '../../';
 import { SkipTreeException } from '../../utils/error';
 import { readNewick } from './newick';
