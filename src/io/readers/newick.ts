@@ -1,20 +1,56 @@
 import { Tree, Node } from '../../';
-import { SkipTreeException, ParseException } from '../../utils/error';
+import { SkipTreeException } from '../../utils/error';
 
 /**
- * Reads .newick string and returns a tree.
- * @param {string} newick
- * @returns {Tree} Tree
+ *  Parse a string in the New Hampshire format and return a pointer to the tree. 
+
+    Is a slight modification of code written by Heng Li (kn_parse) for jstreeview: at
+    https://github.com/lh3/jstreeview/blob/main/knhx.js
+
+    Modifications are for compatability with our tree object, and to avoid assigning
+    ';' as the root label.
+
+    Function works by reding a .nwk string left to right. Where an open bracket is encountered,
+    we venture deeper into the tree which is reflected in pushing -1 to the stack array.
+ * @param {string} str
+ * @returns {Tree}
  */
-export function readNewick(newick: string): Tree {
-  const tokenList = doLex(newick);
-  const rootNode = doParse(tokenList, newick);
+export function readNewick(str: string): Tree {
+  const stack: number[] = [];
+  const nodes: Node[] = [];
 
-  const tree = new Tree(rootNode);
-  if (tree.root.branchLength === 0.0) {
-    tree.root.branchLength = undefined;
+  for (let l = 0; l < str.length; ) {
+    while (l < str.length && (str.charAt(l) < '!' || str.charAt(l) > '~')) ++l;
+    if (l == str.length) break;
+    const c = str.charAt(l);
+    if (c == ',') ++l;
+    else if (c == '(') {
+      stack.push(-1);
+      ++l;
+    } else if (c == ')') {
+      let m, i;
+      const x = nodes.length;
+      for (i = stack.length - 1; i >= 0; --i) {
+        if (stack[i] < 0) break;
+      }
+      if (i < 0) {
+        break; // TODO: Add error
+      }
+      m = stack.length - 1 - i;
+      l = kn_add_node(str, l + 1, nodes, m);
+      for (i = stack.length - 1, m = m - 1; m >= 0; --m, --i) {
+        nodes[x].children[m] = nodes[stack[i]];
+        nodes[stack[i]].parent = nodes[x];
+      }
+      stack.length = i;
+      stack.push(x);
+    } else {
+      stack.push(nodes.length);
+      l = kn_add_node(str, l, nodes, 0); // leaps l to index after non ',' or '{' or ')'
+    }
   }
-
+  //if (stack.length > 1) tree.error |= 2; // TODO: Add error message
+  const tree = new Tree(nodes[nodes.length - 1]);
   return tree;
 }
 
@@ -45,253 +81,150 @@ export function readTreesFromNewick(newick: string): Tree[] {
   return trees;
 }
 
-type Token = [string, string, number];
+/**
+ * Function constructs nodes. Returns index of furthest character read in nwk string.
+ * Also originates from Heng Li's jstreeview.
+ */
+/**
+ * Description
+ * @param {string} str
+ * @param {number} l
+ * @param {Tree} tree
+ * @param {number} x
+ * @returns {number}
+ */
+function kn_add_node(str: string, l: number, nodes: Node[], x: number) {
+  const beg = l;
+  let end = 0,
+    i: number,
+    j: number;
 
-const tokens: [string, RegExp, boolean, number?][] = [
-  ['OPENP', /^\(/, false],
-  ['CLOSEP', /^\)/, false],
-  ['COLON', /^:/, false],
-  ['COMMA', /^,/, false],
-  ['SEMI', /^;/, false],
-  ['OPENA', /^\[&/, false],
-  ['CLOSEA', /^\]/, false],
-  ['OPENV', /^{/, false],
-  ['CLOSEV', /^}/, false],
-  ['EQ', /^=/, false],
-  ['HASH', /#/, false],
-  ['STRING', /^"(?:[^"]|"")+"/, true],
-  ['STRING', /^'(?:[^']|'')+'/, true],
-  ['STRING', /^[^,():;[\]#]+(?:\([^)]*\))?/, true, 0],
-  ['STRING', /^[^,[\]{}=]+/, true, 1],
-];
-
-function doLex(newick: string): Token[] {
-  const tokenList: Token[] = [];
-  let idx = 0;
-
-  // Lexer has two modes: 0 (default) and 1 (attribute mode)
-  let lexMode = 0;
-
-  while (idx < newick.length) {
-    // Skip over whitespace:
-    const wsMatch = /^\s/.exec(newick.slice(idx));
-    if (wsMatch !== null && wsMatch.index === 0) {
-      idx += wsMatch[0].length;
-      continue;
-    }
-
-    let matchFound = false;
-    for (let k = 0; k < tokens.length; k++) {
-      // Skip lexer rules not applying to mode:
-      if (tokens[k].length > 3 && tokens[k][3] !== lexMode) {
-        continue;
-      }
-
-      const match = tokens[k][1].exec(newick.slice(idx));
-      if (match !== null && match.index === 0) {
-        let value = match[0];
-
-        if (tokens[k][2]) {
-          if (tokens[k][0] === 'STRING') {
-            value = value.replace(/^"(.*)"$/, '$1').replace(/^'(.*)'$/, '$1');
-            value = value.replace("''", "'").replace('""', '"');
-          }
-        }
-
-        tokenList.push([tokens[k][0], value, idx]);
-
-        switch (tokens[k][0]) {
-          case 'OPENA':
-            lexMode = 1;
-            break;
-          case 'CLOSEA':
-            lexMode = 0;
-            break;
-          default:
-            break;
-        }
-
-        matchFound = true;
-        idx += match[0].length;
+  const z = new Node(x); // TODO: Unsure if x is righ index
+  let label: string; // Node label
+  for (
+    i = l;
+    i < str.length && str.charAt(i) != ',' && str.charAt(i) != ')';
+    ++i
+  ) {
+    const c = str.charAt(i);
+    if (c == '[') {
+      const meta_beg = i;
+      if (end == 0) end = i;
+      do ++i;
+      while (i < str.length && str.charAt(i) != ']');
+      if (i == str.length) {
+        //tree.error |= 4; // <-- TODO: add unfinished annotation error
         break;
       }
-    }
+      z.annotation = parseNewickAnnotations(str.slice(meta_beg + 1, i));
+    } else if (c == ':') {
+      // Parse branch length
+      if (end == 0) end = i;
+      for (j = ++i; i < str.length; ++i) {
+        const cc = str.charAt(i);
+        if (
+          (cc < '0' || cc > '9') &&
+          cc != 'e' &&
+          cc != 'E' &&
+          cc != '+' &&
+          cc != '-' &&
+          cc != '.'
+        )
+          break;
+      }
+      z.branchLength = parseFloat(str.slice(j, i));
+      --i;
+    } else if (c < '!' && c > '~' && end == 0) end = i;
+  }
+  if (end == 0) end = i;
+  if (end > beg) {
+    label = str
+      .slice(beg, end)
+      .replace(/;$/g, '')
+      .replace(/^"|"$/g, '') // remove quotes
+      .replace(/^'|'$/g, ''); // remove quotes
 
-    if (!matchFound) {
-      throw new ParseException(
-        `Error reading character ${newick[idx]} at position ${idx}`
-      );
+    if (label.includes('#')) {
+      // Hybrid case
+      const parsedLabel = parseHybridLabels(label);
+      z.label = parsedLabel['label'];
+      z.hybridID = parsedLabel['hybridID'];
+    } else {
+      label.length > 0 ? (z.label = label) : (z.label = undefined);
     }
   }
 
-  return tokenList;
+  nodes.push(z);
+  return i;
 }
 
-function doParse(tokenList: Token[], newick: string): Node {
-  let thisNodeID = 0;
+interface HybridInformation {
+  label: string | undefined;
+  hybridID: number;
+}
 
-  let idx = 0;
-  const treeRoot = ruleT();
-  return treeRoot;
+/**
+ * Function parses hybrid id labels, which are assumed to contain '#'.
+ * Following Cardona et al. 2008, (https://doi.org/10.1186/1471-2105-9-532).
+ * Function expects unparsed labels to be of the form [label]#[type]i[:branch-length]
+ * where '#' and i (the hybrid node ID) are mandatory. PhyloJS ignores the type annotation
+ * (H for hybridisation, LGT for lateral gene transfer, R for recombination) and extracts only
+ * the label and hybridID, following icyTREE.
+ * @param {string} label
+ * @returns {HybridInformation}
+ */
+export function parseHybridLabels(label: string): HybridInformation {
+  if (!label.includes('#')) throw 'No hash(#), in hybrid label.';
 
-  function getContext(flank: number) {
-    const strIdx = tokenList[idx][2];
-    const startIdx = strIdx >= flank ? strIdx - flank : 0;
-    const stopIdx =
-      newick.length - strIdx >= flank ? strIdx + flank : newick.length;
+  const splitLabel = label.split('#');
+  const parsedLabel = splitLabel[0].length > 0 ? splitLabel[0] : undefined;
+  const hybridID = Number(splitLabel[1].replace(/H|LGT|R/g, '')); // remove hybridisation types
 
-    return {
-      left: newick.slice(startIdx, strIdx),
-      at: newick[strIdx],
-      right: newick.slice(strIdx + 1, stopIdx),
-    };
+  if (!Number.isInteger(hybridID)) throw 'Hybrid ID is not an integer!';
+
+  const info: HybridInformation = {
+    label: parsedLabel,
+    hybridID: hybridID,
+  };
+
+  return info;
+}
+
+/**
+ * Parses newick annotations to object for storage
+ * in `Node` object. Parses annotations in BEAST-type format [&...]
+ * and in NHX type [&&NHX:..], such as from RevBayes. Annotations in
+ * arrays are expected to be stored in braces, and separaged by ',' or ':'.
+ * For example ...Type={Blue,Res} or ...Type={Blue:Red}
+ * @param {string} annotations
+ * @returns {any}
+ */
+export function parseNewickAnnotations(
+  annotations: string
+): typeof Node.prototype.annotation {
+  // Remove the '&' at the start or '&&NHX' in the case of NHX
+  if (annotations.startsWith('&&NHX:')) {
+    annotations = annotations.slice(6);
+  } else if (annotations.startsWith('&')) {
+    annotations = annotations.slice(1);
   }
 
-  function acceptToken(token: string, mandatory: boolean) {
-    if (idx < tokenList.length && tokenList[idx][0] === token) {
-      idx += 1;
-      return true;
+  const annotation_object: typeof Node.prototype.annotation = {};
+
+  const pairs = annotations.split(/[,:](?![^{]*\})/g); // Split on all ',' and ':' not in braces '{}'
+
+  pairs.forEach(pair => {
+    const keyValue: string[] = pair.split('=');
+    const key: string = keyValue[0];
+    const value: string = keyValue[1];
+
+    // Handling array-like values enclosed in {}
+    if (value.includes('{') && value.includes('}')) {
+      annotation_object[key] = value.replace(/{|}/g, '').split(/,|:/g);
     } else {
-      if (mandatory)
-        if (idx < tokenList.length) {
-          throw new ParseException(
-            `Expected token <b>${token}</b> but found <b>${tokenList[idx][0]}</b> (${tokenList[idx][1]}) at string position <b>${tokenList[idx][2]}</b>.`,
-            getContext(15)
-          );
-        } else {
-          throw new ParseException(
-            'Newick string terminated early. Expected token ' + token + '.'
-          );
-        }
-      else return false;
+      annotation_object[key] = value;
     }
-  }
+  });
 
-  function ruleT() {
-    const node = ruleN(undefined);
-
-    if (!acceptToken('SEMI', false) && acceptToken('COMMA', false))
-      throw new ParseException('Tree/network with multiple roots found.');
-
-    return node;
-  }
-
-  function ruleN(parent?: Node) {
-    const node = new Node(thisNodeID++);
-    if (parent !== undefined) parent.addChild(node);
-
-    ruleC(node);
-    ruleL(node);
-    ruleH(node);
-    ruleA(node);
-    ruleB(node);
-
-    return node;
-  }
-
-  function ruleC(node: Node) {
-    if (acceptToken('OPENP', false)) {
-      ruleN(node);
-      ruleM(node);
-      acceptToken('CLOSEP', true);
-    }
-  }
-
-  function ruleM(node: Node) {
-    if (acceptToken('COMMA', false)) {
-      ruleN(node);
-      ruleM(node);
-    }
-  }
-
-  function ruleL(node: Node) {
-    if (acceptToken('STRING', false)) {
-      node.label = tokenList[idx - 1][1];
-    }
-  }
-
-  function ruleH(node: Node) {
-    if (acceptToken('HASH', false)) {
-      acceptToken('STRING', true);
-      node.hybridID = Number(tokenList[idx - 1][1]);
-    }
-  }
-  function ruleA(node: Node) {
-    if (acceptToken('OPENA', false)) {
-      ruleD(node);
-      ruleE(node);
-      acceptToken('CLOSEA', true);
-    }
-  }
-  function isStringOrStringArrayOrNull(
-    value: RuleQResult
-  ): value is string | string[] {
-    return (
-      typeof value === 'string' ||
-      (Array.isArray(value) && value.every(item => typeof item === 'string')) ||
-      value == null
-    );
-  }
-  function ruleD(node: Node) {
-    acceptToken('STRING', true);
-    const key = tokenList[idx - 1][1];
-    acceptToken('EQ', true);
-    const value = ruleQ();
-    if (isStringOrStringArrayOrNull(value)) {
-      node.annotation[key] = value;
-    }
-  }
-
-  type RuleQResult = string | RuleQResult[] | null;
-
-  function ruleQ(): RuleQResult {
-    let value;
-    if (acceptToken('STRING', false)) value = tokenList[idx - 1][1];
-    else if (acceptToken('OPENV', false)) {
-      value = [ruleQ()].concat(ruleW());
-      acceptToken('CLOSEV', true);
-    } else value = null;
-
-    return value;
-  }
-
-  function ruleW(): RuleQResult {
-    if (acceptToken('COMMA', false)) {
-      return [ruleQ()].concat(ruleW());
-    } else return [];
-  }
-
-  function ruleE(node: Node) {
-    if (acceptToken('COMMA', false)) {
-      ruleD(node);
-      ruleE(node);
-    }
-  }
-
-  function ruleB(node: Node) {
-    if (acceptToken('COLON', false)) {
-      acceptToken('STRING', true);
-
-      const length = Number(tokenList[idx - 1][1]);
-      if (String(length) !== 'NaN') node.branchLength = length;
-      else
-        throw new ParseException(
-          'Expected numerical branch length. Found ' +
-            tokenList[idx - 1][1] +
-            ' instead.'
-        );
-
-      ruleR();
-
-      ruleA(node);
-    }
-  }
-
-  function ruleR() {
-    if (acceptToken('COLON', false)) {
-      acceptToken('STRING', false);
-
-      ruleR();
-    }
-  }
+  return annotation_object;
 }

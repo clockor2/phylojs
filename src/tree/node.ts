@@ -38,6 +38,7 @@ export class Node {
     this.label = undefined;
     this.annotation = {};
     this.hybridID = undefined;
+    this.rttDist = undefined;
   }
 
   // Node methods
@@ -155,17 +156,23 @@ export class Node {
    * Apply a function `f()` to each node in a subtree descending from `node` in post-order
    * @param {Node} node Node from which to apply `f()` post-order
    */
-  applyPreOrder(f: (node: Node) => any): any[] {
-    let res: any[] = [];
+  applyPreOrder<T>(f: (node: Node) => T): T[] {
+    const res: T[] = [];
+    const stack: Node[] = [this]; // Initialize the stack with the root node.
 
-    const thisRes = f(this);
-    if (thisRes !== null) res = res.concat(thisRes);
+    while (stack.length > 0) {
+      const currentNode = stack.pop(); // Pop the last node from the stack.
 
-    for (let i = 0; i < this.children.length; i++) {
-      res = res.concat(this.children[i].applyPreOrder(f));
+      if (!currentNode) continue; // If the node is null or undefined, skip.
+
+      const thisRes = f(currentNode);
+      res.push(thisRes); // Apply f to the current node and collect the result.
+
+      // Push children to the stack in reverse order to maintain the correct traversal order.
+      for (let i = currentNode.children.length - 1; i >= 0; i--) {
+        stack.push(currentNode.children[i]);
+      }
     }
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return res; // will have to create a function signature type
+    return res;
   }
 }

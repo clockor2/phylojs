@@ -4,6 +4,42 @@ import { Tree } from '../../src/tree';
 import { writeNewick } from '../../src';
 import { readFileSync } from 'fs';
 
+describe('Netowrks', () => {
+    test('empiricalARGNetworkRecombMapDefined', () => {
+      const inNHX = readFileSync('test/data/ARG.newick', 'utf-8').split("\n")[0];
+      const network = readNewick(inNHX);
+      const edgeMap = network.getRecombEdgeMap();
+      expect(
+        JSON.stringify(Object.values(edgeMap).map(e => e.length)) // Once source and dest
+      ).toBe(
+        JSON.stringify(Array(Object.keys(edgeMap).length).fill(2))
+      )
+    })
+    test('empiricalTestSrcNode', () => {
+      const inNHX = readFileSync('test/data/ARG.newick', 'utf-8').split("\n")[0];
+      const network = readNewick(inNHX);
+      const node = network.nodeList[network.nodeList.length - 1]
+      expect(network.isRecombSrcNode(node)).toBe(false)
+    })
+    test('empiricalTestDestNode', () => {
+      const inNHX = readFileSync('test/data/ARG.newick', 'utf-8').split("\n")[0];
+      const network = readNewick(inNHX);
+      const node = network.nodeList[network.nodeList.length - 1]
+      expect(network.isRecombDestNode(node)).toBe(true)
+
+    })
+    test('empiricalIsNetwork', () => {
+      const inNHX = readFileSync('test/data/ARG.newick', 'utf-8').split("\n")[0];
+      const network = readNewick(inNHX);
+      expect(network.isNetwork()).toBe(true)
+    })
+    test('isNotNetwork', () => {
+      const inNHX = '(A,B);';
+      const network = readNewick(inNHX);
+      expect(network.isNetwork()).toBe(false)
+    })
+})
+
 describe('Tree', () => {
   const rootNode = new Node(0);
   const childNode1 = new Node(1);
@@ -31,7 +67,7 @@ describe('Tree', () => {
     ).toStrictEqual(['A', 'B', 'C']);
     tree.reroot(childNode4);
     const newick = writeNewick(tree);
-    expect(newick).toBe('("C":0.5,("B":1,"A":2):0.5):0.0;');
+    expect(newick).toBe('("C":0.5,("B":1,"A":2):0.5);');
     expect(tree.root.children.length).toBe(2);
     expect(
       tree.nodeList.map(n => n.label).filter(n => n !== undefined)
@@ -122,7 +158,7 @@ describe('getSubtree()', () => {
     const subTree = tr.getSubtree(tr.nodeList[1]);
 
     expect(writeNewick(subTree)).toBe(
-      '((("A":0.0,"B":0.0):0.0,"C":0.0):0.0,"D":0.0):0.0;'
+      '((("A","B"),"C"),"D");'
     );
   });
 });
@@ -134,7 +170,7 @@ describe('getMRCA()', () => {
     const mrca = tr.getMRCA([nodeA, nodeA]);
     if (mrca === null) throw new Error('MRCA is null');
     const subTree = tr.getSubtree(mrca);
-    expect(writeNewick(subTree)).toBe('"A":0.0;');
+    expect(writeNewick(subTree)).toBe('"A";');
   });
 
   test('sibling nodes', () => {
@@ -144,7 +180,7 @@ describe('getMRCA()', () => {
     const mrca = tr.getMRCA([nodeA, nodeB]);
     if (mrca === null) throw new Error('MRCA is null');
     const subTree = tr.getSubtree(mrca);
-    expect(writeNewick(subTree)).toBe('("A":0.0,"B":0.0):0.0;');
+    expect(writeNewick(subTree)).toBe('("A","B");');
   });
 
   test('non-sibling nodes', () => {
@@ -154,7 +190,7 @@ describe('getMRCA()', () => {
     const mrca = tr.getMRCA([nodeA, nodeC]);
     if (mrca === null) throw new Error('MRCA is null');
     const subTree = tr.getSubtree(mrca);
-    expect(writeNewick(subTree)).toBe('(("A":0.0,"B":0.0):0.0,"C":0.0):0.0;');
+    expect(writeNewick(subTree)).toBe('(("A","B"),"C");');
   });
 });
 
@@ -216,7 +252,7 @@ describe('ladderise()', () => {
 
   test('Sort simple tree', () => {
     expect(nwkLadderise).toMatch(
-      '(("D":0.0,"E":0.0):0.0,("C":0.0,("A":0.0,"B":0.0):0.0):0.0):0.0;'
+      '(("D","E"),("C",("A","B")));'
     );
   });
 });

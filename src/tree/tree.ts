@@ -24,7 +24,6 @@ export class Tree {
    */
   constructor(root: Node) {
     this.root = root;
-    this.computeNodeAges();
   }
 
   // Tree methods
@@ -84,21 +83,25 @@ export class Tree {
 
   /** Returns root to tip distances. Counts undefined branch lengths as zero */
   getRTTDist(): number[] {
-    const rttDist: number[] = this.root.applyPreOrder((node: Node) => {
-      if (node.parent == undefined) {
-        node.rttDist = 0.0; // root case
-      } else if (node.parent.rttDist !== undefined) {
-        if (node.branchLength !== undefined) {
+    const rttDist: (number | undefined)[] = this.root.applyPreOrder(
+      (node: Node) => {
+        if (node.parent === undefined) {
+          node.rttDist = 0.0; // root case
+        } else if (
+          node.branchLength !== undefined &&
+          node.parent.rttDist !== undefined
+        ) {
           node.rttDist = node.branchLength + node.parent.rttDist;
         } else {
           node.rttDist = node.parent.rttDist;
         }
+        if (node.isLeaf()) return node.rttDist;
+        return undefined;
       }
-      if (node.isLeaf()) return node.rttDist;
-      else return null;
-    });
-
-    return rttDist;
+    );
+    // TODO: have to loop over array to remove undefined values
+    // do it in the applyPreOrder function
+    return rttDist.filter(e => e !== undefined) as number[];
   }
 
   /** Assign new node IDs (use with care!) */
@@ -148,10 +151,7 @@ export class Tree {
   /** A getter that returns an array of nodes (`Node[]`) from private `_nodeList` property in order determined by a pre-order search*/
   get leafList(): Node[] {
     if (this._leafList === undefined && this.root !== undefined) {
-      this._leafList = this.root.applyPreOrder((node: Node) => {
-        if (node.isLeaf()) return node;
-        else return null;
-      });
+      this._leafList = this.nodeList.filter(e => e.isLeaf());
     }
     return this._leafList == undefined ? [] : this._leafList;
   }
@@ -183,10 +183,7 @@ export class Tree {
       let i: number;
       let hybridNodeList: Node[];
       if (this.root !== undefined) {
-        hybridNodeList = this.root.applyPreOrder((node: Node) => {
-          if (node.isHybrid()) return node;
-          else return null;
-        });
+        hybridNodeList = this.nodeList.filter(e => e.isHybrid());
       } else {
         hybridNodeList = [];
       }
@@ -194,6 +191,7 @@ export class Tree {
       const srcHybridIDMap: { [key: string]: Node } = {};
       const destHybridIDMap: { [key: string]: Node[] } = {};
       for (i = 0; i < hybridNodeList.length; i++) {
+        if (hybridNodeList[i] === null) continue;
         node = hybridNodeList[i];
         if (node.hybridID === undefined) {
           continue;
@@ -226,6 +224,45 @@ export class Tree {
     }
 
     return this.recombEdgeMap;
+  }
+
+  /**
+   * Check if node is a source node for a hybrid edge in the tree.
+   * @param {Node} node
+   * @returns {boolean}
+   */
+  isRecombSrcNode(node: Node): boolean {
+    if (node.hybridID !== undefined) {
+      return (
+        node.isHybrid() && this.getRecombEdgeMap()[node.hybridID][0] == node
+      );
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * Check if node is a destination node for a hybrid edge in the tree.
+   * @param {Node} node
+   * @returns {boolean}
+   */
+  isRecombDestNode(node: Node): boolean {
+    if (node.hybridID !== undefined) {
+      return (
+        node.isHybrid() && this.getRecombEdgeMap()[node.hybridID][0] != node
+      );
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * Check if the tree is a phylogenetic network.
+   * @param {Node} node
+   * @returns {boolean}
+   */
+  isNetwork(): boolean {
+    return Object.keys(this.getRecombEdgeMap()).length > 0;
   }
 
   /**
@@ -277,9 +314,9 @@ export class Tree {
   getTipLabels(node?: Node): string[] {
     let tips: string[];
     if (node !== undefined) {
-      tips = this.getSubtree(node)
-        .leafList
-        .map(e => e.label ?? e.id.toString());
+      tips = this.getSubtree(node).leafList.map(
+        e => e.label ?? e.id.toString()
+      );
     } else {
       tips = this.leafList.map(e => e.label ?? e.id.toString());
     }
