@@ -158,6 +158,11 @@ function kn_add_node(str: string, l: number, nodes: Node[], x: number) {
   return i;
 }
 
+interface HybridInformation {
+  label: string | undefined;
+  hybridID: number;
+}
+
 /**
  * Function parses hybrid id labels, which are assumed to contain '#'.
  * Following Cardona et al. 2008, (https://doi.org/10.1186/1471-2105-9-532).
@@ -166,31 +171,23 @@ function kn_add_node(str: string, l: number, nodes: Node[], x: number) {
  * (H for hybridisation, LGT for lateral gene transfer, R for recombination) and extracts only
  * the label and hybridID, following icyTREE.
  * @param {string} label
- * @returns {any}
+ * @returns {HybridInformation}
  */
-export function parseHybridLabels(label: string): {
-  label: string;
-  hybridID: number;
-} {
+export function parseHybridLabels(label: string): HybridInformation {
   if (!label.includes('#')) throw 'No hash(#), in hybrid label.';
 
-  const parsed = {
-    label: '',
-    hybridID: NaN,
-  };
   const splitLabel = label.split('#');
-
-  parsed['label'] = splitLabel[0].length > 0 ? splitLabel[0] : '';
-
+  const parsedLabel = splitLabel[0].length > 0 ? splitLabel[0] : undefined;
   const hybridID = Number(splitLabel[1].replace(/H|LGT|R/g, '')); // remove hybridisation types
-  if (Number.isInteger(hybridID)) {
-    // hybridID must be integer
-    parsed['hybridID'] = hybridID;
-  } else {
-    throw 'Hybrid index not an integer!';
-  }
 
-  return parsed;
+  if (!Number.isInteger(hybridID)) throw 'Hybrid ID is not an integer!';
+
+  const info: HybridInformation = {
+    label: parsedLabel,
+    hybridID: hybridID,
+  };
+
+  return info;
 }
 
 /**
