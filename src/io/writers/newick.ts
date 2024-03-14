@@ -8,16 +8,16 @@ import { Node, Tree } from '../../';
  */
 
 export function writeNewick(
-  tree: Tree,
-  annotationWriter: (annotation: typeof Node.prototype.annotation) => string = annotation => ''
+    tree: Tree,
+    annotationWriter: (annotation: typeof Node.prototype.annotation) => string = annotation => ''
 ): string {
 
-  let newickStr = '';
+    let newickStr = '';
 
-  if (tree.root !== undefined)
-    newickStr += newickRecurse(tree.root, annotationWriter) + ';';
+    if (tree.root !== undefined)
+        newickStr += newickRecurse(tree.root, annotationWriter) + ';';
 
-  return newickStr;
+    return newickStr;
 }
 
 /**
@@ -27,37 +27,37 @@ export function writeNewick(
  * @returns {string}
  */
 export function newickRecurse(
-  node: Node,
-  annotationWriter: (annotation: typeof Node.prototype.annotation) => string = annotation => ''
-  ): string {
+    node: Node,
+    annotationWriter: (annotation: typeof Node.prototype.annotation) => string = annotation => ''
+): string {
 
-  let res = '';
+    let res = '';
 
-  if (!node.isLeaf()) {
-    res += '(';
-    for (let i = 0; i < node.children.length; i++) {
-      if (i > 0) res += ',';
-      res += newickRecurse(node.children[i], annotationWriter);
+    if (!node.isLeaf()) {
+        res += '(';
+        for (let i = 0; i < node.children.length; i++) {
+            if (i > 0) res += ',';
+            res += newickRecurse(node.children[i], annotationWriter);
+        }
+        res += ')';
     }
-    res += ')';
-  }
 
-  // TODO: Add hybrid type to node labels - H, LGT, or R
-  if (node.label !== undefined && node.hybridID == undefined) {
-    res += `"${node.label}"`;
-  } else if (node.label !== undefined && node.hybridID !== undefined) {
-    res += `"${node.label}"#${node.hybridID}`;
-  } else if (node.label == undefined && node.hybridID !== undefined) {
-    res += `#${node.hybridID}`;
-  }
-  
-  res += annotationWriter(node.annotation)
+    // TODO: Add hybrid type to node labels - H, LGT, or R
+    if (node.label !== undefined && node.hybridID == undefined) {
+        res += `"${node.label}"`;
+    } else if (node.label !== undefined && node.hybridID !== undefined) {
+        res += `"${node.label}"#${node.hybridID}`;
+    } else if (node.label == undefined && node.hybridID !== undefined) {
+        res += `#${node.hybridID}`;
+    }
 
-  if (node.branchLength !== undefined) {
-    node.branchLength == 0 ? (res += ':0.0') : (res += `:${node.branchLength}`);
-  }
+    res += annotationWriter(node.annotation)
 
-  return res;
+    if (node.branchLength !== undefined) {
+        node.branchLength == 0 ? (res += ':0.0') : (res += `:${node.branchLength}`);
+    }
+
+    return res;
 }
 
 /**
@@ -67,34 +67,34 @@ export function newickRecurse(
  * @returns {string}
  */
 export function beastAnnotation(
-  annotation: typeof Node.prototype.annotation
-  ): string {
+    annotation: typeof Node.prototype.annotation
+): string {
 
     let res = '';
 
     if (annotation !== undefined) {
 
-      const keys = Object.keys(annotation);
+        const keys = Object.keys(annotation);
 
-      if (keys.length > 0) {
-        res += '[&';
+        if (keys.length > 0) {
+            res += '[&';
 
-        for (let i = 0; i < keys.length; i++) {
-          const key = keys[i];
-  
-          if (i > 0) res += ',';
-          res += `${key}=`;
-          const value = annotation[key];
+            for (let i = 0; i < keys.length; i++) {
+                const key = keys[i];
 
-          if (Array.isArray(value)) {
-            res += `{${String(value.join(','))}}`; // Convert the array to a comma-separated string
-          } else {
-            res += `${String(value)}`; // Explicitly convert the value to a string
-          }
+                if (i > 0) res += ',';
+                res += `${key}=`;
+                const value = annotation[key];
+
+                if (Array.isArray(value)) {
+                    res += `{${String(value.join(','))}}`; // Convert the array to a comma-separated string
+                } else {
+                    res += `${String(value)}`; // Explicitly convert the value to a string
+                }
+            }
+
+            res += ']'
         }
-
-        res += ']'
-      }
     }
 
     return res;
@@ -109,29 +109,29 @@ export function beastAnnotation(
  * @returns {string}
  */
 export function nhxAnnotation(
-  annotation: typeof Node.prototype.annotation
-  ): string {
+    annotation: typeof Node.prototype.annotation
+): string {
 
     let res = '';
 
     if (annotation !== undefined) {
-      const keys = Object.keys(annotation);
+        const keys = Object.keys(annotation);
 
-      if (keys.length > 0) {
-        res += '[&&NHX:';
+        if (keys.length > 0) {
+            res += '[&&NHX:';
 
-        for (let i = 0; i < keys.length; i++) {
-          const key = keys[i];
-  
-          if (i > 0) res += ':';
-          res += `${key}=`;
+            for (let i = 0; i < keys.length; i++) {
+                const key = keys[i];
 
-          const value = annotation[key];
-          res += `${String(value)}`; // Explicitly convert the value to a string
+                if (i > 0) res += ':';
+                res += `${key}=`;
+
+                const value = annotation[key];
+                res += `${String(value)}`; // Explicitly convert the value to a string
+            }
+
+            res += ']'
         }
-
-        res += ']'
-      }
     }
 
     return res;
