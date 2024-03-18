@@ -14,8 +14,8 @@ export class Tree {
   private _leafList: Node[] | undefined;
   /** A public property */
   recombEdgeMap: { [key: string]: Node[] } | undefined;
-  /** A protected property */
-  isTimeTree = false;
+  /** A public property*/
+  ultrametric: boolean | undefined;
 
   /**
    * The constructor of the `Tree` class.
@@ -28,37 +28,55 @@ export class Tree {
 
   // Tree methods
 
-  /** Updates node ages. Automatically done if rerooting*/
-  computeNodeAges(): void {
-    const heights: number[] = this.root.applyPreOrder((node: Node) => {
+  /**
+   * Computes height of each node above the root. Automatically done if rerooting.
+   * NaN if any undefined branch lengths ancestral to a particular node. Contrasts
+   * `Tree.getRTTD()` in not converting undefined branch lengths to 0.0.
+   */
+  computeNodeHeights(): void {
+    this.root.applyPreOrder((node: Node) => {
       if (node.parent === undefined) node.height = 0.0;
       // root case
       else {
         if (node.branchLength !== undefined && node.parent.height !== undefined)
-          node.height = node.parent.height - node.branchLength;
-        else {
-          node.height = NaN;
-        }
+          node.height = node.parent.height + node.branchLength;
       }
 
       return node.height;
     });
-    const youngestHeight: number = Math.min(...heights);
+  }
 
-    this.isTimeTree =
-      !Number.isNaN(youngestHeight) &&
-      (heights.length > 1 || this.root.branchLength !== undefined);
+  /**
+   * Reflects whether all tips are the same age (0), equivalently if they are
+   * all the same height about the root. Only makes sense for time trees.
+   * Sets property on tree object and returns boolean. The tolerance for differences
+   * in tip heights is 1e-6 as a default, but can be adjusted.
+   * @param {number} tol
+   * @returns {boolean}
+   */
+  isUltrametric(tol = 1e-6): boolean {
+    this.computeNodeHeights();
+    const tipHeights = this.leafList.map(e => e.height);
+    let definedHeights: number[];
 
-    for (let i = 0; i < this.nodeList.length; i++) {
-      const node = this.nodeList[i];
-      if (node.height !== undefined) {
-        node.height -= youngestHeight;
+    if (tipHeights.some(e => e == undefined)) {
+      this.ultrametric = false;
+      return false;
+    } else {
+      definedHeights = tipHeights as number[];
+      if (definedHeights.every((e, i, a) => Math.abs(e - a[0]) < tol)) {
+        this.ultrametric = true;
+        return true;
+      } else {
+        this.ultrametric = false;
+        return false;
       }
     }
   }
 
-  /** Ladderises the tree.
-   * Applies a pre-order search.For each node, child nodes are ordered by increasing number of descending tips
+  /**
+   * Ladderises the tree.
+   * Applies a pre-order search. For each node, child nodes are ordered by increasing number of descending tips
    */
   ladderise(): void {
     this.root.applyPreOrder((node: Node) => {
@@ -118,6 +136,7 @@ export class Tree {
     this.labelNodeMap = undefined;
     this._leafList = undefined;
     this.recombEdgeMap = undefined;
+    this.ultrametric = undefined;
   }
 
   /** A getter that returns an array of nodes (`Node[]`) from private `_nodeList` property in order determined by a pre-order search*/
@@ -464,7 +483,7 @@ export class Tree {
     this.clearCaches();
 
     // Recompute node ages
-    this.computeNodeAges();
+    this.computeNodeHeights();
 
     // Create new node IDs:
     this.reassignNodeIDs();
@@ -481,5 +500,105 @@ export class Tree {
         destNode.branchLength += destNode.height - srcNode.height;
       }
     }
+  }
+
+  /**
+   * Returns height above the root for each internal node. Root height is assumed to be 0
+   * and undefined branch lengths are assumed to be zero.
+   * @returns {number[]}
+   */
+  getInternalNodeHeights(): number[] {
+    const heights: (number | undefined)[] = this.root.applyPreOrder(
+      (node: Node) => {
+        if (node.parent === undefined) {
+          node.height = 0.0; // root case
+        } else if (
+          node.branchLength !== undefined &&
+          node.parent.height !== undefined
+        ) {
+          node.height = node.branchLength + node.parent.height;
+        } else {
+          node.height = node.parent.height;
+        }
+
+        if (!node.isLeaf()) return node.height;
+        return undefined;
+      }
+    );
+    // TODO: have to loop over array to remove undefined values from leaves
+    // do it in the applyPreOrder function
+    return heights.filter(e => e !== undefined) as number[];
+  }
+
+  /**
+   * Calculates Gamma statistic from Pybus and Harvey 2000 (10.1098/rspb.2000.1278 ).
+   * The Gamma statistic measures deviation from a constant rate pure-birth process
+   * in the underlying population (also known as a Yule process). Values above 0 indicate
+   *  longer external branches, while values corresond to internal branches. Calculating the Gamma statistic involves
+   * manipulations that mean the statistic should follow a standard normal distribution,
+   * such that one can perform a frequentist test to measure consistency with the pure birth
+   * process.
+   *
+   * Since the Gamma statistic applies to a pure birth process, the tree is expected to be
+   * ultrametric and the method throws an error if it is not. It also returns NaN if any node
+   * node heights are undefined, due to undefined branch lengths.
+   *
+   * @param {number} tol Tolerance for ultrametricity passed to `.isUltrametric()`
+   * @returns {number}
+   *
+   */
+  gammaStatistic(tol = 1e-6): number {
+    let g: number[]; // inter-node times (Fig 1 Pybys & Harvey 2004)
+    const n: number = this.leafList.length; // Num Tips
+    let A = 0;
+
+    if (n <= 2) {
+      return NaN;
+    } else if (!this.isUltrametric(tol)) {
+      console.warn('Gamma Statistic requires an untrametric tree!');
+      return NaN;
+    }
+
+    this.computeNodeHeights();
+    const nodes = this.nodeList;
+    const heights = nodes.map(e => e.height).slice(1);
+
+    if (heights.slice(1).some(e => e == undefined)) return NaN; // if any heights undefined
+
+    if (nodes.some(node => node.isHybrid())) {
+      console.warn('This is a netowrk! Gamma statistic ignoring hybrid nodes.');
+    }
+
+    g = nodes
+      .slice(1)
+      .filter(node => !node.isLeaf())
+      .map(node => node.height)
+      .filter(e => e !== undefined) as number[]; // Need to assert type here
+
+    const maxHeight = this.leafList.map(e => e.height)[0] as number;
+    g.push(maxHeight);
+    g.sort((a, b) => a - b); // in place
+    const minHeight = g[0];
+    g = g.map((e, i, a) => e - a[i - 1]);
+    g[0] = minHeight; // NaN from first diff --> frist branch time
+
+    const T = g
+      .map((e, i) => (i + 2) * e)
+      .reduce((partialSum, e) => partialSum + e, 0);
+
+    let sum: number;
+    for (let i = 0; i <= g.length - 2; i++) {
+      sum = 0;
+      for (let k = 0; k <= i; k++) {
+        sum += (k + 2) * g[k];
+      }
+      A += sum;
+    }
+
+    A /= n - 2;
+
+    const gamma = (A - T / 2) / Math.sqrt(1 / (12 * (n - 2)));
+
+    return gamma;
   }
 }
