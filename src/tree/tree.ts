@@ -597,8 +597,86 @@ export class Tree {
 
     A /= n - 2;
 
-    const gamma = (A - T / 2) / Math.sqrt(1 / (12 * (n - 2)));
+    const gamma = (A - T / 2) / (T * Math.sqrt(1 / (12 * (n - 2))));
 
     return gamma;
+  }
+
+  /**
+   * Returns the Sackin Index, which measures imbalance as the sum of the number of tips
+   * descending from each internal node. The sum increases for more imbalances (ladder-like) trees.
+   * See Chapter 5 in "Tree balance indices: a comprehensive survey" (https://doi.org/10.1007/978-3-031-39800-1_5)
+   * for further details, a reference we point to from the treebalance R package
+   * @returns {number}
+   */
+  sackinIndex(): number {
+    const internalNodes = this.nodeList.filter(e => !e.isLeaf());
+    const sackinIindex = internalNodes
+      .map(e => this.getSubtree(e).leafList.length)
+      .reduce((partialSum, e) => partialSum + e, 0);
+    return sackinIindex;
+  }
+
+  /**
+   * Check whether the tree is binary (each internal node has <= 2 descendents)
+   * @returns {any}
+   */
+  isBinary(): boolean {
+    const internalNodes = this.nodeList.filter(e => !e.isLeaf());
+    const nChildren = internalNodes.map(e => e.children.length);
+
+    if (nChildren.every(e => e <= 2)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * Returns the Colless Imbalance (CI) index, with an option to normalise or use the standard method.
+   * The CI is defined for binary trees, so NaN is returned if the tree is not binary.
+   * In essence, the CI adds the difference between the number of tips descending from each internal node.
+   * The square of each difference is taking if the method selected is quadratic. If the method is set to
+   * "corrected", then the overall sum is scaled by the number of tips. If method is "standard", then
+   * sum is returned.
+   * The value should be smaller for more balanced trees (less ladder-like). As for the Sacking Index,
+   * see "Tree balance indices: a comprehensive survey
+   * (https://doi.org/10.1007/978-3-031-39800-1_12, https://doi.org/10.1007/978-3-031-39800-1_13, https://doi.org/10.1007/978-3-031-39800-1_15)
+   * for further details.
+   * @param {"standard" | "normalised" | "quadratic"} method
+   * @returns {number}
+   */
+  collessIndex(
+    method: 'standard' | 'corrected' | 'quadratic' = 'standard'
+  ): number {
+    if (!this.isBinary()) {
+      console.warn('Coless Imbalance not defined for non-binary trees');
+      return NaN;
+    }
+
+    const internalNodes = this.nodeList.filter(e => !e.isLeaf());
+
+    // Number of left and right escending tips for each internal node
+    const collessIndex = internalNodes
+      .map(e => {
+        let nLeft = this.getSubtree(e.children[0]).leafList.length;
+        let nRight = this.getSubtree(e.children[1]).leafList.length;
+
+        if (!Number.isInteger(nLeft)) nLeft = 0;
+        if (!Number.isInteger(nRight)) nRight = 0;
+
+        return method === 'quadratic'
+          ? Math.pow(nLeft - nRight, 2)
+          : Math.abs(nLeft - nRight);
+      })
+      .reduce((partialSum, e) => partialSum + e, 0);
+
+    if (method === 'corrected') {
+      const n = this.leafList.length;
+      if (n <= 2) return 0;
+      return (2 * collessIndex) / ((n - 1) * (n - 2));
+    }
+
+    return collessIndex;
   }
 }

@@ -300,3 +300,20 @@ describe('gammaStatistic', () => {
         expect(tree.gammaStatistic()).toBe(NaN)
     })
 })
+
+describe('imbalanceIndicies', () => {
+    const newick = "((t1:0.3475497498,(t3:0.1509478958,t2:0.1509478958):0.196601854):0.1545193298,t4:0.5020690796);"
+    const tree = readNewick(newick)
+    test('colless', () => {
+        expect(tree.collessIndex()).toBe(3)
+    })
+    test('collessNormalised', () => {
+        expect(tree.collessIndex("corrected")).toBe(1)
+    })
+    test('collessQuadratic', () => {
+        expect(tree.collessIndex("quadratic")).toBe(5)
+    })
+    test('Sackin', () => {
+        expect(tree.sackinIndex()).toBe(9)
+    })
+})
