@@ -7,7 +7,7 @@ import {
   readTreesFromPhyJSON,
 } from '../../';
 
-type Schema = 'newick' | 'nexus' | 'phyloxml' | 'nexml';
+type Schema = 'newick' | 'nexus' | 'phyloxml' | 'nexml' | 'phyjson';
 
 /**
  * Reads trees from a string according to the specified `schema`. TODO: add support for getting trees from a URL.
