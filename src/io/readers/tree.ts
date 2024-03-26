@@ -4,6 +4,7 @@ import {
   readTreesFromNeXML,
   readTreesFromPhyloXML,
   readTreesFromNexus,
+  readTreesFromPhyJSON,
 } from '../../';
 
 type Schema = 'newick' | 'nexus' | 'phyloxml' | 'nexml';
@@ -27,6 +28,8 @@ export function read(text: string, schema: Schema = 'newick'): Tree[] {
       return readTreesFromPhyloXML(text);
     case 'nexml':
       return readTreesFromNeXML(text);
+    case 'phyjson':
+      return readTreesFromPhyJSON(text);
     default:
       throw new Error('Invalid schema');
   }

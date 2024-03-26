@@ -4,10 +4,12 @@ import {
     readNexus,
     readPhyloXML,
     readNeXML,
+    readPhyJSON,
     readTreesFromNewick,
     readTreesFromNexus,
     readTreesFromPhyloXML,
-    readTreesFromNeXML
+    readTreesFromNeXML,
+    readTreesFromPhyJSON,
 
 } from '../../src';
 import { parseNewickAnnotations, parseHybridLabels } from '../../src/io/readers/newick';
@@ -278,6 +280,130 @@ describe('NeXML', () => {
         </trees>
     </nexml>`;
         const trees = readTreesFromNeXML(inNeXML);
+        const outNewick = trees.map(tree => writeNewick(tree)).join('\n');
+        const newick = '("A":1,("B":1,"C":1):1);\n("A":1,("B":1,"C":1):1);';
+        expect(outNewick).toBe(newick);
+    });
+});
+
+describe('PhyJSON', () => {
+    test('read', () => {
+        const inPhyJSON = `{
+    "trees": [
+        {
+            "root": {
+                "children": [
+                    {
+                        "branch_length": 1,
+                        "taxon": 1
+                    },
+                    {
+                        "branch_length": 1,
+                        "children": [
+                            {
+                                "branch_length": 1,
+                                "taxon": 2
+                            },
+                            {
+                                "branch_length": 1,
+                                "taxon": 3
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    ],
+    "taxa": [
+        {
+            "id": 1,
+            "name": "A"
+        },
+        {
+            "id": 2,
+            "name": "B"
+        },
+        {
+            "id": 3,
+            "name": "C"
+        }
+    ],
+    "format": "phylojson",
+    "version": "1"
+}`;
+        const tree = readPhyJSON(inPhyJSON);
+        const outNewick = writeNewick(tree);
+        const newick = '("A":1,("B":1,"C":1):1);';
+        expect(outNewick).toBe(newick);
+    });
+    test('readTrees', () => {
+        const inPhyJSON = `{
+    "trees": [
+        {
+            "root": {
+                "children": [
+                    {
+                        "branch_length": 1,
+                        "taxon": 1
+                    },
+                    {
+                        "branch_length": 1,
+                        "children": [
+                            {
+                                "branch_length": 1,
+                                "taxon": 2
+                            },
+                            {
+                                "branch_length": 1,
+                                "taxon": 3
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "root": {
+                "children": [
+                    {
+                        "branch_length": 1,
+                        "taxon": 1
+                    },
+                    {
+                        "branch_length": 1,
+                        "children": [
+                            {
+                                "branch_length": 1,
+                                "taxon": 2
+                            },
+                            {
+                                "branch_length": 1,
+                                "taxon": 3
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    ],
+    "taxa": [
+        {
+            "id": 1,
+            "name": "A"
+        },
+        {
+            "id": 2,
+            "name": "B"
+        },
+        {
+            "id": 3,
+            "name": "C"
+        }
+    ],
+    "format": "phylojson",
+    "version": "1"
+}`;
+        const trees = readTreesFromPhyJSON(inPhyJSON);
         const outNewick = trees.map(tree => writeNewick(tree)).join('\n');
         const newick = '("A":1,("B":1,"C":1):1);\n("A":1,("B":1,"C":1):1);';
         expect(outNewick).toBe(newick);
