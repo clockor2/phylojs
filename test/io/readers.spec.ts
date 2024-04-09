@@ -22,7 +22,7 @@ describe('read', () => {
         const inNewick = readFileSync('test/data/egTree.nwk', 'utf-8');
         const tree = readNewick(inNewick);
         // test the number of nodes
-        expect(tree.nodeList.length).toBe(274);
+        expect(tree.leafList.length).toBe(274);
     });
 });
 
