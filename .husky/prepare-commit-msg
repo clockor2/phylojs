@@ -1,4 +1,5 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-# Check if /dev/tty exists or is accessible
+# TODO: Check if /dev/tty exists or is accessible
+exec </dev/tty && node_modules/.bin/cz --hook || true
