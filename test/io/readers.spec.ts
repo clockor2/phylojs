@@ -16,6 +16,21 @@ import { parseNewickAnnotations, parseHybridLabels } from '../../src/io/readers/
 import { readFileSync } from 'fs';
 import { beastAnnotation, nhxAnnotation } from '../../src/io/writers/newick';
 
+// test read local files
+describe('read', () => {
+    test('readTreesFromNewick', () => {
+
+        const inNewick = readFileSync('test/data/egTree.nwk', 'utf-8');
+
+        const tree = readTreesFromNewick(inNewick)[0];
+
+        // test the number of leaves
+        expect(tree.leafList.length).toBe(274);
+
+    });
+});
+
+
 describe('parseAnnotations', () => {
     test('parseBEASTStyleAnnotations', () => {
         var a = '&col=Red,hand={left,right}';
