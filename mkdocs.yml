@@ -1,4 +1,3 @@
-
 site_name: phylojs
 site_url: https://clockor2.github.io/phylojs/
 repo_url: https://github.com/clockor2/phylojs
@@ -6,10 +5,10 @@ edit_uri: https://github.com/clockor2/phylojs/edit/main/docs/
 
 theme:
   name: "material"
-  palette: 
+  palette:
     - scheme: default
       toggle:
-        icon: material/brightness-7 
+        icon: material/brightness-7
         name: Switch to dark mode
     - scheme: slate
       toggle:
@@ -35,34 +34,35 @@ markdown_extensions:
   - pymdownx.superfences
 
 plugins:
-- search
-- mkdocs-video:
-    is_video: True
-    video_muted: True
-    video_controls: True
-    css_style:
-      width: "100%"
-- typedoc:
-    source: './src/'
-    tsconfig: 'tsconfig.json'
-    name: 'API'
-    options: 'typedoc.json'
-    disable_system_check: False
+  - search
+  - mkdocs-video:
+      is_video: True
+      video_muted: True
+      video_controls: True
+      css_style:
+        width: "100%"
+  - typedoc:
+      source: "./src/"
+      tsconfig: "tsconfig.json"
+      name: "API"
+      options: "typedoc.json"
+      disable_system_check: False
 
 nav:
-  - Home: 'index.md'
+  - Home: "index.md"
   - Examples:
-    - examples/index.md
-    - Overview of the Tree Class: examples/tree.md
-    - Visualise: examples/visualise.md
-    - Fetching Trees from a URL: examples/fetch.md
-    - Finding the MRCA: examples/mrca.md
-    - Root-to-tip regression: examples/rttr.md
-    - Rerooting: examples/reroot.md
-    - Working with annotations: examples/annotations.md
-    - Working with arrays of trees: examples/treeArray.md
-    - Writing trees: examples/writer.md
-    - Summary statistics: examples/ieRatio.md
-    - Pruning and Grafting: examples/pruneGraft.md
-  - API: 'typedoc'
+      - examples/index.md
+      - Overview of the Tree Class: examples/tree.md
+      - Rerooting App: examples/rerootingApp.md
+      - Ladderising App: examples/ladderiseApp.md
+      - Fetching Trees from a URL: examples/fetch.md
+      - Finding the MRCA: examples/mrca.md
+      - Root-to-tip regression: examples/rttr.md
+      - Rerooting: examples/reroot.md
+      - Working with annotations: examples/annotations.md
+      - Working with arrays of trees: examples/treeArray.md
+      - Writing trees: examples/writer.md
+      - Summary statistics: examples/ieRatio.md
+      - Pruning and Grafting: examples/pruneGraft.md
+  - API: "typedoc"
   - Cite: cite.md
