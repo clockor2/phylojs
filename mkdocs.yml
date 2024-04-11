@@ -57,6 +57,7 @@ nav:
       - Rerooting App: examples/rerootingApp.md
       - Ladderising App: examples/ladderiseApp.md
       - Newick Conversion App: examples/toNewickApp.md
+      - Tree Statistics App: examples/treeStatsApp.md
       - Fetching Trees from a URL: examples/fetch.md
       - Finding the MRCA: examples/mrca.md
       - Root-to-tip regression: examples/rttr.md
