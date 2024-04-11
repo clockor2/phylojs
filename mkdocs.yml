@@ -54,10 +54,11 @@ nav:
   - Examples:
       - examples/index.md
       - Overview of the Tree Class: examples/tree.md
-      - Rerooting App: examples/rerootingApp.md
+      - Random-Rerooting App: examples/rerootingApp.md
       - Ladderising App: examples/ladderiseApp.md
       - Newick Conversion App: examples/toNewickApp.md
       - Tree Statistics App: examples/treeStatsApp.md
+      - Annotations and Pre-Order Traversal: examples/annotationsPreOrder.md
       - Fetching Trees from a URL: examples/fetch.md
       - Finding the MRCA: examples/mrca.md
       - Root-to-tip regression: examples/rttr.md
@@ -65,7 +66,6 @@ nav:
       - Working with annotations: examples/annotations.md
       - Working with arrays of trees: examples/treeArray.md
       - Writing trees: examples/writer.md
-      - Summary statistics: examples/ieRatio.md
       - Pruning and Grafting: examples/pruneGraft.md
   - API: "typedoc"
   - Cite: cite.md
