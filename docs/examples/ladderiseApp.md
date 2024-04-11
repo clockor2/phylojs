@@ -4,7 +4,7 @@ Here is an example of an app that ladderises a user supplied Newick string. It a
 You can paste in any Newick string, or use the following for convenience:
 
 ```
-((t3:0.1214280168,(t5:0.1848530392,t1:0.8746360096):0.7670262265):0.6987996523,(t4:0.4007139837,t2:0.8491224579):0.2763029449);
+(t4:1,(((t2:1,t7:1):1,(t1:1,t3:1):1):1,(t6:1,t5:1):1):1);
 ```
 
 <p class="codepen" data-height="300" data-theme-id="dark" data-default-tab="html,result" data-slug-hash="ZEZovgM" data-editable="true" data-user="LeoFeatherstone" style="height: 300px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;">
