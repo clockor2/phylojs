@@ -29,7 +29,7 @@ Here are the key methods for the Tree class:
 
 - `getRTTDist()`: Returns an array of root-to-tip distances for all leaves in the tree.
 
-- `getSubtree(node)`: Returns a new Tree object representing the subtree rooted at the specified node.
+- `getClade(node)`: Returns a new Tree object representing the subtree rooted at the specified node.
 
 - `getMRCA(nodes)`: Returns the most recent common ancestor (MRCA) of the given list of nodes.
 
@@ -60,7 +60,7 @@ const totalBranchLength = tree.getTotalBranchLength();
 const rttDist = tree.getRTTDist();
 
 // Get subtree
-const subtree = tree.getSubtree(nodes[1]);
+const subtree = tree.getClade(nodes[1]);
 
 // Get most recent common ancestor of two nodes
 const mrca = tree.getMRCA([nodes[1], nodes[2]]);

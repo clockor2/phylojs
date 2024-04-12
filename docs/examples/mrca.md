@@ -1,6 +1,6 @@
 # Finding MRCA for a set of nodes
 
-This script demonstrates how the `getNodeByLabel`, `getMRCA`, and `getSubtree` methods on the `Tree` object can be wrapped in a function to find and extract subtrees given a newick string and list of desired taxa.
+This script demonstrates how the `getNodeByLabel`, `getMRCA`, and `getClade` methods on the `Tree` object can be wrapped in a function to find and extract subtrees given a newick string and list of desired taxa.
 
 ```typescript
 import { readNewick, Tree, Node } from 'phylojs';
@@ -16,7 +16,7 @@ function findMRCAandExtractSubtree(newickStr: string, labels: string[]): Tree {
   const mrca = tree.getMRCA(nodes);
   if (mrca === null) throw new Error('MRCA is null');
 
-  const subtree: Tree = tree.getSubtree(mrca);
+  const subtree: Tree = tree.getClade(mrca);
 
   return subtree;
 }

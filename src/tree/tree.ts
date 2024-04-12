@@ -81,8 +81,8 @@ export class Tree {
   ladderise(): void {
     this.root.applyPreOrder((node: Node) => {
       node.children.sort((a, b) => {
-        const lenA = this.getSubtree(a).getTipLabels().length;
-        const lenB = this.getSubtree(b).getTipLabels().length;
+        const lenA = this.getClade(a).getTipLabels().length;
+        const lenB = this.getClade(b).getTipLabels().length;
         if (lenA < lenB) {
           return -1;
         } else if (lenA > lenB) {
@@ -286,9 +286,9 @@ export class Tree {
 
   /**
    * Return sub-stree descending from a given `node`
-   * @parm {Node} node root of desired subtree
+   * @parm {Node} root node root of desired subtree
    */
-  getSubtree(node: Node): Tree {
+  getClade(node: Node): Tree {
     return new Tree(node);
   }
 
@@ -333,9 +333,7 @@ export class Tree {
   getTipLabels(node?: Node): string[] {
     let tips: string[];
     if (node !== undefined) {
-      tips = this.getSubtree(node).leafList.map(
-        e => e.label ?? e.id.toString()
-      );
+      tips = this.getClade(node).leafList.map(e => e.label ?? e.id.toString());
     } else {
       tips = this.leafList.map(e => e.label ?? e.id.toString());
     }
@@ -612,7 +610,7 @@ export class Tree {
   sackinIndex(): number {
     const internalNodes = this.nodeList.filter(e => !e.isLeaf());
     const sackinIindex = internalNodes
-      .map(e => this.getSubtree(e).leafList.length)
+      .map(e => this.getClade(e).leafList.length)
       .reduce((partialSum, e) => partialSum + e, 0);
     return sackinIindex;
   }
@@ -659,8 +657,8 @@ export class Tree {
     // Number of left and right escending tips for each internal node
     const collessIndex = internalNodes
       .map(e => {
-        let nLeft = this.getSubtree(e.children[0]).leafList.length;
-        let nRight = this.getSubtree(e.children[1]).leafList.length;
+        let nLeft = this.getClade(e.children[0]).leafList.length;
+        let nRight = this.getClade(e.children[1]).leafList.length;
 
         if (!Number.isInteger(nLeft)) nLeft = 0;
         if (!Number.isInteger(nRight)) nRight = 0;
