@@ -152,10 +152,10 @@ describe('getRTTDist()', () => {
     });
 });
 
-describe('getSubtree()', () => {
+describe('getClade()', () => {
     test('simple tree', () => {
         const tr = readNewick('((((A,B),C),D),E);');
-        const subTree = tr.getSubtree(tr.nodeList[1]);
+        const subTree = tr.getClade(tr.nodeList[1]);
 
         expect(writeNewick(subTree)).toBe(
             '((("A","B"),"C"),"D");'
@@ -169,7 +169,7 @@ describe('getMRCA()', () => {
         const nodeA = tr.leafList[0];
         const mrca = tr.getMRCA([nodeA, nodeA]);
         if (mrca === null) throw new Error('MRCA is null');
-        const subTree = tr.getSubtree(mrca);
+        const subTree = tr.getClade(mrca);
         expect(writeNewick(subTree)).toBe('"A";');
     });
 
@@ -179,7 +179,7 @@ describe('getMRCA()', () => {
         const nodeB = tr.leafList[1];
         const mrca = tr.getMRCA([nodeA, nodeB]);
         if (mrca === null) throw new Error('MRCA is null');
-        const subTree = tr.getSubtree(mrca);
+        const subTree = tr.getClade(mrca);
         expect(writeNewick(subTree)).toBe('("A","B");');
     });
 
@@ -189,7 +189,7 @@ describe('getMRCA()', () => {
         const nodeC = tr.leafList[2];
         const mrca = tr.getMRCA([nodeA, nodeC]);
         if (mrca === null) throw new Error('MRCA is null');
-        const subTree = tr.getSubtree(mrca);
+        const subTree = tr.getClade(mrca);
         expect(writeNewick(subTree)).toBe('(("A","B"),"C");');
     });
 });
@@ -234,7 +234,7 @@ describe('getTipLabels()', () => {
     });
 
     test('subtree', () => {
-        const labs = tr.getSubtree(tr.nodeList[1]).getTipLabels();
+        const labs = tr.getClade(tr.nodeList[1]).getTipLabels();
 
         expect(JSON.stringify(labs)).toMatch(JSON.stringify(['A', 'B', 'C', 'D']));
     });
