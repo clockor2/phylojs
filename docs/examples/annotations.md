@@ -1,27 +1,16 @@
-# Handling annotations
+# Modifying annotations
 
-All node objects have an `annotation` field where annotations. The `annotation` fiel itself stores an object for all annotated tags. For example `Node.annotations = {Type: Blue}` for some leaf nodes in the following example.
+This is another example, in addition to "Annotations and Pre-Order Traversal", that shows how annotations can be modified without a Pre-Order search.
 
 Here, we show show how annotations can be extracted and modified in a loop. We swap Blue an Green type annotations to Red and Yellow on a small tree.
 
-Altered annotations are then writtedn back to newick or nexus.
+All node objects have an `annotation` field where annotations. The `annotation` fiel itself stores an object for all annotated tags. For example `Node.annotations = {Type: Blue}` for some leaf nodes in the following example.
 
-```typescript
-        let newick = '((A[&Type=Blue],B[&Type=Blue]),C[&Type=Green]);'
-        let tree = readNewick(newick)
+Altered annotations are then written back to newick.
 
-        if (tree.leafList !== undefined) { // Avoids 'leafList' possibly undefined error
-
-            for (let i=0; i<tree.leafList.length; i++) {
-                if(tree.leafList[i].annotation.Type == 'Blue') {
-                    tree.leafList[i].annotation.Type = 'Red'
-                } else {
-                    tree.leafList[i].annotation.Type = 'Yellow'
-                }
-            }
-        }
-
-        console.log(writeNewick(tree, true))
-        // (("A"[&"Type"="Red"]:0.0,"B"[&"Type"="Red"]:0.0):0.0,"C"[&"Type"="Yellow"]:0.0):0.0;
-        // Note types changed ^
-```
+<p class="codepen" data-height="300" data-theme-id="dark" data-default-tab="js" data-slug-hash="vYMrRKe" data-editable="true" data-user="LeoFeatherstone" style="height: 300px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;">
+  <span>See the Pen <a href="https://codepen.io/LeoFeatherstone/pen/vYMrRKe">
+  modify-annotations</a> by Leo Featherstone (<a href="https://codepen.io/LeoFeatherstone">@LeoFeatherstone</a>)
+  on <a href="https://codepen.io">CodePen</a>.</span>
+</p>
+<script async src="https://cpwebassets.codepen.io/assets/embed/ei.js"></script>

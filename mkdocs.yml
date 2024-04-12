@@ -64,9 +64,8 @@ nav:
       - Root-to-tip regression: examples/rttr.md
       - Pruning and Grafting: examples/pruneGraft.md
       - Extracting Clades: examples/mrca.md
+      - Modifying Annotations: examples/annotations.md
 
-      - Rerooting: examples/reroot.md
-      - Working with annotations: examples/annotations.md
       - Working with arrays of trees: examples/treeArray.md
       - Writing trees: examples/writer.md
   - API: "typedoc"
