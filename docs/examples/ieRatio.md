@@ -28,7 +28,7 @@ The internal to external branch length ratio is defined as the ratio of the sum 
     // IE ratio for subtrees descending from each node, except tips
     tree.root.applyPreOrder((node: Node) => {
       if(!node.isLeaf()) {
-        let ieRatio = getBranchLengthRatio(tree.getSubtree(node))
+        let ieRatio = getBranchLengthRatio(tree.getClade(node))
         node.annotation = {ieRatio: ieRatio.toFixed(2)}
       }
     });
