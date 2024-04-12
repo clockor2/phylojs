@@ -18,11 +18,11 @@ import { beastAnnotation, nhxAnnotation } from '../../src/io/writers/newick';
 
 // test read local files
 describe('read', () => {
-    test('readTreesFromNewick', () => {
+    test('readNewick', () => {
 
         const inNewick = readFileSync('test/data/egTree.nwk', 'utf-8');
 
-        const tree = readTreesFromNewick(inNewick)[0];
+        const tree = readNewick(inNewick);
 
         // test the number of leaves
         expect(tree.leafList.length).toBe(274);
