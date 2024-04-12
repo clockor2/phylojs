@@ -19,6 +19,7 @@ theme:
   features:
     - toc.follow
     - content.action.edit
+    - content.code.copy
     - navigation.tabs
     - navigation.indexes
     - navigation.top
@@ -60,12 +61,13 @@ nav:
       - Tree Statistics App: examples/treeStatsApp.md
       - Annotations and Pre-Order Traversal: examples/annotationsPreOrder.md
       - Fetching Trees from a URL: examples/fetch.md
-      - Finding the MRCA: examples/mrca.md
       - Root-to-tip regression: examples/rttr.md
+      - Pruning and Grafting: examples/pruneGraft.md
+      - Extracting Clades: examples/mrca.md
+
       - Rerooting: examples/reroot.md
       - Working with annotations: examples/annotations.md
       - Working with arrays of trees: examples/treeArray.md
       - Writing trees: examples/writer.md
-      - Pruning and Grafting: examples/pruneGraft.md
   - API: "typedoc"
   - Cite: cite.md
