@@ -19,6 +19,14 @@ export function readNewick(str: string): Tree {
   const stack: number[] = [];
   const nodes: Node[] = [];
 
+  // check for multiple trees
+  if (str.includes('\n')) {
+    str = str.slice(0, str.indexOf('\n'));
+    console.warn(
+      'Multiple trees in Newick string. Only reading the first tree. Use readTreesFromNewick() to read all trees.'
+    );
+  }
+
   for (let l = 0; l < str.length; ) {
     while (l < str.length && (str.charAt(l) < '!' || str.charAt(l) > '~')) ++l;
     if (l == str.length) break;
