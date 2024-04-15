@@ -53,8 +53,10 @@ plugins:
 nav:
   - Home:
       - "index.md"
-      - Overview of the Tree Class: examples/tree.md
-      - Writing Trees: examples/writer.md
+      - Overview of the Tree Class: tree.md
+      - Overview of the Node Class: node.md
+      - Reading Trees: reader.md
+      - Writing Trees: writer.md
 
   - Examples:
       - examples/index.md
