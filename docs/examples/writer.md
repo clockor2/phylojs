@@ -1,4 +1,4 @@
-# Write
+# Writing trees
 
 The `writeNewick` and `writeNexus` functions are used to convert a tree data structure back into a Newick or Nexus formatted string, respectively. Both Newick and Nexus formats are commonly used in phylogenetics to represent tree data structures.
 
@@ -15,12 +15,16 @@ import { writeNewick, writeNexus } from '../src/Write';
 The `writeNewick` function has the following signature:
 
 ```javascript
-writeNewick(tree: Tree, annotate: boolean = false): string
+writeNewick(
+    tree: Tree,
+    annotationWriter: (annotation: typeof Node.prototype.annotation) => string = _annotation => ''
+): string 
 ```
 
 **Parameters**
 
 - `tree` (Tree): The tree object to be converted into a Newick string.
+- `annotationWriter` (annotationWriter: (annotation: typeof Node.prototype.annotation) => string = _annotation => ''): Function converting node annotations to string. Defaults to empty string(no annotation case). Can be user defined or use in-built beastAnnotation() or nhxAnnotation()
 
 **Return**
 
@@ -29,12 +33,16 @@ writeNewick(tree: Tree, annotate: boolean = false): string
 The `writeNexus` function has the following signature:
 
 ```javascript
-writeNexus(tree: Tree, annotate: boolean = true): string
+writeNexus(
+    tree: Tree,
+    annotationWriter: (annotation: typeof Node.prototype.annotation) => string = _annotation => ''
+): string 
 ```
 
 **Parameters**
 
 - `tree` (Tree): The tree object to be converted into a Nexus string.
+- `annotationWriter` (annotationWriter: (annotation: typeof Node.prototype.annotation) => string = _annotation => ''): Function converting node annotations to string. Defaults to empty string(no annotation case). Can be user defined or use in-built beastAnnotation() or nhxAnnotation()
 
 **Return**
 
@@ -43,22 +51,22 @@ writeNexus(tree: Tree, annotate: boolean = true): string
 ## Function usage
 
 ```javascript
-const tree = createTreeObject(); // Function to create the Tree object, not provided
-const newickString = writeNewick(tree);
-const nexusString = writeNexus(tree);
+const tree; // Tree object
+const newickString = writeNewick(tree); // annotations omitted
+const newickString = writeNewick(tree, beastAnnotations); // include annotations as in BEAST Newick
+const newickString = writeNewick(tree, nhxAnnotations); // include annotations as in NHX
+const nexusString = writeNexus(tree); // Annotations options same as for `writeNewick()`
 ```
-
-In the example above, `createTreeObject()` is a hypothetical function that returns a Tree object. This tree is then passed to `writeNewick` and `writeNexus` functions, which return Newick and Nexus strings respectively.
 
 ## Function details
 
 The `writeNewick` function uses recursion to traverse the Tree object and build the corresponding Newick string. The `writeNexus` function, on the other hand, uses the same recursive traversal method, but appends additional Nexus-specific formatting to the output string.
 
-Both functions handle node labels, hybrid IDs, and annotations, as well as branch lengths. If a node's branch length is undefined, a default value of 0.0 is used.
+Both functions handle node labels, hybrid IDs, and annotations, as well as branch lengths.
 
-## Function testing
+## How We Test Each Function
 
-The module includes tests to validate both `writeNewick` and `writeNexus` functions. The tests ensure that the functions can correctly convert a Tree object back to Newick or Nexus strings.
+The module includes tests to validate both `writeNewick` and `writeNexus` functions. The tests ensure that the functions can correctly convert a Tree object back to Newick or Nexus strings, with variations for including/excluding annotations.
 
 ```javascript
 import { writeNewick } from '../src/Write';
@@ -75,5 +83,3 @@ describe('TreeFromNewick', () => {
 ```
 
 The test shown above creates a Tree object from a Newick string using the `readNewick` function. It then uses `writeNewick` to convert the tree back to a Newick string and checks if the resulting string is identical to the input string. A similar testing approach can be used for `writeNexus`.
-
-Please ensure that your input Tree object is correctly formed and adheres to the tree data structure standards, to avoid writing errors.

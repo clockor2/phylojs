@@ -51,10 +51,13 @@ plugins:
       disable_system_check: False
 
 nav:
-  - Home: "index.md"
+  - Home:
+      - "index.md"
+      - Overview of the Tree Class: examples/tree.md
+      - Writing Trees: examples/writer.md
+
   - Examples:
       - examples/index.md
-      - Overview of the Tree Class: examples/tree.md
       - Random-Rerooting App: examples/rerootingApp.md
       - Ladderising App: examples/ladderiseApp.md
       - Newick Conversion App: examples/toNewickApp.md
@@ -65,8 +68,6 @@ nav:
       - Pruning and Grafting: examples/pruneGraft.md
       - Extracting Clades: examples/mrca.md
       - Modifying Annotations: examples/annotations.md
-
-      - Working with arrays of trees: examples/treeArray.md
-      - Writing trees: examples/writer.md
+      - Arrays of Trees: examples/treeArray.md
   - API: "typedoc"
   - Cite: cite.md
