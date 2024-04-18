@@ -18,10 +18,6 @@ export class Node {
   annotation: { [key: string]: string | string[] | null };
   /** ID of node if hybrid */
   hybridID: number | undefined;
-  /** Node is collapsed? */
-  collapsed: boolean | undefined;
-  /** Cartoon boolean */
-  cartoon: boolean | undefined;
 
   /**
    * The constructor of the `Node` class.
@@ -142,9 +138,6 @@ export class Node {
       nodeCopy.annotation[key] = this.annotation[key];
     nodeCopy.id = this.id;
     nodeCopy.hybridID = this.hybridID;
-
-    nodeCopy.collapsed = this.collapsed;
-    nodeCopy.cartoon = this.cartoon;
 
     for (let i = 0; i < this.children.length; i++)
       nodeCopy.addChild(this.children[i].copy());
