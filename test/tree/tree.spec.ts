@@ -110,6 +110,35 @@ describe('reroot() - basic', () => {
         expect(JSON.stringify(diff)).toBe(
             JSON.stringify(originalLength.map(e => true))
         );
+    })
+});
+
+describe('diagnose reroot deltas at each tip', () => {
+    const newick = `(Bovine:0.69395,(Gibbon:0.36079,(Orangutan:0.33636,` +
+        `(Gorilla:0.17147,(Chimp:1.19268,Human:0.11927):0.08386):0.06124):0.15057):0.54939,Mouse:1.21460);`;
+    const base = readNewick(newick);
+    const N0 = base.nodeList.length;
+    const L0 = base.leafList.length;
+    const BL0 = base.getTotalBranchLength();
+
+    const results: { label: string; dN: number; dL: number; dBL: number }[] = [];
+
+    for (const leaf of base.leafList) {
+        const tr = readNewick(newick);
+        const node = tr.getNodeByLabel(leaf.label!)!;
+        tr.reroot(node);
+
+        const dN = tr.nodeList.length - N0;
+        const dL = tr.leafList.length - L0;
+        const dBL = tr.getTotalBranchLength() - BL0;
+        results.push({ label: leaf.label!, dN, dL, dBL });
+    }
+
+    test('print reroot deltas', () => {
+        // This will print out the array so you can inspect it.
+        console.table(results);
+        // And fail so you actually see it in CI
+        expect(results.every(r => r.dN === 0 && Math.abs(r.dBL) < 1e-8)).toBe(true);
     });
 });
 
