@@ -120,3 +120,5 @@ lib/
 
 #docs
 site/
+
+.DS_Store
