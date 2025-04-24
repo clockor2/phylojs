@@ -359,143 +359,125 @@ export class Tree {
    * @param {Node} edgeBaseNode `Node` to reroot at
    * @param {number|undefined} prop Proportion of the branch descending from `edgeBaseNode` at which to cut and place the root. Defaults ot 0.5
    */
-  reroot(edgeBaseNode: Node, prop?: number): void {
-    this.recombEdgeMap = undefined;
-    const currentRecombEdgeMap = this.getRecombEdgeMap();
-
+  reroot(edgeBaseNode: Node, prop = 0.5): void {
+    // --- 0. Prep old root and recomb map ---
     const oldRoot = this.root;
-    this.root = new Node(0); // TODO figure out what the root node ID should be ? new Node()
+    this.recombEdgeMap = undefined;
+    const recombMap = this.getRecombEdgeMap();
 
-    const edgeBaseNodeP = edgeBaseNode.parent;
-    if (edgeBaseNodeP === undefined) throw 'edgeBaseNodeP === undefined';
-    edgeBaseNodeP.removeChild(edgeBaseNode);
-    this.root.addChild(edgeBaseNode);
+    // --- 1. Cut A—B at the desired proportion ---
+    const A = edgeBaseNode;
+    const B = A.parent;
+    if (!B) throw new Error('Cannot reroot at the current root');
+    const origBL = A.branchLength ?? 0;
+    const frac = Math.min(1, Math.max(0, prop));
+    const BL_A = origBL * frac;
+    const BL_B = origBL - BL_A;
+    B.removeChild(A);
+    A.parent = undefined;
 
-    // handling proprtion to cut branch for root
-    let BL = edgeBaseNode.branchLength; // TMP
-    if (edgeBaseNode.branchLength !== undefined) {
-      if (prop !== undefined && prop >= 0 && prop <= 1) {
-        const totalBL = edgeBaseNode.branchLength;
-        edgeBaseNode.branchLength *= prop;
-        BL = totalBL - edgeBaseNode.branchLength;
-      } else {
-        edgeBaseNode.branchLength /= 2;
-        BL = edgeBaseNode.branchLength;
+    // --- 2. Build undirected adjacency including the two halves and recomb edges ---
+    const R = new Node(0);
+    const adj = new Map<Node, { node: Node; weight: number }[]>();
+
+    function addEdge(u: Node, v: Node, w: number) {
+      if (!adj.has(u)) adj.set(u, []);
+      if (!adj.has(v)) adj.set(v, []);
+      adj.get(u)?.push({ node: v, weight: w });
+      adj.get(v)?.push({ node: u, weight: w });
+    }
+
+    // a) original tree edges (walk old nodes before we wipe parent/children)
+    const allOld = [...this.nodeList];
+    for (const n of allOld) {
+      for (const c of n.children) {
+        // skip the cut edge A→B
+        if ((n === B && c === A) || (n === A && c === B)) continue;
+        addEdge(n, c, c.branchLength ?? 0);
       }
     }
 
-    const node = edgeBaseNodeP;
-    const prevNode = this.root;
+    // b) the two new cuts
+    addEdge(R, A, BL_A);
+    addEdge(R, B, BL_B);
 
-    const usedHybridIDs: { [key: string]: boolean } = {};
-    for (const recombID in currentRecombEdgeMap) {
-      usedHybridIDs[recombID] = true;
-    }
-
-    function recurseReroot(
-      node: Node | undefined,
-      prevNode: Node,
-      seenNodes: { [key: number]: boolean },
-      BL: number | undefined
-    ): void {
-      if (node === undefined) return;
-
-      if (node.id in seenNodes) {
-        // Handle creation of hybrid nodes
-
-        const newHybrid = new Node(0); // TODO figure out what the root node ID should be ? new Node()
-        if (node.isHybrid()) newHybrid.hybridID = node.hybridID;
-        else {
-          let newHybridID = 0;
-          while (newHybridID in usedHybridIDs) {
-            newHybridID += 1;
-          }
-          node.hybridID = newHybridID;
-          newHybrid.hybridID = newHybridID;
-          usedHybridIDs[newHybridID] = true;
-        }
-
-        newHybrid.branchLength = BL;
-        prevNode.addChild(newHybrid);
-
-        return;
-      } else {
-        seenNodes[node.id] = true;
-      }
-
-      const nodeP = node.parent;
-
-      if (nodeP !== undefined) nodeP.removeChild(node);
-      prevNode.addChild(node);
-
-      const tmpBL = node.branchLength;
-      node.branchLength = BL;
-      BL = tmpBL;
-
-      recurseReroot(nodeP, node, seenNodes, BL);
-
-      let destNodes: Node[] = [];
-      let destNodePs: (Node | undefined)[] = []; // root P is undefined
-      if (node.isHybrid()) {
-        if (node.hybridID === undefined)
-          throw 'Hybrid node does not have hybridID';
-        destNodes = currentRecombEdgeMap[node.hybridID].slice(1);
-        destNodePs = destNodes.map(function (destNode: Node) {
-          return destNode.parent;
-        });
-
-        // Node will no longer be hybrid
-        node.hybridID = undefined;
-
-        for (let i = 0; i < destNodes.length; i++) {
-          const destNodeP = destNodePs[i];
-          if (destNodeP !== undefined) {
-            destNodeP.removeChild(destNodes[i]);
-          }
-
-          recurseReroot(destNodeP, node, seenNodes, destNodes[i].branchLength);
-        }
+    // c) recombination (hybrid) edges
+    for (const hidStr in recombMap) {
+      const group = recombMap[+hidStr];
+      const src = group[0];
+      for (let i = 1; i < group.length; i++) {
+        const dst = group[i];
+        addEdge(src, dst, dst.branchLength ?? 0);
       }
     }
 
-    recurseReroot(node, prevNode, {}, BL);
+    // --- 3. Clear all old orientation and rebuild from R via BFS ---
+    for (const n of allOld) {
+      n.parent = undefined;
+      n.children = [];
+    }
+    this.root = R;
 
-    // Delete singleton node left by old root
+    const visited = new Set<Node>([R]);
+    const queue: Node[] = [R];
+    while (queue.length) {
+      const u = queue.shift();
+      if (!u) {
+        throw new Error('Queue is unexpectedly empty');
+      }
+      for (const { node: v, weight } of adj.get(u) || []) {
+        if (visited.has(v)) continue;
+        v.parent = u;
+        u.children.push(v);
+        v.branchLength = weight;
+        visited.add(v);
+        queue.push(v);
+      }
+    }
 
-    if (oldRoot.children.length == 1 && !oldRoot.isHybrid()) {
-      const child = oldRoot.children[0];
-      const parent = oldRoot.parent;
-      if (parent === undefined) throw 'root with single child?';
-      parent.removeChild(oldRoot);
-      oldRoot.removeChild(child);
-      parent.addChild(child);
+    // --- 4. Clean up old singleton root if it lost all but one child ---
+    if (oldRoot.children.length === 1 && !oldRoot.isHybrid()) {
+      const [only] = oldRoot.children;
+      if (!oldRoot.parent) {
+        throw new Error('Old root does not have a parent.');
+      }
+      const p = oldRoot.parent;
+      p.removeChild(oldRoot);
+      oldRoot.removeChild(only);
+      p.addChild(only);
       if (
-        child.branchLength === undefined ||
-        oldRoot.branchLength === undefined
-      )
-        throw 'branchLength === undefined';
-      child.branchLength = child.branchLength + oldRoot.branchLength;
+        oldRoot.branchLength !== undefined &&
+        only.branchLength !== undefined
+      ) {
+        only.branchLength += oldRoot.branchLength;
+      } else {
+        throw new Error(
+          'Branch length is undefined for either the old root or the only child.'
+        );
+      }
     }
 
-    // Clear out-of-date leaf and node lists
+    // --- 5. Final bookkeeping ---
     this.clearCaches();
-
-    // Recompute node ages
     this.computeNodeHeights();
-
-    // Create new node IDs:
     this.reassignNodeIDs();
 
-    // Ensure destNode leaf heights match those of corresponding srcNodes
-    for (const recombID in this.getRecombEdgeMap()) {
-      const srcNode = this.getRecombEdgeMap()[recombID][0];
-      for (let i = 1; i < this.getRecombEdgeMap()[recombID].length; i++) {
-        const destNode = this.getRecombEdgeMap()[recombID][i];
-        if (destNode.branchLength === undefined)
-          throw 'branchLength === undefined';
-        if (destNode.height === undefined || srcNode.height === undefined)
-          throw 'height === undefined';
-        destNode.branchLength += destNode.height - srcNode.height;
+    // fix recombination edge lengths
+    const newMap = this.getRecombEdgeMap();
+    for (const hid in newMap) {
+      const [src, ...dests] = newMap[hid];
+      for (const dest of dests) {
+        if (
+          dest.branchLength !== undefined &&
+          dest.height !== undefined &&
+          src.height !== undefined
+        ) {
+          dest.branchLength += dest.height - src.height;
+        } else {
+          throw new Error(
+            'Branch length or height is undefined for the destination or source node.'
+          );
+        }
       }
     }
   }
