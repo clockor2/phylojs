@@ -114,8 +114,7 @@ describe('reroot() - basic', () => {
 });
 
 describe('diagnose reroot deltas at each tip', () => {
-    const newick = `(Bovine:0.69395,(Gibbon:0.36079,(Orangutan:0.33636,` +
-        `(Gorilla:0.17147,(Chimp:1.19268,Human:0.11927):0.08386):0.06124):0.15057):0.54939,Mouse:1.21460);`;
+    const newick = `("C":0.5,("B":1,"A":2):0.5);`;
     const base = readNewick(newick);
     const N0 = base.nodeList.length;
     const L0 = base.leafList.length;
