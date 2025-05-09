@@ -360,6 +360,11 @@ export class Tree {
    * @param {number|undefined} prop Proportion of the branch descending from `edgeBaseNode` at which to cut and place the root. Defaults ot 0.5
    */
   reroot(edgeBaseNode: Node, prop = 0.5): void {
+    // --- Prior check if nework ---
+    if (this.isNetwork()) {
+      throw new Error('Cannot reroot a network.');
+    }
+
     // --- 0. Prep old root and recomb map ---
     const oldRoot = this.root;
     this.recombEdgeMap = undefined;

@@ -110,6 +110,16 @@ describe('reroot() - basic', () => {
         expect(JSON.stringify(diff)).toBe(
             JSON.stringify(originalLength.map(e => true))
         );
+    });
+
+    test('Expect error if rerooting network', () => {
+        const inNHX = readFileSync('test/data/ARG.newick', 'utf-8').split("\n")[0];
+        const network = readNewick(inNHX);
+        const node = network.nodeList[network.nodeList.length - 1]
+        expect(() => {
+            network.reroot(node)
+        }
+        ).toThrowError('Cannot reroot a network');
     })
 });
 
