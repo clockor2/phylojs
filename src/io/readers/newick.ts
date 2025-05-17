@@ -4,16 +4,17 @@ import { SkipTreeException } from '../../utils/error';
 /**
  * Parse a string in the New Hampshire (Newick) format and return a tree object.
  *
- * This function reads a Newick string from left to right, building the tree structure:
- * - Opening parenthesis '(' starts a new subtree
- * - Closing parenthesis ')' completes the current subtree and attaches it to its parent
+ * This function reads a Newick string from left to right. It is based on
+ * the `kn_parse` function by Heng Li for jstreeview (https://github.com/lh3/jstreeview/blob/main/knhx.js),
+ * modified for compatibility with our Tree object and to prevent ';' assignment as root label.
  *
- * Based on the kn_parse function by Heng Li for jstreeview:
- * https://github.com/lh3/jstreeview/blob/main/knhx.js
- * Modified for compatibility with our Tree object and to prevent ';' assignment as root label.
+ * NB. Node IDs are unique and allocated in order of parsing. Specifically, leaf node IDs are numbered
+ * according to the order in which they are encountered. Where a close parenthesis ')' is
+ * encountered, an internal node is added with an incremented ID. This means that leaf node IDs
+ * are not guaranteed to be contiguous or numbered from 0 to n-1. For example, for `(A,B);`, leaf A has index 1,
+ * leaf B has index 2, and the root node has index 3. In general the root will have the highest index.
  *
- * Note: Node IDs are allocated in order of parsing, not reflecting the tree structure.
- * To renumber nodes, use .preorderTraversal() or .postorderTraversal() methods.
+ * To renumber nodes, one could use `.preorderTraversal()` or `.postorderTraversal()` methods.
  *
  * @param {string} newick - The string in Newick format to parse
  * @returns {Tree} - The constructed phylogenetic tree
