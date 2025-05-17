@@ -18,7 +18,7 @@ import { beastAnnotation, nhxAnnotation } from '../../src/io/writers/newick';
 
 // test read local files
 describe('read', () => {
-    test('readNewick', () => {
+    test('readNewick - parse empirical tree', () => {
 
         const inNewick = readFileSync('test/data/egTree.nwk', 'utf-8');
 
