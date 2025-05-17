@@ -2,64 +2,104 @@ import { Tree, Node } from '../../';
 import { SkipTreeException } from '../../utils/error';
 
 /**
- *  Parse a string in the New Hampshire format and return a pointer to the tree. 
-
-    Is a slight modification of code written by Heng Li (kn_parse) for jstreeview: at
-    https://github.com/lh3/jstreeview/blob/main/knhx.js
-
-    Modifications are for compatability with our tree object, and to avoid assigning
-    ';' as the root label.
-
-    Function works by reding a .nwk string left to right. Where an open bracket is encountered,
-    we venture deeper into the tree which is reflected in pushing -1 to the stack array.
- * @param {string} str
- * @returns {Tree}
+ * Parse a string in the New Hampshire (Newick) format and return a tree object.
+ *
+ * This function reads a Newick string from left to right. It is based on
+ * the `kn_parse` function by Heng Li for jstreeview (https://github.com/lh3/jstreeview/blob/main/knhx.js),
+ * modified for compatibility with our Tree object and to prevent ';' assignment as root label.
+ *
+ * NB. Node IDs are unique and allocated in order of parsing. Specifically, leaf node IDs are numbered
+ * according to the order in which they are encountered. Where a close parenthesis ')' is
+ * encountered, an internal node is added with an incremented ID. This means that leaf node IDs
+ * are not guaranteed to be contiguous or numbered from 0 to n-1. For example, for `(A,B);`, leaf A has index 1,
+ * leaf B has index 2, and the root node has index 3. In general the root will have the highest index.
+ *
+ * To renumber nodes, one could use `.preorderTraversal()` or `.postorderTraversal()` methods.
+ *
+ * @param {string} newick - The string in Newick format to parse
+ * @returns {Tree} - The constructed phylogenetic tree
  */
-export function readNewick(str: string): Tree {
-  const stack: number[] = [];
-  const nodes: Node[] = [];
+export function readNewick(newick: string): Tree {
+  const stack: number[] = []; // Stack to track node relationships during parsing
+  const nodes: Node[] = []; // Array to store all created nodes
 
-  // check for multiple trees
-  if (str.includes('\n')) {
-    str = str.slice(0, str.indexOf('\n'));
+  // Check if multiple trees are included in the string
+  if (newick.includes('\n')) {
+    newick = newick.slice(0, newick.indexOf('\n'));
     console.warn(
       'Multiple trees in Newick string. Only reading the first tree. Use readTreesFromNewick() to read all trees.'
     );
   }
 
-  for (let l = 0; l < str.length; ) {
-    while (l < str.length && (str.charAt(l) < '!' || str.charAt(l) > '~')) ++l;
-    if (l == str.length) break;
-    const c = str.charAt(l);
-    if (c == ',') ++l;
-    else if (c == '(') {
-      stack.push(-1);
-      ++l;
-    } else if (c == ')') {
-      let m, i;
-      const x = nodes.length;
-      for (i = stack.length - 1; i >= 0; --i) {
-        if (stack[i] < 0) break;
+  // Parse the string character by character
+  let position = 0;
+  while (position < newick.length) {
+    // Skips over space and delete (non-printable) characters in ASCII
+    while (
+      position < newick.length &&
+      (newick.charAt(position) < '!' || newick.charAt(position) > '~')
+    ) {
+      position++;
+    }
+
+    if (position === newick.length) break;
+
+    const currentChar = newick.charAt(position);
+
+    if (currentChar === ',') {
+      // Comma separates nodes at the same level
+      position++;
+    } else if (currentChar === '(') {
+      // Opening parenthesis indicates the start of child nodes
+      stack.push(-1); // -1 marks new set of sister nodes
+      position++;
+    } else if (currentChar === ')') {
+      // Closing parenthesis indicates the end of sister nodes
+      const newNodeIndex = nodes.length;
+
+      let stackIndex, childIndex;
+
+      // Search backwards for first sibling node (most recent opening parenthesis)
+      for (stackIndex = stack.length - 1; stackIndex >= 0; --stackIndex) {
+        if (stack[stackIndex] < 0) break;
       }
-      if (i < 0) {
-        break; // TODO: Add error
+
+      if (stackIndex < 0) {
+        throw new Error('Unmatched closing parenthesis in Newick string');
       }
-      m = stack.length - 1 - i;
-      l = kn_add_node(str, l + 1, nodes, m);
-      for (i = stack.length - 1, m = m - 1; m >= 0; --m, --i) {
-        nodes[x].children[m] = nodes[stack[i]];
-        nodes[stack[i]].parent = nodes[x];
+
+      // Number of children we need to add
+      const childCount = stack.length - 1 - stackIndex;
+
+      // Add new node, parse its label/branch length, and update position
+      position = kn_add_node(newick, position + 1, nodes, newNodeIndex);
+
+      // Connect children to the new parent node
+      for (
+        stackIndex = stack.length - 1, childIndex = childCount - 1;
+        childIndex >= 0;
+        stackIndex--, childIndex--
+      ) {
+        nodes[newNodeIndex].children[childIndex] = nodes[stack[stackIndex]];
+        nodes[stack[stackIndex]].parent = nodes[newNodeIndex];
       }
-      stack.length = i;
-      stack.push(x);
+
+      // Remove processed nodes from stack
+      stack.length = stackIndex;
+      stack.push(newNodeIndex);
     } else {
+      // Add leaves. Parent established when ')' next encountered in case above^
       stack.push(nodes.length);
-      l = kn_add_node(str, l, nodes, 0); // leaps l to index after non ',' or '{' or ')'
+      position = kn_add_node(newick, position, nodes, nodes.length);
     }
   }
-  //if (stack.length > 1) tree.error |= 2; // TODO: Add error message
-  const tree = new Tree(nodes[nodes.length - 1]);
-  return tree;
+
+  if (stack.length > 1) {
+    console.warn('Multiple unconnected trees found in Newick string');
+  }
+
+  // Create and return the tree with the last node as root
+  return new Tree(nodes[nodes.length - 1]);
 }
 
 /**
@@ -88,29 +128,34 @@ export function readTreesFromNewick(newick: string): Tree[] {
 
   return trees;
 }
-
 /**
- * Function constructs nodes. Returns index of furthest character read in nwk string.
- * Also originates from Heng Li's jstreeview.
+ * Parses a node from a Newick string and adds it to the nodes array.
+ *
+ * This function extracts node information (label, branch length, annotations) from
+ * the Newick string starting at position l. It creates a new Node object, populates
+ * its properties, and adds it to the nodes array.
+ *
+ * @param {string} str - The Newick format string being parsed
+ * @param {number} position - The starting position in the string to parse from
+ * @param {Node[]} nodes - The array where all created nodes are stored
+ * @param {number} newNodeIndex - The index to assign to the new node
+ * @returns {number} - The position in the string where parsing for this node ended
  */
-/**
- * Description
- * @param {string} str
- * @param {number} l
- * @param {Tree} tree
- * @param {number} x
- * @returns {number}
- */
-function kn_add_node(str: string, l: number, nodes: Node[], x: number) {
-  const beg = l;
+function kn_add_node(
+  str: string,
+  position: number,
+  nodes: Node[],
+  newNodeIndex: number
+) {
+  const beg = position;
   let end = 0,
     i: number,
     j: number;
 
-  const z = new Node(x); // TODO: Unsure if x is righ index
+  const z = new Node(newNodeIndex);
   let label: string; // Node label
   for (
-    i = l;
+    i = position;
     i < str.length && str.charAt(i) != ',' && str.charAt(i) != ')';
     ++i
   ) {
