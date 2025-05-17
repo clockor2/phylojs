@@ -102,6 +102,50 @@ describe('parseAnnotations', () => {
             JSON.stringify({ label: 'x', hybridID: 21 })
         )
     })
+    test('custom annotations', () => {
+        // A small Newick tree with custom annotations in {...}
+        const newickString = "((A[color:red;isRelevant:no],B),C[color:yellow]);"
+
+        function customAnnotationParser(annotationString) {
+            if (!annotationString) return {};
+
+            // Parse the annotation string (format: "key1:value1;key2:value2")
+            const result = {};
+            const pairs = annotationString.split(';');
+
+            pairs.forEach(pair => {
+                const [key, value] = pair.split(':');
+                if (key && value) {
+                    result[key.trim()] = value.trim();
+                }
+            });
+
+            return result;
+        }
+
+        const tree = readNewick(newickString, customAnnotationParser);
+        // Arbitrarily modify the annotation color
+        tree.nodeList.forEach(node => {
+            if (node.annotation.color) node.annotation.color = "MODIFIED"
+        })
+
+        // Writes annotations in parantheses, not square brackets
+        function customAnnotationWriter(annotations) {
+            if (!annotations || Object.keys(annotations).length === 0) return '';
+
+            // Format as "key1:value1;key2:value2"
+            const pairs = Object.entries(annotations)
+                .map(([key, value]) => `${key}:${value}`)
+                .join(';');
+
+            return `{${pairs}}`;
+        }
+
+        const outputNewick = writeNewick(tree, customAnnotationWriter);
+
+        expect(outputNewick).toBe('(("A"{color:MODIFIED;isRelevant:no},"B"),"C"{color:MODIFIED});')
+
+    })
 })
 
 describe('Extended Newick', () => {

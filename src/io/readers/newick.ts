@@ -186,12 +186,13 @@ function kn_add_node(
   ) {
     const c = str.charAt(i);
     if (c == '[') {
+      // TODO: Custom open delimiter?
       const meta_beg = i;
       if (end == 0) end = i;
       do ++i;
       while (i < str.length && str.charAt(i) != ']');
       if (i == str.length) {
-        //tree.error |= 4; // <-- TODO: add unfinished annotation error
+        throw new Error('Unclosed annotation bracket in Newick string');
         break;
       }
       z.annotation = annotationParser(str.slice(meta_beg + 1, i));
@@ -269,7 +270,23 @@ export function parseHybridLabels(label: string): HybridInformation {
 }
 
 /**
- * Type definition for annotation parsers
+ * Users can provide theit own annotation parsers.
+ *
+ * Note that square brackets are hard-coded in readNewick() as open and close
+ * delimiters for annotations. This is a limitation, but as far as we know, all
+ * annotations in Newick format are enclosed in square brackets.
+ *
+ * In the future, we may want to add support for custom open and close
+ * delimiters, but this would require a more complex parsing logic.
+ *
+ * In the complementary function custon annotation writers, users can define their own
+ * open and close delimiters.
+ *
+ * @typedef {function} annotationParser
+ * @param {string} annotations - The string containing annotations in Newick format
+ * @returns {typeof Node.prototype.annotation} - The parsed annotations as key value pairs
+ * @property {string} [key] - The key of the annotation
+ * @property {any} [value] - The value of the annotation
  */
 export type AnnotationParser = (
   annotations: string
@@ -279,8 +296,10 @@ export type AnnotationParser = (
  * Parses BEAST-type annotations in format [&...] to object for storage
  * in `Node` object. Annotations in arrays are expected to be stored in braces,
  * and separated by ',' or ':'. For example ...Type={Blue,Red} or ...Type={Blue:Red}
- * @param {string} annotations
- * @returns {any}
+ * @param {string} annotations - The string containing annotations in Newick format
+ * @returns {typeof Node.prototype.annotation} - The parsed annotations as key value pairs
+ * @property {string} [key] - The key of the annotation
+ * @property {any} [value] - The value of the annotation
  */
 export function parseBeastAnnotations(
   annotations: string
@@ -313,8 +332,10 @@ export function parseBeastAnnotations(
 /**
  * Parses NHX-type annotations in format [&&NHX:...] to object for storage
  * in `Node` object. Annotations in arrays are expected to be stored in braces.
- * @param {string} annotations
- * @returns {any}
+ * @param {string} annotations - The string containing annotations in Newick format
+ * @returns {typeof Node.prototype.annotation} - The parsed annotations as key value pairs
+ * @property {string} [key] - The key of the annotation
+ * @property {any} [value] - The value of the annotation
  */
 export function parseNHXAnnotations(
   annotations: string
@@ -347,8 +368,10 @@ export function parseNHXAnnotations(
 
 /**
  * Default annotation parser that checks for both BEAST and NHX formats
- * @param {string} annotations
- * @returns {any}
+ * @param {string} annotations - The string containing annotations in Newick format
+ * @returns {typeof Node.prototype.annotation} - The parsed annotations as key value pairs
+ * @property {string} [key] - The key of the annotation
+ * @property {any} [value] - The value of the annotation
  */
 export function parseNewickAnnotations(
   annotations: string

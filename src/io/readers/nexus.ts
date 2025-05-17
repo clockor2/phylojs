@@ -95,7 +95,7 @@ function _getTreesFromNexus(nexus: string, singleTree?: boolean): Tree[] {
 }
 
 /**
- * Reads a tree from nexus format.
+ * Reads a tree from nexus format. Currently does not support custom annotation parsing.
  * @param {string} nexus
  * @returns {Tree}
  */

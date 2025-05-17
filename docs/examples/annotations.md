@@ -4,7 +4,7 @@ This is another example, in addition to "Annotations and Pre-Order Traversal", t
 
 Here, we show show how annotations can be extracted and modified in a loop. We swap Blue an Green type annotations to Red and Yellow on a small tree.
 
-All node objects have an `annotation` field where annotations. The `annotation` fiel itself stores an object for all annotated tags. For example `Node.annotations = {Type: Blue}` for some leaf nodes in the following example.
+All node objects have an `annotation` field where annotations. The `annotation` field itself stores an object for all annotated tags. For example `Node.annotations = {Type: Blue}` for some leaf nodes in the following example.
 
 Altered annotations are then written back to newick.
 
