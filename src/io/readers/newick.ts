@@ -12,6 +12,10 @@ import { SkipTreeException } from '../../utils/error';
 
     Function works by reding a .nwk string left to right. Where an open bracket is encountered,
     we venture deeper into the tree which is reflected in pushing -1 to the stack array.
+
+    Note that nodes ids are allocated in the order they are read, so their numbering doesn't reflect
+    structure in any ordinary sense. To modify, users could update `node.id` via .preorderTraversal() or .postorderTraversal()
+    methods, for example.
  * @param {string} str
  * @returns {Tree}
  */
@@ -45,7 +49,7 @@ export function readNewick(str: string): Tree {
         break; // TODO: Add error
       }
       m = stack.length - 1 - i;
-      l = kn_add_node(str, l + 1, nodes, m);
+      l = kn_add_node(str, l + 1, nodes, nodes.length);
       for (i = stack.length - 1, m = m - 1; m >= 0; --m, --i) {
         nodes[x].children[m] = nodes[stack[i]];
         nodes[stack[i]].parent = nodes[x];
@@ -54,7 +58,7 @@ export function readNewick(str: string): Tree {
       stack.push(x);
     } else {
       stack.push(nodes.length);
-      l = kn_add_node(str, l, nodes, 0); // leaps l to index after non ',' or '{' or ')'
+      l = kn_add_node(str, l, nodes, nodes.length); // leaps l to index after non ',' or '{' or ')'
     }
   }
   //if (stack.length > 1) tree.error |= 2; // TODO: Add error message

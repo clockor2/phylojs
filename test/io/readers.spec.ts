@@ -30,6 +30,39 @@ describe('read', () => {
     });
 });
 
+describe('Node ID Coherent', () => {
+    test('Small newick node IDs', () => {
+        const nwk = '((A,B),C);'
+        const tree = readNewick(nwk);
+
+        expect(tree.nodeList.map(node => node.id).sort()).toEqual([4, 2, 0, 1, 3].sort());
+        // num nodes should be 2 * num leaves - 1 in a binary tree
+        expect(tree.nodeList.length).toBe(2 * tree.leafList.length - 1)
+        // check that all node ids are unique
+        expect(new Set(tree.nodeList.map(node => node.id)).size).toBe(tree.nodeList.length)
+    });
+
+    test('Multifurcating small newick node IDs', () => {
+        const nwk = '(A,B,C);'
+        const tree = readNewick(nwk);
+
+        expect(tree.nodeList.map(node => node.id).sort()).toEqual([2, 3, 1, 0].sort());
+        expect(tree.nodeList.length).toBe(4) // Not a binary tree
+        // check that all node ids are unique
+        expect(new Set(tree.nodeList.map(node => node.id)).size).toBe(tree.nodeList.length)
+    });
+
+    test('Empirical tree case', () => {
+        const inNewick = readFileSync('test/data/egTree.nwk', 'utf-8');
+        const tree = readNewick(inNewick);
+
+        // Not a strictly binary tree, so we skip the check for 2 * num leaves - 1
+        // expect(tree.nodeList.length).toBe(2 * tree.leafList.length - 1)
+
+        // Check that all node ids are unique 
+        expect(new Set(tree.nodeList.map(node => node.id)).size).toBe(tree.nodeList.length);
+    });
+});
 
 describe('parseAnnotations', () => {
     test('parseBEASTStyleAnnotations', () => {
