@@ -62,6 +62,13 @@ describe('Node ID Coherent', () => {
         // Check that all node ids are unique 
         expect(new Set(tree.nodeList.map(node => node.id)).size).toBe(tree.nodeList.length);
     });
+
+    test('Network case', () => {
+        const inNHX = '((C,(Y)x#H1)c,(x#H1,D)d)e;'
+        const network = readNewick(inNHX);
+        // Check that all node ids are unique 
+        expect(new Set(network.nodeList.map(node => node.id)).size).toBe(network.nodeList.length);
+    });
 });
 
 describe('parseAnnotations', () => {
