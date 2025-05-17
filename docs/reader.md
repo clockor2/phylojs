@@ -8,8 +8,13 @@ This function reads a NeXML string and returns a single tree. NeXML is an XML fo
 Reads NeXML strings and returns an array of trees, allowing multiple trees to be parsed from a single NeXML document.
 
 ## Newick
-`readNewick(str: string): Tree`
-Parses a Newick format string and returns a tree.
+```javascript
+readNewick(
+    str: string,
+    annotationParser: (annotations: string) => typeof Node.prototype.annotation = parseNewickAnnotations
+    ): Tree
+```
+Parses a Newick format string and returns a tree. See API for details on the `annotationParser` function. In short, it is optional and you can ommit any reference to it if you do not need to parse annotations. That is, you can just call `readNewick(str)`.
 
 `readTreesFromNewick(newick: string): Tree[]`
 Reads multiple Newick format strings, each separated by `\n`, and returns an array of trees.

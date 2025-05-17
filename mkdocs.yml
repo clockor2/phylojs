@@ -70,6 +70,7 @@ nav:
       - Pruning and Grafting: examples/pruneGraft.md
       - Extracting Clades: examples/mrca.md
       - Modifying Annotations: examples/annotations.md
+      - Custom annotation parsing and writing: examples/customAnnotationParsingAndWriting.md
       - Arrays of Trees: examples/treeArray.md
   - API: "typedoc"
   - Cite: cite.md

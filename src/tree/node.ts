@@ -15,7 +15,7 @@ export class Node {
   /** Node label */
   label: string | undefined;
   /** Node annotation(s) */
-  annotation: { [key: string]: string | string[] | null };
+  annotation: { [key: string]: any };
   /** ID of node if hybrid */
   hybridID: number | undefined;
 
