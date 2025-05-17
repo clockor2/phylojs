@@ -8,7 +8,14 @@ import { SkipTreeException } from '../../utils/error';
  * the `kn_parse` function by Heng Li for jstreeview (https://github.com/lh3/jstreeview/blob/main/knhx.js),
  * modified for compatibility with our Tree object and to prevent ';' assignment as root label.
  *
- * NB. Node IDs are unique and allocated in order of parsing. Specifically, leaf node IDs are numbered
+ * Supports node annotations in both BEAST [&...] and NHX [&&NHX:...] formats through the annotationParser parameter.
+ * Users can provide their own annotation parser function to handle custom formats.
+ * Also handles hybrid nodes marked with # notation following Cardona et al. 2008.
+ *
+ * If the input string contains multiple trees (separated by newlines), only the first tree is parsed
+ * and a warning is issued. Use readTreesFromNewick() to parse multiple trees.
+ *
+ * Node IDs are unique and allocated in order of parsing. Specifically, leaf node IDs are numbered
  * according to the order in which they are encountered. Where a close parenthesis ')' is
  * encountered, an internal node is added with an incremented ID. This means that leaf node IDs
  * are not guaranteed to be contiguous or numbered from 0 to n-1. For example, for `(A,B);`, leaf A has index 1,
@@ -19,7 +26,12 @@ import { SkipTreeException } from '../../utils/error';
  * @param {string} newick - The string in Newick format to parse
  * @returns {Tree} - The constructed phylogenetic tree
  */
-export function readNewick(newick: string): Tree {
+export function readNewick(
+  newick: string,
+  annotationParser: (
+    annotations: string
+  ) => typeof Node.prototype.annotation = parseNewickAnnotations
+): Tree {
   const stack: number[] = []; // Stack to track node relationships during parsing
   const nodes: Node[] = []; // Array to store all created nodes
 
@@ -72,7 +84,13 @@ export function readNewick(newick: string): Tree {
       const childCount = stack.length - 1 - stackIndex;
 
       // Add new node, parse its label/branch length, and update position
-      position = kn_add_node(newick, position + 1, nodes, newNodeIndex);
+      position = kn_add_node(
+        newick,
+        position + 1,
+        nodes,
+        newNodeIndex,
+        annotationParser
+      );
 
       // Connect children to the new parent node
       for (
@@ -90,7 +108,13 @@ export function readNewick(newick: string): Tree {
     } else {
       // Add leaves. Parent established when ')' next encountered in case above^
       stack.push(nodes.length);
-      position = kn_add_node(newick, position, nodes, nodes.length);
+      position = kn_add_node(
+        newick,
+        position,
+        nodes,
+        nodes.length,
+        annotationParser
+      );
     }
   }
 
@@ -145,7 +169,8 @@ function kn_add_node(
   str: string,
   position: number,
   nodes: Node[],
-  newNodeIndex: number
+  newNodeIndex: number,
+  annotationParser: (annotations: string) => typeof Node.prototype.annotation
 ) {
   const beg = position;
   let end = 0,
@@ -169,7 +194,7 @@ function kn_add_node(
         //tree.error |= 4; // <-- TODO: add unfinished annotation error
         break;
       }
-      z.annotation = parseNewickAnnotations(str.slice(meta_beg + 1, i));
+      z.annotation = annotationParser(str.slice(meta_beg + 1, i));
     } else if (c == ':') {
       // Parse branch length
       if (end == 0) end = i;
@@ -244,31 +269,34 @@ export function parseHybridLabels(label: string): HybridInformation {
 }
 
 /**
- * Parses newick annotations to object for storage
- * in `Node` object. Parses annotations in BEAST-type format [&...]
- * and in NHX type [&&NHX:..], such as from RevBayes. Annotations in
- * arrays are expected to be stored in braces, and separaged by ',' or ':'.
- * For example ...Type={Blue,Res} or ...Type={Blue:Red}
+ * Type definition for annotation parsers
+ */
+export type AnnotationParser = (
+  annotations: string
+) => typeof Node.prototype.annotation;
+
+/**
+ * Parses BEAST-type annotations in format [&...] to object for storage
+ * in `Node` object. Annotations in arrays are expected to be stored in braces,
+ * and separated by ',' or ':'. For example ...Type={Blue,Red} or ...Type={Blue:Red}
  * @param {string} annotations
  * @returns {any}
  */
-export function parseNewickAnnotations(
+export function parseBeastAnnotations(
   annotations: string
 ): typeof Node.prototype.annotation {
-  // Remove the '&' at the start or '&&NHX' in the case of NHX
-  if (annotations.startsWith('&&NHX:')) {
-    annotations = annotations.slice(6);
-  } else if (annotations.startsWith('&')) {
+  // Remove the '&' at the start
+  if (annotations.startsWith('&')) {
     annotations = annotations.slice(1);
   }
 
   const annotation_object: typeof Node.prototype.annotation = {};
-
   const pairs = annotations.split(/[,:](?![^{]*\})/g); // Split on all ',' and ':' not in braces '{}'
 
   pairs.forEach(pair => {
     const keyValue: string[] = pair.split('=');
-    const key: string = keyValue[0];
+    if (keyValue.length < 2) return;
+    const key: string = keyValue[0].trim();
     const value: string = keyValue[1];
 
     // Handling array-like values enclosed in {}
@@ -280,4 +308,54 @@ export function parseNewickAnnotations(
   });
 
   return annotation_object;
+}
+
+/**
+ * Parses NHX-type annotations in format [&&NHX:...] to object for storage
+ * in `Node` object. Annotations in arrays are expected to be stored in braces.
+ * @param {string} annotations
+ * @returns {any}
+ */
+export function parseNHXAnnotations(
+  annotations: string
+): typeof Node.prototype.annotation {
+  // Remove the '&&NHX:' at the start
+  if (annotations.startsWith('&&NHX:')) {
+    annotations = annotations.slice(6);
+  }
+
+  const annotation_object: typeof Node.prototype.annotation = {};
+  const pairs = annotations.split(/:/g); // Split on all ':'
+
+  pairs.forEach(pair => {
+    if (!pair) return;
+    const keyValue: string[] = pair.split('=');
+    if (keyValue.length < 2) return;
+    const key: string = keyValue[0].trim();
+    const value: string = keyValue[1];
+
+    // Handling array-like values enclosed in {}
+    if (value && value.includes('{') && value.includes('}')) {
+      annotation_object[key] = value.replace(/{|}/g, '').split(/,/g);
+    } else {
+      annotation_object[key] = value;
+    }
+  });
+
+  return annotation_object;
+}
+
+/**
+ * Default annotation parser that checks for both BEAST and NHX formats
+ * @param {string} annotations
+ * @returns {any}
+ */
+export function parseNewickAnnotations(
+  annotations: string
+): typeof Node.prototype.annotation {
+  if (annotations.startsWith('&&NHX:')) {
+    return parseNHXAnnotations(annotations);
+  } else {
+    return parseBeastAnnotations(annotations);
+  }
 }
