@@ -29,6 +29,24 @@ export class Tree {
   // Tree methods
 
   /**
+   * Convenience function applied function post-order to all nodes in the tree.
+   * Is a wrapper for `Node.applyPostOrder()`
+   * @param {function} func Function to apply to each node
+   */
+  applyPostOrder(func: (node: Node) => void): void {
+    this.root.applyPostOrder(func);
+  }
+
+  /**
+   * Convenience function applied function pre-order to all nodes in the tree.
+   * Is a wrapper for `Node.applyPreOrder()`
+   * @param {function} func Function to apply to each node
+   */
+  applyPreOrder(func: (node: Node) => void): void {
+    this.root.applyPreOrder(func);
+  }
+
+  /**
    * Computes height of each node above the root. Automatically done if rerooting.
    * NaN if any undefined branch lengths ancestral to a particular node. Contrasts
    * `Tree.getRTTD()` in not converting undefined branch lengths to 0.0.

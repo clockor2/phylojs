@@ -4,6 +4,32 @@ import { Tree } from '../../src/tree';
 import { writeNewick } from '../../src';
 import { readFileSync } from 'fs';
 
+describe('Traversal', () => {
+    test('applyPreOrder', () => {
+        // Create a tree with three tips using Newick: ((A,B),C);
+        const tree = readNewick('(((A,B),C);');
+
+        const visited: string[] = [];
+        tree.applyPreOrder((node: Node) => {
+            node.parent?.isRoot() ? visited.push('T') : visited.push('F');
+        });
+        // Pre-order: root, left subtree (A, B), right (C) (labels only for leaves)
+        expect(visited).toStrictEqual(['F', 'T', 'F', 'F', 'T']);
+    });
+    test('applyPostOrder', () => {
+        // Create a tree with three tips using Newick: ((A,B),C);
+        const tree = readNewick('(((A,B),C);');
+
+        const visited: string[] = [];
+        tree.applyPostOrder((node: Node) => {
+            node.parent?.isRoot() ? visited.push('T') : visited.push('F');
+        });
+
+        // Post-order: left subtree (A, B), right (C), root (labels including root)
+        expect(visited).toStrictEqual(['F', 'F', 'T', 'T', 'F']);
+    });
+});
+
 describe('Netowrks', () => {
     test('empiricalARGNetworkRecombMapDefined', () => {
         const inNHX = readFileSync('test/data/ARG.newick', 'utf-8').split("\n")[0];
