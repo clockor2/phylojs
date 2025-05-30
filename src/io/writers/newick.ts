@@ -53,9 +53,10 @@ export function newickRecurse(
     res += `#${node.hybridID}`;
   }
   // annotations
-  res += "["
-  res += annotationWriter(node.annotation);
-  res += "]"
+  const annotation = annotationWriter(node.annotation);
+  if (annotation.length !== 0) {
+    res += `[${annotation}]`;
+  }
   // branch lengths
   if (node.branchLength !== undefined) {
     node.branchLength == 0 ? (res += ':0.0') : (res += `:${node.branchLength}`);
