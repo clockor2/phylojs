@@ -143,7 +143,7 @@ describe('parseAnnotations', () => {
 
         const outputNewick = writeNewick(tree, customAnnotationWriter);
 
-        expect(outputNewick).toBe('(("A"{color:MODIFIED;isRelevant:no},"B"),"C"{color:MODIFIED});')
+        expect(outputNewick).toBe('(("A"[{color:MODIFIED;isRelevant:no}],"B"),"C"[{color:MODIFIED}]);')
 
     })
 })
