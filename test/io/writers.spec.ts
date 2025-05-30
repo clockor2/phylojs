@@ -8,14 +8,14 @@ describe('annotationWriters', () => {
             col: 'Blue',
             hand: ['left', 'right']
         }
-        expect(beastAnnotation(ann)).toBe('[&col=Blue,hand={left,right}]')
+        expect(beastAnnotation(ann)).toBe('&col=Blue,hand={left,right}')
     })
     test('nhxAnnotation', () => {
         let ann = {
             col: 'Blue',
             hand: 'left'
         }
-        expect(nhxAnnotation(ann)).toBe('[&&NHX:col=Blue:hand=left]')
+        expect(nhxAnnotation(ann)).toBe('&&NHX:col=Blue:hand=left')
     })
 })
 
