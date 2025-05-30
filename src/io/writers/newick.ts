@@ -52,9 +52,11 @@ export function newickRecurse(
   } else if (node.label == undefined && node.hybridID !== undefined) {
     res += `#${node.hybridID}`;
   }
-
+  // annotations
+  res += "["
   res += annotationWriter(node.annotation);
-
+  res += "]"
+  // branch lengths
   if (node.branchLength !== undefined) {
     node.branchLength == 0 ? (res += ':0.0') : (res += `:${node.branchLength}`);
   }
@@ -77,7 +79,7 @@ export function beastAnnotation(
     const keys = Object.keys(annotation);
 
     if (keys.length > 0) {
-      res += '[&';
+      res += '&';
 
       for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
@@ -92,8 +94,6 @@ export function beastAnnotation(
           res += `${String(value)}`; // Explicitly convert the value to a string
         }
       }
-
-      res += ']';
     }
   }
 
@@ -116,7 +116,7 @@ export function nhxAnnotation(
     const keys = Object.keys(annotation);
 
     if (keys.length > 0) {
-      res += '[&&NHX:';
+      res += '&&NHX:';
 
       for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
@@ -127,8 +127,6 @@ export function nhxAnnotation(
         const value = annotation[key];
         res += `${String(value)}`; // Explicitly convert the value to a string
       }
-
-      res += ']';
     }
   }
 
